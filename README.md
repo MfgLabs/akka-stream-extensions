@@ -24,11 +24,9 @@ Commons:
 ```scala
 import com.mfglabs.stream._
 
-val blockingEc = ExecutionContextForBlockingOps(someEc)
-
 val formattedSource: Source[String] = 
   SourceExt
-    .fromFile(new File("path"))(blockingEc)
+    .fromFile(new File("path"))(ExecutionContextForBlockingOps(someEc))
     .via(FlowExt.rechunkByteStringBySeparator(ByteString("\n")))
     .map(_.utf8String)
     .via(FlowExt.zipWithIndex)
