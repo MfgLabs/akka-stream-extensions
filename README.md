@@ -49,7 +49,7 @@ val queryStream: Source[ByteString] =
   PgStream
     .getQueryResultAsStream("select a, b, c from table")
 
-val streamOfNbInsertLines: Flow[ByteString, Long] = 
+val streamOfNbInsertedLines: Flow[ByteString, Long] = 
   someLineStream
     .via(PgStream.insertStreamToTable("schema", "table"))
 ```
