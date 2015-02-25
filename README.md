@@ -35,6 +35,7 @@ val formattedSource: Source[String] =
     .map { case (line, i) => s"Line $i: $line" }
 ```
 
+
 Postgres extension:
 
 ```scala
@@ -44,8 +45,11 @@ import com.mfglabs.stream.extensions.postgres._
 implicit val pgConnection = PgStream.sqlConnAsPgConnUnsafe(sqlConnection)
 implicit val blockingEc = ExecutionContextForBlockingOps(someEc)
 
-val queryStream: Source[ByteString] = PgStream.getQueryResultAsStream("select a, b, c from table")
+val queryStream: Source[ByteString] = 
+  PgStream
+    .getQueryResultAsStream("select a, b, c from table")
 
 val streamOfNbInsertLines: Flow[ByteString, Long] = 
-  someLineStream.via(PgStream.insertStreamToTable("schema", "table"))
+  someLineStream
+    .via(PgStream.insertStreamToTable("schema", "table"))
 ```
