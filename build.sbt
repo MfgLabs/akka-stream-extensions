@@ -29,7 +29,7 @@ lazy val commons = project.in(file("commons"))
   .settings(
     name := "akka-stream-extensions",
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-stream-experimental" % "1.0-M3",
+      "com.typesafe.akka" %% "akka-stream-experimental" % "1.0-M4",
       "org.scalatest" %% "scalatest" % "2.1.6"
     )
   )
