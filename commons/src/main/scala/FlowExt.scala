@@ -82,7 +82,7 @@ trait FlowExt {
    */
   def rechunkByteStringBySeparator(separator: ByteString = ByteString("\n"),
                                    maximumChunkBytes: Int = Int.MaxValue): Flow[ByteString, ByteString] = {
-    val stage = new PushPullStage[ByteString, ByteString] {
+    def stage = new PushPullStage[ByteString, ByteString] {
       private val separatorBytes = separator
       private val firstSeparatorByte = separatorBytes.head
       private var buffer = ByteString.empty
@@ -153,7 +153,7 @@ trait FlowExt {
   def rateLimiter[A](interval: FiniteDuration): Flow[A, A] = {
     case object Tick
 
-    val flow = Flow() { implicit builder =>
+    def flow = Flow() { implicit builder =>
       import FlowGraphImplicits._
 
       val undefinedSource = UndefinedSource[A]
@@ -217,7 +217,7 @@ trait FlowExt {
    * Rechunk a stream of bytes with a new chunk size
    */
   def rechunkByteStringBySize(chunkSize: Int): Flow[ByteString, ByteString] = {
-    val stage = new PushPullStage[ByteString, ByteString] {
+    def stage = new PushPullStage[ByteString, ByteString] {
       private var buffer = ByteString.empty
 
       override def onPush(elem: ByteString, ctx: Context[ByteString]): Directive = {
@@ -268,7 +268,7 @@ trait FlowExt {
   def customStatefulProcessor[A, B, C](zero: => B)
                              (f: (B, A) => (Option[B], IndexedSeq[C]),
                               lastPushIfUpstreamEnds: B => IndexedSeq[C] = {_: B => IndexedSeq.empty}): Flow[A, C] = {
-    val stage = new PushPullStage[A, C] {
+    def stage = new PushPullStage[A, C] {
       private var state: B = _
       private var buffer = Vector.empty[C]
       private var finishing = false
