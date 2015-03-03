@@ -19,7 +19,7 @@ trait FlowExt {
    * @tparam B
    * @return Bounded map flow
    */
-  def mapAsyncUnorderedWithBoundedConcurrency[A, B](maxConcurrency: Int)(f: A => Future[B]): Flow[A, B] =
+  def mapAsyncUnorderedWithBoundedConcurrency[A, B](maxConcurrency: Int)(f: A => Future[B]): Flow[A, B, Unit] =
     Flow[A].section(OperationAttributes.inputBuffer(initial = maxConcurrency, max = maxConcurrency)) { sectionFlow =>
       sectionFlow.mapAsyncUnordered(f)
     }
@@ -32,7 +32,7 @@ trait FlowExt {
    * @tparam B
    * @return Bounded map flow
    */
-  def mapAsyncWithBoundedConcurrency[A, B](maxConcurrency: Int)(f: A => Future[B]): Flow[A, B] =
+  def mapAsyncWithBoundedConcurrency[A, B](maxConcurrency: Int)(f: A => Future[B]): Flow[A, B, Unit] =
     Flow[A].section(OperationAttributes.inputBuffer(initial = maxConcurrency, max = maxConcurrency)) { sectionFlow =>
       sectionFlow.mapAsync(f)
     }
@@ -45,7 +45,7 @@ trait FlowExt {
    * @tparam B
    * @return Bounded map flow
    */
-  def mapAsyncWithOrderedSideEffect[A, B](f: A => Future[B]): Flow[A, B] = mapAsyncWithBoundedConcurrency(1)(f)
+  def mapAsyncWithOrderedSideEffect[A, B](f: A => Future[B]): Flow[A, B, Unit] = mapAsyncWithBoundedConcurrency(1)(f)
 
   /**
    * Helper to create a flow whose creation depends on the first element of the upstream.
@@ -54,7 +54,7 @@ trait FlowExt {
    * @tparam B
    * @return
    */
-  def withHead[A, B](includeHeadInUpStream: Boolean)(f: A => Flow[A, B]): Flow[A, B] = {
+  def withHead[A, B, M](includeHeadInUpStream: Boolean)(f: A => Flow[A, B, M]): Flow[A, B, Unit] = {
     Flow[A]
       .prefixAndTail(1)
       .map {
@@ -70,7 +70,7 @@ trait FlowExt {
    * add a sequence id to each record
    * @return a stream of strings
    */
-  def zipWithIndex[A] : Flow[A, (A, Long)] = {
+  def zipWithIndex[A] : Flow[A, (A, Long), Unit] = {
     withHead(includeHeadInUpStream = false) { head =>
       Flow[A].scan((head, 0L)) { case ((_, n), el) => (el, n + 1) }
     }
@@ -81,7 +81,7 @@ trait FlowExt {
    * @return a stream of strings
    */
   def rechunkByteStringBySeparator(separator: ByteString = ByteString("\n"),
-                                   maximumChunkBytes: Int = Int.MaxValue): Flow[ByteString, ByteString] = {
+                                   maximumChunkBytes: Int = Int.MaxValue): Flow[ByteString, ByteString, Unit] = {
     def stage = new PushPullStage[ByteString, ByteString] {
       private val separatorBytes = separator
       private val firstSeparatorByte = separatorBytes.head
@@ -150,23 +150,19 @@ trait FlowExt {
    * @tparam A
    * @return A flow that limit the rate of the stream
    */
-  def rateLimiter[A](interval: FiniteDuration): Flow[A, A] = {
+  def rateLimiter[A](interval: FiniteDuration): Flow[A, A, Unit] = {
     case object Tick
 
-    def flow = Flow() { implicit builder =>
-      import FlowGraphImplicits._
-
-      val undefinedSource = UndefinedSource[A]
-      val undefinedSink = UndefinedSink[A]
+    val flow = Flow() { implicit builder =>
+      import FlowGraph.Implicits._
 
       val rateLimiter = Source.apply(0 second, interval, Tick)
 
-      val zip = Zip[A, Tick.type]
-      undefinedSource ~> zip.left
-      rateLimiter ~> zip.right
-      zip.out ~> Flow[(A, Tick.type)].map(_._1) ~> undefinedSink
+      val zip = builder.add(Zip[A, Tick.type]())
 
-      (undefinedSource, undefinedSink)
+      rateLimiter ~> zip.in1
+
+      (zip.in0, zip.out.map(_._1).outlet)
     }
 
     // We need to limit input buffer to 1 to guarantee the rate limiting feature
@@ -216,7 +212,7 @@ trait FlowExt {
   /**
    * Rechunk a stream of bytes with a new chunk size
    */
-  def rechunkByteStringBySize(chunkSize: Int): Flow[ByteString, ByteString] = {
+  def rechunkByteStringBySize(chunkSize: Int): Flow[ByteString, ByteString, Unit] = {
     def stage = new PushPullStage[ByteString, ByteString] {
       private var buffer = ByteString.empty
 
@@ -267,7 +263,7 @@ trait FlowExt {
    */
   def customStatefulProcessor[A, B, C](zero: => B)
                              (f: (B, A) => (Option[B], IndexedSeq[C]),
-                              lastPushIfUpstreamEnds: B => IndexedSeq[C] = {_: B => IndexedSeq.empty}): Flow[A, C] = {
+                              lastPushIfUpstreamEnds: B => IndexedSeq[C] = {_: B => IndexedSeq.empty}): Flow[A, C, Unit] = {
     def stage = new PushPullStage[A, C] {
       private var state: B = _
       private var buffer = Vector.empty[C]
@@ -333,7 +329,7 @@ trait FlowExt {
    * @tparam B
    * @return
    */
-  def fold[A, B](zero: => B)(f: (B, A) => B): Flow[A, B] = {
+  def fold[A, B](zero: => B)(f: (B, A) => B): Flow[A, B, Unit] = {
     customStatefulProcessor[A, B, B](zero)(
       (b, a) => (Some(f(b, a)), Vector.empty),
       b => Vector(b)
@@ -347,19 +343,15 @@ trait FlowExt {
    * @tparam B
    * @return
    */
-  def zipWithConstantLazyAsync[A, B](futB: => Future[B])(implicit ec: ExecutionContext): Flow[A, (A, B)] = {
-    Flow() { implicit b =>
-      import FlowGraphImplicits._
+  def zipWithConstantLazyAsync[A, B](futB: => Future[B])(implicit ec: ExecutionContext): Flow[A, (A, B), Unit] = {
+    Flow() { implicit builder =>
+      import FlowGraph.Implicits._
 
-      val undefinedSource = UndefinedSource[A]
-      val undefinedSink = UndefinedSink[(A, B)]
-      val zip = Zip[A, B]
+      val zip = builder.add(Zip[A, B]())
 
-      undefinedSource                   ~> zip.left
-      SourceExt.constantLazyAsync(futB) ~> zip.right
-                                           zip.out ~> undefinedSink
+      SourceExt.constantLazyAsync(futB) ~> zip.in1
 
-      (undefinedSource, undefinedSink)
+      (zip.in0, zip.out)
     }
   }
 
@@ -369,7 +361,7 @@ trait FlowExt {
    * @tparam A
    * @return
    */
-  def repeatEach[A](nb: Int): Flow[A, A] = Flow[A].mapConcat(a => Vector.fill(nb)(a))
+  def repeatEach[A](nb: Int): Flow[A, A, Unit] = Flow[A].mapConcat(a => Vector.fill(nb)(a))
 
 }
 

@@ -6,6 +6,7 @@ import java.util.zip.GZIPInputStream
 import akka.stream.FlattenStrategy
 import akka.stream.scaladsl.Source
 import akka.util.ByteString
+import akka.actor.ActorRef
 import com.mfglabs.stream.internals.source.{UnfoldPullerAsync, BulkPullerAsync}
 
 import scala.concurrent._
@@ -25,7 +26,7 @@ trait SourceExt {
     }
   }
 
-  def fromStream(is: InputStream, maxChunkSize: Int = defaultChunkSize)(implicit ec: ExecutionContextForBlockingOps): Source[ByteString] = {
+  def fromStream(is: InputStream, maxChunkSize: Int = defaultChunkSize)(implicit ec: ExecutionContextForBlockingOps): Source[ByteString, ActorRef] = {
     bulkPullerAsync[ByteString](0) { (counter, demand) =>
       Future {
         val fulfillments = Vector.fill(demand)(readFromStream(is, maxChunkSize)).flatten
@@ -35,13 +36,13 @@ trait SourceExt {
     }
   }
 
-  def fromGZIPStream(is: InputStream, maxChunkSize: Int = defaultChunkSize)(implicit ec: ExecutionContextForBlockingOps): Source[ByteString] =
+  def fromGZIPStream(is: InputStream, maxChunkSize: Int = defaultChunkSize)(implicit ec: ExecutionContextForBlockingOps): Source[ByteString, ActorRef] =
     fromStream(new GZIPInputStream(is), maxChunkSize)(ec)
 
-  def fromFile(f: File, maxChunkSize: Int = defaultChunkSize)(implicit ec: ExecutionContextForBlockingOps): Source[ByteString] =
+  def fromFile(f: File, maxChunkSize: Int = defaultChunkSize)(implicit ec: ExecutionContextForBlockingOps): Source[ByteString, ActorRef] =
     fromStream(new FileInputStream(f), maxChunkSize)(ec)
 
-  def fromGZIPFile(f: File, maxChunkSize: Int = defaultChunkSize)(implicit ec: ExecutionContextForBlockingOps): Source[ByteString] =
+  def fromGZIPFile(f: File, maxChunkSize: Int = defaultChunkSize)(implicit ec: ExecutionContextForBlockingOps): Source[ByteString, ActorRef] =
     fromGZIPStream(new FileInputStream(f), maxChunkSize)(ec)
 
   /**
@@ -53,7 +54,7 @@ trait SourceExt {
    * @tparam A
    * @return Pulling source
    */
-  def bulkPullerAsync[A](offset: Long)(f: (Long, Int) => Future[(Seq[A], Boolean)]): Source[A] =
+  def bulkPullerAsync[A](offset: Long)(f: (Long, Int) => Future[(Seq[A], Boolean)]): Source[A, ActorRef] =
     Source[A](BulkPullerAsync.props(offset)(f))
 
   /**
@@ -63,7 +64,7 @@ trait SourceExt {
    *          a new state b if we want the stream to continue or no new state if we want the stream to end.
    * @return Pulling source
    */
-  def unfoldPullerAsync[A, B](zero: => B)(f: B => Future[(Option[A], Option[B])]): Source[A] =
+  def unfoldPullerAsync[A, B](zero: => B)(f: B => Future[(Option[A], Option[B])]): Source[A, ActorRef] =
     Source[A](UnfoldPullerAsync.props[A, B](zero)(f))
 
   /**
@@ -75,7 +76,7 @@ trait SourceExt {
    * @tparam B
    * @return
    */
-  def seededLazyAsync[A, B](futB: => Future[B])(f: B => Source[A]): Source[A] =
+  def seededLazyAsync[A, B, M](futB: => Future[B])(f: B => Source[A, M]): Source[A, Unit] =
     singleLazyAsync(futB).map(f).flatten(FlattenStrategy.concat)
 
   /**
@@ -85,7 +86,7 @@ trait SourceExt {
    * @tparam A
    * @return
    */
-  def singleLazyAsync[A](fut: => Future[A]): Source[A] = singleLazy(fut).mapAsync(identity)
+  def singleLazyAsync[A](fut: => Future[A]): Source[A, Unit] = singleLazy(fut).mapAsync(identity)
 
   /**
    * Create a source from a Lazy Value that will be evaluated only when the stream is materialized.
@@ -94,7 +95,7 @@ trait SourceExt {
    * @tparam A
    * @return
    */
-  def singleLazy[A](a: => A): Source[A] = Source.single(() => a).map(_())
+  def singleLazy[A](a: => A): Source[A, Unit] = Source.single(() => a).map(_())
 
   /**
    * Create an infinite source of the same Async Lazy value evaluated only when the stream is materialized.
@@ -103,7 +104,7 @@ trait SourceExt {
    * @tparam A
    * @return
    */
-  def constantLazyAsync[A](fut: => Future[A]): Source[A] = constantLazy(fut).mapAsync(identity)
+  def constantLazyAsync[A](fut: => Future[A]): Source[A, ActorRef] = constantLazy(fut).mapAsync(identity)
 
   /**
    * Create an infinite source of the same Lazy value evaluated only when the stream is materialized.
@@ -112,7 +113,7 @@ trait SourceExt {
    * @tparam A
    * @return
    */
-  def constantLazy[A](a: => A): Source[A] = 
+  def constantLazy[A](a: => A): Source[A, ActorRef] = 
     unfoldPullerAsync(a)(evaluatedA => Future.successful(Some(evaluatedA), Some(evaluatedA)))
 }
 

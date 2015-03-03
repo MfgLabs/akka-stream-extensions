@@ -17,7 +17,7 @@ trait PgStream {
    * Get a postgres table as a stream source (each line is separated with '\n')
    */
   def getQueryResultAsStream(sqlQuery: String, delimiter: String = ",", outputStreamTransformer : OutputStream => OutputStream = identity)
-                      (implicit conn: PGConnection, ec: ExecutionContextForBlockingOps): Source[ByteString] = {
+                      (implicit conn: PGConnection, ec: ExecutionContextForBlockingOps): Source[ByteString, (akka.actor.ActorRef, Unit)] = {
     val copyManager = conn.getCopyAPI()
     val os = new PipedOutputStream()
     val is = new PipedInputStream(os)
@@ -57,7 +57,7 @@ trait PgStream {
    */
   def insertStreamToTable(schema: String, table: String, delimiter: String = ",", insertChunkSize: Int = 1 * 1024 * 1024,
                           chunkInsertionConcurrency: Int = 1)
-                         (implicit conn: PGConnection, ec: ExecutionContextForBlockingOps): Flow[ByteString, Long] = {
+                         (implicit conn: PGConnection, ec: ExecutionContextForBlockingOps): Flow[ByteString, Long, Unit] = {
     val copyManager = conn.getCopyAPI()
     Flow[ByteString]
       .map(_.utf8String)
