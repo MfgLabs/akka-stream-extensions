@@ -160,8 +160,6 @@ trait FlowExt {
 
       val zip = builder.add(Zip[A, Tick.type]())
 
-      val out = Flow[(A, Tick.type)].map(_._1)
-
       rateLimiter ~> zip.in1
 
       (zip.in0, zip.out.map(_._1).outlet)
