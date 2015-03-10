@@ -10,11 +10,13 @@ resolvers ++= Seq(
 ```
 
 ## Dependencies
+Currently depends on akka-stream-1.0-M4
+
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.4-SNAPSHOT"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.5-SNAPSHOT"
 
 // Postgres extensions
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.4-SNAPSHOT"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.5-SNAPSHOT"
 ```
 
 ## Use
