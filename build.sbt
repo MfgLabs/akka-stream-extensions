@@ -19,7 +19,7 @@ resolvers in ThisBuild ++= Seq(
 )
 
 lazy val all = project.in(file("."))
-  .aggregate(commons, postgres)
+  .aggregate(commons, postgres, shapeless)
   .settings(
     name := "commons-all",
     publishArtifact := false
@@ -40,5 +40,14 @@ lazy val postgres = project.in(file("extensions/postgres"))
     name := "akka-stream-extensions-postgres",
     libraryDependencies ++= Seq(
       "org.postgresql" % "postgresql"  % "9.3-1102-jdbc4"
+    )
+  )
+
+lazy val shapeless = project.in(file("extensions/shapeless"))
+  .dependsOn(commons)
+  .settings(
+    name := "akka-stream-extensions-shapeless",
+    libraryDependencies ++= Seq(
+      "com.chuusai"       %% "shapeless"   % "2.1.0"
     )
   )
