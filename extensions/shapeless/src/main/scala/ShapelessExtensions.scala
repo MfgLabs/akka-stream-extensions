@@ -5,7 +5,7 @@ import shapeless._
 import shapeless.ops.hlist._
 import shapeless.ops.nat._
 
-import akka.stream.{FlowMaterializer, ActorFlowMaterializer, FanInShape, FanOutShape, Graph, UniformFanInShape, Outlet}
+import akka.stream.{FlowMaterializer, ActorFlowMaterializer, FanInShape, FanOutShape, Graph, UniformFanInShape, Outlet, Inlet}
 import akka.stream.scaladsl._
 import akka.stream.stage._
 import akka.event.Logging
@@ -41,12 +41,41 @@ object OutletBuilder {
 
 }
 
+trait InletFunction {
+  def apply[H]: Inlet[H]
+}
+
+trait InletBuilder[C <: Coproduct] {
+  type Out <: HList
+
+  def apply(f: InletFunction): Out
+}
+
+object InletBuilder {
+  type Aux[C <: Coproduct, HL <: HList] = InletBuilder[C] { type Out = HL }
+  
+  implicit val last: Aux[CNil, HNil] = new InletBuilder[CNil] {
+    type Out = HNil
+    def apply(f: InletFunction): HNil = HNil
+  }
+  
+  implicit def head[H, T <: Coproduct, HT <: HList](
+    implicit tl: InletBuilder.Aux[T, HT]
+  ): InletBuilder.Aux[H :+: T, Inlet[H] :: HT] = new InletBuilder[H :+: T] {
+    type Out = Inlet[H] :: HT
+    def apply(f: InletFunction): Inlet[H] :: HT = f.apply[H] :: tl.apply(f)
+  }
+
+
+}
+
+
 
 trait SelectOutletValue[C <: Coproduct] {
   type Outlets <: HList
   def apply(c: C, outlets: Outlets): (Outlet[_], Option[_])
 }
-  //extends DepFn2[C, HL] { type O ; type Out = (Outlet[O], Option[O]) }
+
 object SelectOutletValue{
   type Aux[C <: Coproduct, HL <: HList] = SelectOutletValue[C] { type Outlets = HL }
 
@@ -77,41 +106,112 @@ object SelectOutletValue{
 
 }
 
-class CoproductShape[C <: Coproduct, HL <: HList](
+
+// trait SelectInletValue[C <: Coproduct] {
+//   type Inlets <: HList
+//   def apply(c: C, inlets: Inlets): (Inlet[C], Option[C])
+// }
+
+// object SelectInletValue{
+//   type Aux[C <: Coproduct, HL <: HList] = SelectInletValue[C] { type Inlets = HL }
+
+//   implicit def last[H, HL <: HList](
+//     implicit sel0: Selector[HL, Inlet[H]]
+//   ): SelectInletValue.Aux[H :+: CNil, HL] = new SelectInletValue[H :+: CNil] {
+//     type Inlets = HL
+//     def apply(c: H :+: CNil, inlets: HL): (Inlet[_], Option[_]) =
+//       c match {
+//         case Inl(h) => inlets.select[Inlet[H]] -> Some(h)
+//         case Inr(_) => throw new RuntimeException("impossible case")
+//       }
+//   }
+
+//   implicit def head[H, T <: Coproduct, HL <: HList](
+//     implicit
+//       sel: SelectInletValue.Aux[T, HL],
+//       selO: Selector[HL, Inlet[H]]
+//   ): SelectInletValue.Aux[H :+: T, HL] = new SelectInletValue[H :+: T] {
+//     type Inlets = HL
+//     def apply(c: H :+: T, inlets: HL): (Inlet[_], Option[_]) = 
+//       c match {
+//         case Inl(h) => inlets.select[Inlet[H]] -> Some(h)
+//         case Inr(t) => sel.apply(t, inlets)
+//       }
+//   }
+
+// }
+
+class CoproductFanOutShape[C <: Coproduct, HL <: HList](
   val builder: OutletBuilder.Aux[C, HL],
-  _init: FanOutShape.Init[C] = FanOutShape.Name[C]("CoproductShape")
+  _init: FanOutShape.Init[C] = FanOutShape.Name[C]("CoproductFanOutShape")
 ) extends FanOutShape[C](_init) {
-  SelectOutletValuef =>
+  self =>
   val rnd = new scala.util.Random
-  // val oos = oo.toList[Outlet[_]](trav)
-  val oos = builder.apply(new OutletFunction{
-    def apply[H] = SelectOutletValuef.newOutlet[H](rnd.nextString(5))
+  // val outs = oo.toList[Outlet[_]](trav)
+  val outs = builder.apply(new OutletFunction{
+    def apply[H] = self.newOutlet[H](rnd.nextString(5))
   })
 
-  protected override def construct(i: FanOutShape.Init[C]) = new CoproductShape(builder, i)
+  protected override def construct(i: FanOutShape.Init[C]) = new CoproductFanOutShape(builder, i)
 }
-
-
 
 class CoproductFlexiRoute[C <: Coproduct, HL <: HList](implicit
   builder: OutletBuilder.Aux[C, HL],
   trav: ToTraversable.Aux[HL, List, Outlet[_]],
   sel: SelectOutletValue.Aux[C, HL]
-) extends FlexiRoute[C, CoproductShape[C, HL]](
-  new CoproductShape(builder), OperationAttributes.name("CoproductShape")
+) extends FlexiRoute[C, CoproductFanOutShape[C, HL]](
+  new CoproductFanOutShape(builder), OperationAttributes.name("CoproductFanOutShape")
 ) {
   import FlexiRoute._
 
   override def createRouteLogic(p: PortT) = new RouteLogic[C] {
-    // val outlets = builder.apply()
-    // Only responds to demands from outDown, outUp is waiting anyway!
-    println(p.oos.toList[Outlet[_]](trav))
-    override def initialState = State[Any](DemandFromAll(p.oos.toList[Outlet[_]](trav))) {
+
+    override def initialState = State[Any](DemandFromAll(p.outs.toList[Outlet[_]](trav))) {
       (ctx, _, element) =>
-      println("e="+element)
-        val (outlet, Some(h)) = sel.apply(element, p.oos)
+        println("e="+element)
+        val (outlet, Some(h)) = sel.apply(element, p.outs)
         println(s"outlet:$outlet h:$h")
         ctx.emit(outlet)(h)
+        println(s"after")
+        SameState
+    }
+ 
+    override def initialCompletionHandling = eagerClose
+  }
+}
+
+class CoproductFanInShape[C <: Coproduct, HL <: HList](
+  val builder: InletBuilder.Aux[C, HL],
+  _init: FanInShape.Init[C] = FanInShape.Name("CoproductFanInShape")
+) extends FanInShape[C](_init) {
+  self =>
+
+  val rnd = new scala.util.Random
+  val ins = builder.apply(new InletFunction{
+    def apply[H] = self.newInlet[H](rnd.nextString(5))
+  })
+
+  protected override def construct(i: FanInShape.Init[C]) = new CoproductFanInShape(builder, i)
+}
+
+
+class CoproductFlexiMerge[C <: Coproduct, HL <: HList](implicit
+  builder: InletBuilder.Aux[C, HL],
+  trav: ToTraversable.Aux[HL, List, Inlet[C]],
+  sel: SelectInletValue.Aux[C, HL]
+) extends FlexiRoute[C, CoproductFanInShape[C, HL]](
+  new CoproductFanInShape(builder), OperationAttributes.name("CoproductFanInShape")
+) {
+  import FlexiMerge._
+
+  override def createMergeLogic(p: PortT) = new MergeLogic[C] {
+
+    override def initialState = State[C](ReadAny(p.ins.toList[Inlet[C]](trav))) {
+      (ctx, _, element) =>
+        println("e="+element)
+        val (inlet, Some(h)) = sel.apply(element, p.ins)
+        println(s"inlet:$inlet h:$h")
+        ctx.emit(h)
         println(s"after")
         SameState
     }
@@ -218,8 +318,8 @@ object ShapelessStream {
       val router = builder.add(new CoproductFlexiRoute[A :+: B :+: CNil, Outlet[A] :: Outlet[B] :: HNil])
       val merge = builder.add(Merge[Any](2))
 
-      router.oos.select[Outlet[A]] ~> fa ~> merge.in(0)
-      router.oos.select[Outlet[B]] ~> fb ~> merge.in(1)
+      router.outs.select[Outlet[A]] ~> fa ~> merge.in(0)
+      router.outs.select[Outlet[B]] ~> fb ~> merge.in(1)
       router.in -> merge.out
     }
 
@@ -243,7 +343,7 @@ object ShapelessStream {
       val router = builder.add(new CoproductFlexiRoute[CIn, CInOutlets]())
       val merge = builder.add(Merge[Any](toIntN()))
 
-      flowBuilder.build(router.oos, flows, merge)
+      flowBuilder.build(router.outs, flows, merge)
       router.in -> merge.out
     }
 }
