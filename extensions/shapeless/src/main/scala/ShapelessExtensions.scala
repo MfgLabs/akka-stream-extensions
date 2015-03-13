@@ -4,6 +4,7 @@ package extensions.shapeless
 import shapeless._
 import shapeless.ops.hlist._
 import shapeless.ops.nat._
+import shapeless.ops.coproduct.Inject
 
 import akka.stream.{FlowMaterializer, ActorFlowMaterializer, FanInShape, FanOutShape, Graph, UniformFanInShape, Outlet, Inlet}
 import akka.stream.scaladsl._
@@ -41,33 +42,7 @@ object OutletBuilder {
 
 }
 
-trait InletFunction {
-  def apply[H]: Inlet[H]
-}
 
-trait InletBuilder[C <: Coproduct] {
-  type Out <: HList
-
-  def apply(f: InletFunction): Out
-}
-
-object InletBuilder {
-  type Aux[C <: Coproduct, HL <: HList] = InletBuilder[C] { type Out = HL }
-  
-  implicit val last: Aux[CNil, HNil] = new InletBuilder[CNil] {
-    type Out = HNil
-    def apply(f: InletFunction): HNil = HNil
-  }
-  
-  implicit def head[H, T <: Coproduct, HT <: HList](
-    implicit tl: InletBuilder.Aux[T, HT]
-  ): InletBuilder.Aux[H :+: T, Inlet[H] :: HT] = new InletBuilder[H :+: T] {
-    type Out = Inlet[H] :: HT
-    def apply(f: InletFunction): Inlet[H] :: HT = f.apply[H] :: tl.apply(f)
-  }
-
-
-}
 
 
 
@@ -180,8 +155,40 @@ class CoproductFlexiRoute[C <: Coproduct, HL <: HList](implicit
   }
 }
 
+
+trait InletFunction {
+  def apply[H]: Inlet[H]
+}
+
+trait InletBuilder[C <: Coproduct] {
+  type Sub <: Coproduct
+  type Out <: HList
+
+  def apply(f: InletFunction): Out
+}
+
+object InletBuilder {
+  type Aux[C <: Coproduct, Sub0 <: Coproduct, HL <: HList] = InletBuilder[C] { type Sub = Sub0; type Out = HL }
+  
+  implicit def last[Sub0 <: Coproduct]: Aux[CNil, Sub0, HNil] = new InletBuilder[CNil] {
+    type Sub = Sub0
+    type Out = HNil
+    def apply(f: InletFunction): HNil = HNil
+  }
+  
+  implicit def head[H, T <: Coproduct, Sub0 <: Coproduct, HT <: HList](
+    implicit tl: InletBuilder.Aux[T, Sub0, HT]
+  ): InletBuilder.Aux[H :+: T, Sub0, Inlet[Sub0] :: HT] = new InletBuilder[H :+: T] {
+    type Sub = Sub0
+    type Out = Inlet[Sub0] :: HT
+    def apply(f: InletFunction): Inlet[Sub0] :: HT = f.apply[Sub0] :: tl.apply(f)
+  }
+
+
+}
+
 class CoproductFanInShape[C <: Coproduct, HL <: HList](
-  val builder: InletBuilder.Aux[C, HL],
+  val builder: InletBuilder.Aux[C, C, HL],
   _init: FanInShape.Init[C] = FanInShape.Name("CoproductFanInShape")
 ) extends FanInShape[C](_init) {
   self =>
@@ -196,27 +203,32 @@ class CoproductFanInShape[C <: Coproduct, HL <: HList](
 
 
 class CoproductFlexiMerge[C <: Coproduct, HL <: HList](implicit
-  builder: InletBuilder.Aux[C, HL],
-  trav: ToTraversable.Aux[HL, List, Inlet[C]],
-  sel: SelectInletValue.Aux[C, HL]
-) extends FlexiRoute[C, CoproductFanInShape[C, HL]](
+  builder: InletBuilder.Aux[C, C, HL],
+  trav: ToTraversable.Aux[HL, List, Inlet[C]]
+) extends FlexiMerge[C, CoproductFanInShape[C, HL]](
   new CoproductFanInShape(builder), OperationAttributes.name("CoproductFanInShape")
 ) {
   import FlexiMerge._
 
   override def createMergeLogic(p: PortT) = new MergeLogic[C] {
+    var inletsOpened = p.ins.toList[Inlet[C]](trav).size
 
     override def initialState = State[C](ReadAny(p.ins.toList[Inlet[C]](trav))) {
       (ctx, _, element) =>
         println("e="+element)
-        val (inlet, Some(h)) = sel.apply(element, p.ins)
-        println(s"inlet:$inlet h:$h")
-        ctx.emit(h)
-        println(s"after")
+        ctx.emit(element)
         SameState
     }
  
-    override def initialCompletionHandling = eagerClose
+    override def initialCompletionHandling = CompletionHandling(
+      onUpstreamFinish = (ctx, _) => {
+        if(inletsOpened == 1) ctx.finish()
+        else inletsOpened -= 1
+        SameState
+      },
+      onUpstreamFailure = (ctx, _, cause) => { ctx.fail(cause); SameState }
+    )
+    
   }
 }
 
@@ -301,6 +313,62 @@ object FlowBuilder{
 
 }
 
+trait FlowBuilderC[CIn <: Coproduct, COut <: Coproduct] {
+  type HLO <: HList
+  type HLF <: HList
+  type HLI <: HList
+
+  def build(outlets: HLO, flows: HLF, inlets: HLI)
+           (implicit builder: FlowGraph.Builder): Unit
+}
+
+object FlowBuilderC{
+  type Aux[CIn <: Coproduct, COut <: Coproduct, HLO0 <: HList, HLF0 <: HList, HLI0 <: HList] =
+    FlowBuilderC[CIn, COut] { type HLO = HLO0; type HLF = HLF0; type HLI = HLI0 }
+
+  implicit def last[HI, HO, C <: Coproduct](
+    implicit inj: Inject[C, HO]
+  ): FlowBuilderC.Aux[
+    HI :+: CNil, HO :+: CNil, Outlet[HI] :: HNil, Flow[HI, HO, Unit] :: HNil, Inlet[C] :: HNil
+  ] =
+    new FlowBuilderC[HI :+: CNil, HO :+: CNil] {
+      type HLO = Outlet[HI] :: HNil
+      type HLF = Flow[HI, HO, Unit] :: HNil
+      type HLI = Inlet[C] :: HNil
+
+      def build(outlets: Outlet[HI] :: HNil, flows: Flow[HI, HO, Unit] :: HNil, inlets: Inlet[C] :: HNil)(implicit builder: FlowGraph.Builder): Unit = {
+        import FlowGraph.Implicits._
+        val outlet = outlets.head
+        val inlet = inlets.head
+        val flow = flows.head
+        outlet ~> flow.map((e:HO) => Coproduct[C](e)) ~> inlet
+      }
+    }
+
+  implicit def head[HI, TI <: Coproduct, HO, TO <: Coproduct, HLO0 <: HList, HLF0 <: HList, HLI0 <: HList, C <: Coproduct](
+    implicit
+      flowBuilder: FlowBuilderC.Aux[TI, TO, HLO0, HLF0, HLI0],
+      inj: Inject[C, HO]
+  ): FlowBuilderC.Aux[
+    HI :+: TI, HO :+: TO, Outlet[HI] :: HLO0, Flow[HI, HO, Unit] :: HLF0, Inlet[C] :: HLI0
+  ] = new FlowBuilderC[HI :+: TI, HO :+: TO] {
+      type HLO = Outlet[HI] :: HLO0
+      type HLF = Flow[HI, HO, Unit] :: HLF0
+      type HLI = Inlet[C] :: HLI0
+
+      def build(outlets: Outlet[HI] :: HLO0, flows: Flow[HI, HO, Unit] :: HLF0, inlets: Inlet[C] :: HLI0)(implicit builder: FlowGraph.Builder): Unit = {
+        import FlowGraph.Implicits._
+        
+        val outlet = outlets.head
+        val flow = flows.head
+        val inlet = inlets.head
+        outlet ~> flow.map((e:HO) => Coproduct[C](e)) ~> inlet
+
+        flowBuilder.build(outlets.tail, flows.tail, inlets.tail)
+      }
+    }
+
+}
 object ShapelessStream {
 
   def coproductFlow[A, B, O1, O2](
@@ -324,7 +392,7 @@ object ShapelessStream {
     }
 
 
-  def coproductFlow[HL <: HList, CIn <: Coproduct, COut <: Coproduct, CInOutlets <: HList, Size <: Nat, N <: Nat](
+  def coproductFlowAny[HL <: HList, CIn <: Coproduct, COut <: Coproduct, CInOutlets <: HList, Size <: Nat, N <: Nat](
     flows: HL
   )(
     implicit
@@ -345,5 +413,28 @@ object ShapelessStream {
 
       flowBuilder.build(router.outs, flows, merge)
       router.in -> merge.out
+    }
+
+  def coproductFlow[HL <: HList, CIn <: Coproduct, COut <: Coproduct, CInOutlets <: HList, COutInlets <: HList](
+    flows: HL
+  )(
+    implicit
+      flowTypes: FlowTypes.Aux[HL, CIn, COut],
+      obuild: OutletBuilder.Aux[CIn, CInOutlets],
+      ibuild: InletBuilder.Aux[COut, COut, COutInlets],
+      otrav: ToTraversable.Aux[CInOutlets, List, Outlet[_]],
+      itrav: ToTraversable.Aux[COutInlets, List, Inlet[COut]],
+      selOutletValue: SelectOutletValue.Aux[CIn, CInOutlets],
+      flowBuilder: FlowBuilderC.Aux[CIn, COut, CInOutlets, HL, COutInlets]
+  ): Flow[CIn, COut, Unit] =
+    Flow() { implicit builder =>
+    
+      import FlowGraph.Implicits._
+
+      val router = builder.add(new CoproductFlexiRoute[CIn, CInOutlets]())
+      val merger = builder.add(new CoproductFlexiMerge[COut, COutInlets]())
+
+      flowBuilder.build(router.outs, flows, merger.ins)
+      router.in -> merger.out
     }
 }
