@@ -193,8 +193,8 @@ class CoproductFanInShape[C <: Coproduct, HL <: HList](
 ) extends FanInShape[C](_init) {
   self =>
 
-  val rnd = new scala.util.Random
-  val ins = builder.apply(new InletFunction{
+  private val rnd = new scala.util.Random
+  val ins: HL = builder.apply(new InletFunction{
     def apply[H] = self.newInlet[H](rnd.nextString(5))
   })
 
