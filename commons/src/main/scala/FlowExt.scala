@@ -337,6 +337,21 @@ trait FlowExt {
   }
 
   /**
+   * Take the stream while condition is false.
+   * @param condition
+   * @tparam A
+   * @return
+   */
+  def takeWhile[A](condition: A => Boolean): Flow[A, A, Unit] = {
+    customStatefulProcessor[A, Unit, A](())(
+      (_, a) => {
+        if (condition(a)) (Some(()), Vector(a))
+        else (None, Vector.empty)
+      }
+    )
+  }
+
+  /**
    * Zip a stream with a lazy future that will be evaluated only when the stream is materialized.
    * @param futB
    * @tparam A
