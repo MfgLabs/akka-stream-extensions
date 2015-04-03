@@ -311,7 +311,12 @@ trait FlowExt {
               ctx.push(elem)
           }
         } else {
-          ctx.pull()
+          buffer match {
+            case Seq() => ctx.pull()
+            case elem +: nextBuffer =>
+              buffer = nextBuffer
+              ctx.push(elem)
+          }
         }
       }
 
