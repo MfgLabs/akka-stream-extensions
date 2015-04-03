@@ -327,6 +327,23 @@ trait FlowExt {
   }
 
   /**
+   * Unfold a stream with an user-defined function.
+   * @param f take current elem, and return a seq of B elems with a stop boolean (true means that we want the stream to stop after sending
+   *          the joined seq of B elems)
+   * @tparam A
+   * @tparam B
+   * @return
+   */
+  def customStatelessProcessor[A, B](f: A => (IndexedSeq[B], Boolean)): Flow[A, B, Unit] = {
+    customStatefulProcessor[A, Unit, B](())(
+      (_, a) => {
+        val (bs, stop) = f(a)
+        (if (stop) None else Some(()), bs)
+      }
+    )
+  }
+
+  /**
    * Fold the stream and push the last B to downstream when upstream finishes
    * @param zero
    * @param f
@@ -343,17 +360,15 @@ trait FlowExt {
 
   /**
    * Take the stream while condition is false.
-   * @param condition
+   * @param f
    * @tparam A
    * @return
    */
-  def takeWhile[A](condition: A => Boolean): Flow[A, A, Unit] = {
-    customStatefulProcessor[A, Unit, A](())(
-      (_, a) => {
-        if (condition(a)) (Some(()), Vector(a))
-        else (None, Vector.empty)
-      }
-    )
+  def takeWhile[A](f: A => Boolean): Flow[A, A, Unit] = {
+    customStatelessProcessor { a =>
+      if (!f(a)) (Vector.empty, true)
+      else (Vector(a), false)
+    }
   }
 
   /**
