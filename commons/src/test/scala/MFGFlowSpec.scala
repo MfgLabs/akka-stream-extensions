@@ -3,7 +3,7 @@ package com.mfglabs.stream
 import java.io.File
 
 import akka.actor.ActorSystem
-import akka.stream.{ActorFlowMaterializerSettings, ActorFlowMaterializer}
+import akka.stream.{OverflowStrategy, ActorFlowMaterializerSettings, ActorFlowMaterializer}
 import akka.stream.scaladsl._
 import akka.util.ByteString
 import org.scalatest._
@@ -11,12 +11,13 @@ import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.time._
 import concurrent.ScalaFutures
 
+import scala.collection.concurrent.TrieMap
 import scala.concurrent._
 import scala.concurrent.duration._
 
 class MFGFlowSpec extends FlatSpec with Matchers with ScalaFutures {
   implicit val system = ActorSystem("MFGSourceSpec")
-  implicit val mat = ActorFlowMaterializer(ActorFlowMaterializerSettings(system).withInputBuffer(initialSize = 16, maxSize = 16))
+  implicit val mat = ActorFlowMaterializer(ActorFlowMaterializerSettings(system).withInputBuffer(16, 16))
   implicit override val patienceConfig =
     PatienceConfig(timeout = Span(3, Minutes), interval = Span(20, Millis))
 
@@ -24,6 +25,40 @@ class MFGFlowSpec extends FlatSpec with Matchers with ScalaFutures {
   implicit val ecBlocking = ExecutionContextForBlockingOps(scala.concurrent.ExecutionContext.Implicits.global)
 
   def bigFile = new File(getClass.getResource("/big.txt").getPath)
+
+  def fireIn(duration: FiniteDuration): Future[Unit] = {
+    val p = Promise[Unit]
+    system.scheduler.scheduleOnce(duration) {
+      p.trySuccess(())
+    }
+    p.future
+  }
+
+  "mapAsyncWithOrderedSideEffect" should "perform side-effect in order" in {
+    val range = 1 to 30
+    @volatile var seq = Seq.empty[Int]
+    Source(range).via(FlowExt.mapAsyncWithOrderedSideEffect { el =>
+      Future {
+        if (el % 2 == 0) {
+          Future {
+            println(el)
+            seq = seq :+ el
+            el
+          }
+        }
+        else fireIn(500 millis).map { _ =>
+          println(el)
+          seq = seq :+ el
+          el
+        }
+      }.flatMap(identity)
+    })
+    .runForeach(_ => ())
+    .futureValue
+
+    seq.length shouldEqual range.length
+    seq shouldEqual range.toSeq
+  }
 
   "withHead" should "allows to define a flow according the first element of the upstream" in {
     val range = 10 to 97

@@ -1,6 +1,6 @@
 package com.mfglabs.stream
 
-import akka.stream.FlattenStrategy
+import akka.stream.{OverflowStrategy, FlattenStrategy}
 import akka.stream.stage._
 import akka.util.ByteString
 
@@ -21,7 +21,7 @@ trait FlowExt {
    */
   def mapAsyncUnorderedWithBoundedConcurrency[A, B](maxConcurrency: Int)(f: A => Future[B]): Flow[A, B, Unit] =
     Flow[A].section(OperationAttributes.inputBuffer(initial = maxConcurrency, max = maxConcurrency)) { sectionFlow =>
-      sectionFlow.mapAsyncUnordered(f)
+      sectionFlow.mapAsyncUnordered(f).buffer(maxConcurrency, OverflowStrategy.backpressure)
     }
 
   /**
@@ -34,7 +34,7 @@ trait FlowExt {
    */
   def mapAsyncWithBoundedConcurrency[A, B](maxConcurrency: Int)(f: A => Future[B]): Flow[A, B, Unit] =
     Flow[A].section(OperationAttributes.inputBuffer(initial = maxConcurrency, max = maxConcurrency)) { sectionFlow =>
-      sectionFlow.mapAsync(f)
+      sectionFlow.mapAsync(f).buffer(maxConcurrency, OverflowStrategy.backpressure)
     }
 
   /**
