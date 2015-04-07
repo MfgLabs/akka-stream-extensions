@@ -41,13 +41,11 @@ class MFGFlowSpec extends FlatSpec with Matchers with ScalaFutures {
       Future {
         if (el % 2 == 0) {
           Future {
-            println(el)
             seq = seq :+ el
             el
           }
         }
         else fireIn(500 millis).map { _ =>
-          println(el)
           seq = seq :+ el
           el
         }
