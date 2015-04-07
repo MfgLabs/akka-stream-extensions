@@ -13,6 +13,7 @@ import org.scalatest.time._
 import org.scalatest._
 import concurrent.ScalaFutures
 import scala.concurrent.Future
+import scala.util.Try
 
 /**
  * To run this test, launch a local postgresql instance and put the right connection info into DriverManager.getConnection
@@ -42,7 +43,6 @@ class PostgresExtensionsSpec extends FlatSpec with Matchers with ScalaFutures wi
     stmt.execute(
       s"""
          create table public.test_postgres_aws_s3(
-          id serial primary key,
           io_id integer,
           dsp_name text,
           advertiser_id integer,
@@ -72,7 +72,7 @@ class PostgresExtensionsSpec extends FlatSpec with Matchers with ScalaFutures wi
       .via(FlowExt.fold(0L)(_ + _))
       .map { total =>
         nbLinesInserted.set(total)
-        PgStream.getQueryResultAsStream("select * from public.test_postgres_aws_s3 order by id")
+        PgStream.getQueryResultAsStream("select * from public.test_postgres_aws_s3")
       }
       .flatten(FlattenStrategy.concat)
       .via(FlowExt.rechunkByteStringBySize(5 * 1024 * 1024))
@@ -90,8 +90,12 @@ class PostgresExtensionsSpec extends FlatSpec with Matchers with ScalaFutures wi
       lines.length shouldEqual expectedLines.length
       lines.length shouldEqual nbLinesInserted.get
 
-      lines.zip(expectedLines).foreach { case (line, expectedLine) =>
-        line.split(",")(1) shouldEqual expectedLine.split(",")(0) // comparing io_id
+      lines.sorted.zip(expectedLines.sorted).foreach { case (line, expectedLine) =>
+        line.split(",").map { s =>
+          Try(s.toDouble).map(BigDecimal(_).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble).getOrElse(s)
+        } shouldEqual expectedLine.split(",").map { s =>
+          Try(s.toDouble).map(BigDecimal(_).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble).getOrElse(s)
+        }
       }
 
       stmt.close()

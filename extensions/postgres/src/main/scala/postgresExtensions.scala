@@ -49,19 +49,19 @@ trait PgStream {
    * @param schema
    * @param table can be table_name or table_name(column1, column2) to insert data in specific columns
    * @param delimiter
-   * @param insertChunkSize
+   * @param nbLinesPerInsertionBatch
    * @param chunkInsertionConcurrency
    * @param conn
    * @param ec
    * @return
    */
-  def insertStreamToTable(schema: String, table: String, delimiter: String = ",", insertChunkSize: Int = 1 * 1024 * 1024,
+  def insertStreamToTable(schema: String, table: String, delimiter: String = ",", nbLinesPerInsertionBatch: Int = 20000,
                           chunkInsertionConcurrency: Int = 1)
                          (implicit conn: PGConnection, ec: ExecutionContextForBlockingOps): Flow[ByteString, Long, Unit] = {
     val copyManager = conn.getCopyAPI()
     Flow[ByteString]
       .map(_.utf8String)
-      .grouped(insertChunkSize)
+      .grouped(nbLinesPerInsertionBatch)
       .via(FlowExt.mapAsyncWithBoundedConcurrency(chunkInsertionConcurrency) { chunk =>
         val query = s"COPY ${schema}.${table} FROM STDIN WITH DELIMITER '$delimiter'"
         Future {
