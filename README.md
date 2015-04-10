@@ -13,10 +13,10 @@ resolvers ++= Seq(
 Currently depends on akka-stream-1.0-M4
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.5-SNAPSHOT"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.5.1-SNAPSHOT"
 
 // Postgres extensions
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.5-SNAPSHOT"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.5.1-SNAPSHOT"
 ```
 
 ## Use
@@ -47,9 +47,11 @@ implicit val blockingEc = ExecutionContextForBlockingOps(someEc)
 
 val queryStream: Source[ByteString] = 
   PgStream
-    .getQueryResultAsStream("select a, b, c from table")
+    .getQueryResultAsStream("select a, b, c from table", 
+        options = Map("FORMAT" -> "CSV", "DELIMITER" -> "','"))
 
 val streamOfNbInsertedLines: Flow[ByteString, Long] = 
   someLineStream
-    .via(PgStream.insertStreamToTable("schema", "table"))
+    .via(PgStream.insertStreamToTable("schema", "table", 
+        options = Map("FORMAT" -> "CSV", "DELIMITER" -> "','")))
 ```

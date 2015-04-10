@@ -68,11 +68,11 @@ class PostgresExtensionsSpec extends FlatSpec with Matchers with ScalaFutures wi
     val futLines = SourceExt
       .fromFile(new File(getClass.getResource("/report.csv0000_part_00").getPath), maxChunkSize = 5 * 1024 * 1024)
       .via(FlowExt.rechunkByteStringBySeparator())
-      .via(PgStream.insertStreamToTable("public", insertTable, chunkInsertionConcurrency = 2))
+      .via(PgStream.insertStreamToTable("public", insertTable, Map("FORMAT" -> "CSV", "DELIMITER" -> "','"), chunkInsertionConcurrency = 2))
       .via(FlowExt.fold(0L)(_ + _))
       .map { total =>
         nbLinesInserted.set(total)
-        PgStream.getQueryResultAsStream("select * from public.test_postgres_aws_s3")
+        PgStream.getQueryResultAsStream("select * from public.test_postgres_aws_s3", Map("FORMAT" -> "CSV", "DELIMITER" -> "','"))
       }
       .flatten(FlattenStrategy.concat)
       .via(FlowExt.rechunkByteStringBySize(5 * 1024 * 1024))
