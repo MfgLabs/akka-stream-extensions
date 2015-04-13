@@ -10,13 +10,13 @@ resolvers ++= Seq(
 ```
 
 ## Dependencies
-Currently depends on akka-stream-1.0-M4
+Currently depends on akka-stream-1.0-M5
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.5.1-SNAPSHOT"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.6-SNAPSHOT"
 
 // Postgres extensions
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.5.1-SNAPSHOT"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.6-SNAPSHOT"
 ```
 
 ## Use
@@ -29,12 +29,11 @@ import com.mfglabs.stream._
 val formattedSource: Source[String] = 
   SourceExt
     .fromFile(new File("path"))(ExecutionContextForBlockingOps(someEc))
-    .via(FlowExt.rechunkByteStringBySeparator(ByteString("\n")))
+    .via(FlowExt.rechunkByteStringBySeparator(ByteString("\n"), maxChunkSize = 5 * 1024))
     .map(_.utf8String)
     .via(FlowExt.zipWithIndex)
     .map { case (line, i) => s"Line $i: $line" }
 ```
-
 
 Postgres extension:
 
