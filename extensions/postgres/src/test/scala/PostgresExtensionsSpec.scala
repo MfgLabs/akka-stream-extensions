@@ -15,18 +15,7 @@ import concurrent.ScalaFutures
 import scala.concurrent.Future
 import scala.util.Try
 
-/**
- * To run this test, launch a local postgresql instance and put the right connection info into DriverManager.getConnection
- */
-
 class PostgresExtensionsSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll with DockerTmpDB {
-
-  import extensions.postgres._
-
-  val bucket = "mfg-commons-aws"
-
-  val keyPrefix = "test/extensions/postgres"
-
   implicit val as = ActorSystem()
   implicit val fm = ActorFlowMaterializer()
   implicit override val patienceConfig =
@@ -34,7 +23,7 @@ class PostgresExtensionsSpec extends FlatSpec with Matchers with ScalaFutures wi
 
   Class.forName("org.postgresql.Driver")
 
-  "PgStream" should "stream a file to a postgres table and stream a query from a postgre table" in {
+  "PgStream" should "stream a file to a Postgres table and stream a sql query from a Postgres table" in {
     val stmt = conn.createStatement()
     implicit val pgConn = PgStream.sqlConnAsPgConnUnsafe(conn)
     import scala.concurrent.ExecutionContext.Implicits.global
@@ -42,7 +31,7 @@ class PostgresExtensionsSpec extends FlatSpec with Matchers with ScalaFutures wi
 
     stmt.execute(
       s"""
-         create table public.test_postgres_aws_s3(
+         create table public.test_postgres(
           io_id integer,
           dsp_name text,
           advertiser_id integer,
@@ -60,29 +49,29 @@ class PostgresExtensionsSpec extends FlatSpec with Matchers with ScalaFutures wi
        """
     )
 
-    val insertTable = "test_postgres_aws_s3(io_id, dsp_name, advertiser_id, campaign_id, strategy_id, day, impressions, " +
+    val insertTable = "test_postgres(io_id, dsp_name, advertiser_id, campaign_id, strategy_id, day, impressions, " +
       "clicks, post_view_conversions, post_click_conversions, media_cost, total_ad_cost, total_cost)"
 
     val nbLinesInserted = new AtomicLong(0L)
 
     val futLines = SourceExt
       .fromFile(new File(getClass.getResource("/report.csv0000_part_00").getPath), maxChunkSize = 5 * 1024 * 1024)
-      .via(FlowExt.rechunkByteStringBySeparator())
+      .via(FlowExt.rechunkByteStringBySeparator(ByteString("\n"), maximumChunkBytes = 1 * 1024 * 1024))
       .via(PgStream.insertStreamToTable("public", insertTable, Map("FORMAT" -> "CSV", "DELIMITER" -> "','"), chunkInsertionConcurrency = 2))
       .via(FlowExt.fold(0L)(_ + _))
       .map { total =>
         nbLinesInserted.set(total)
-        PgStream.getQueryResultAsStream("select * from public.test_postgres_aws_s3", Map("FORMAT" -> "CSV", "DELIMITER" -> "','"))
+        PgStream.getQueryResultAsStream("select * from public.test_postgres", Map("FORMAT" -> "CSV", "DELIMITER" -> "','"))
       }
       .flatten(FlattenStrategy.concat)
       .via(FlowExt.rechunkByteStringBySize(5 * 1024 * 1024))
-      .via(FlowExt.rechunkByteStringBySeparator())
+      .via(FlowExt.rechunkByteStringBySeparator(ByteString("\n"), maximumChunkBytes = 1 * 1024 * 1024))
       .map(_.utf8String)
       .runWith(SinkExt.collect)
 
     val futExpectedLines = SourceExt
       .fromFile(new File(getClass.getResource("/report.csv0000_part_00").getPath), maxChunkSize = 5 * 1024 * 1024)
-      .via(FlowExt.rechunkByteStringBySeparator())
+      .via(FlowExt.rechunkByteStringBySeparator(ByteString("\n"), maximumChunkBytes = 1 * 1024 * 1024))
       .map(_.utf8String)
       .runWith(SinkExt.collect)
 

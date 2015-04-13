@@ -12,12 +12,12 @@ import akka.stream.scaladsl._
 trait FlowExt {
 
   /**
-   * perform an unordered map async with a bounded number of futures running concurrently
+   * Perform an unordered map async with a bounded number of futures running concurrently.
    * @param maxConcurrency
    * @param f
    * @tparam A
    * @tparam B
-   * @return Bounded map flow
+   * @return
    */
   def mapAsyncUnorderedWithBoundedConcurrency[A, B](maxConcurrency: Int)(f: A => Future[B]): Flow[A, B, Unit] =
     Flow[A].section(OperationAttributes.inputBuffer(initial = maxConcurrency, max = maxConcurrency)) { sectionFlow =>
@@ -25,12 +25,12 @@ trait FlowExt {
     }
 
   /**
-   * perform an ordered map async with a bounded number of futures running concurrently
+   * Perform an ordered map async with a bounded number of futures running concurrently.
    * @param maxConcurrency
    * @param f
    * @tparam A
    * @tparam B
-   * @return Bounded map flow
+   * @return
    */
   def mapAsyncWithBoundedConcurrency[A, B](maxConcurrency: Int)(f: A => Future[B]): Flow[A, B, Unit] =
     Flow[A].section(OperationAttributes.inputBuffer(initial = maxConcurrency, max = maxConcurrency)) { sectionFlow =>
@@ -38,21 +38,23 @@ trait FlowExt {
     }
 
   /**
-   * perform a map async with a guarantee on the ordering of the running of futures. It can for instance be used to guarantee
-   * the ordering of side-effecting futures.
-   * @param f
-   * @tparam A
-   * @tparam B
-   * @return Bounded map flow
-   */
-  def mapAsyncWithOrderedSideEffect[A, B](f: A => Future[B]): Flow[A, B, Unit] = mapAsyncWithBoundedConcurrency(1)(f)
-
-  /**
-   * Helper to create a flow whose creation depends on the first element of the upstream.
+   * Perform a map async that executes futures in-order.
+   * It can for instance be used to guarantee the ordering of side-effects in futures.
    * @param f
    * @tparam A
    * @tparam B
    * @return
+   */
+  def mapAsyncWithOrderedSideEffect[A, B](f: A => Future[B]): Flow[A, B, Unit] = mapAsyncWithBoundedConcurrency(1)(f)
+
+  /**
+   * Create a Flow whose creation depends on the first element of the upstream.
+   * @param includeHeadInUpStream true if we want the first element of the upstream to be included in the dowstream.
+   * @param f takes the first element of upstream in input and returns the resulting flow
+   * @tparam A
+   * @tparam B
+   * @tparam M
+   * @return the flow returned by f
    */
   def withHead[A, B, M](includeHeadInUpStream: Boolean)(f: A => Flow[A, B, M]): Flow[A, B, Unit] = {
     Flow[A]
@@ -67,21 +69,23 @@ trait FlowExt {
   }
 
   /**
-   * add a sequence id to each record
-   * @return a stream of strings
+   * Zip a stream with the indices of its elements.
+   * @return
    */
-  def zipWithIndex[A] : Flow[A, (A, Long), Unit] = {
+  def zipWithIndex[A]: Flow[A, (A, Long), Unit] = {
     withHead(includeHeadInUpStream = false) { head =>
       Flow[A].scan((head, 0L)) { case ((_, n), el) => (el, n + 1) }
     }
   }
 
   /**
-   * transform a stream of bytes into a stream of strings, split by line
-   * @return a stream of strings
+   * Rechunk of stream of bytes according to a separator
+   * @param separator the separator to split the stream. For example ByteString("\n") to split a stream by lines.
+   * @param maximumChunkBytes the maximum possible size of a split to send downstream (in bytes). If no separator is found
+   *                          before reaching this limit, the stream fails.
+   * @return
    */
-  def rechunkByteStringBySeparator(separator: ByteString = ByteString("\n"),
-                                   maximumChunkBytes: Int = Int.MaxValue): Flow[ByteString, ByteString, Unit] = {
+  def rechunkByteStringBySeparator(separator: ByteString, maximumChunkBytes: Int): Flow[ByteString, ByteString, Unit] = {
     def stage = new PushPullStage[ByteString, ByteString] {
       private val separatorBytes = separator
       private val firstSeparatorByte = separatorBytes.head
@@ -145,10 +149,10 @@ trait FlowExt {
   }
 
   /**
-   * Limit downstream rate to one element every 'interval' by applying back-pressure on upstream
-   * @param interval
+   * Limit downstream rate to one element every 'interval' by applying back-pressure on upstream.
+   * @param interval time interval to send one element downstream
    * @tparam A
-   * @return A flow that limit the rate of the stream
+   * @return
    */
   def rateLimiter[A](interval: FiniteDuration): Flow[A, A, Unit] = {
     case object Tick
@@ -172,45 +176,9 @@ trait FlowExt {
   }
 
   /**
-   * Rechunk a stream of bytes with a new chunk size (example of StatefulStage version, do not delete)
-   */
-//  def rechunkByteString(chunkSize: Int): Flow[ByteString, ByteString] = {
-//    val stage = new StatefulStage[ByteString, ByteString] {
-//      private var buffer = ByteString.empty
-//
-//      override def initial = new State {
-//        override def onPush(elem: ByteString, ctx: Context[ByteString]): Directive = {
-//          buffer ++= elem
-//          val chunks = buffer.grouped(chunkSize).toVector
-//          chunks.lastOption match {
-//            case Some(lastChunk) if lastChunk.length < chunkSize =>
-//              buffer = lastChunk
-//              emit(chunks.dropRight(1).toIterator, ctx)
-//            case Some(lastChunk) if lastChunk.length == chunkSize =>
-//              buffer = ByteString.empty
-//              emit(chunks.toIterator, ctx)
-//            case None =>
-//              emit(Iterator.empty, ctx)
-//          }
-//        }
-//
-//        override def onPull(ctx: Context[ByteString]): Directive = {
-//          if (ctx.isFinishing) {
-//            emitAndFinish(buffer.grouped(chunkSize), ctx)
-//          } else {
-//            ctx.pull()
-//          }
-//        }
-//      }
-//
-//      override def onUpstreamFinish(ctx: Context[ByteString]): TerminationDirective = ctx.absorbTermination()
-//    }
-//
-//    Flow[ByteString].transform(() => stage)
-//  }
-
-  /**
-   * Rechunk a stream of bytes with a new chunk size
+   * Rechunk a stream of bytes according to a chunk size.
+   * @param chunkSize the new chunk size
+   * @return
    */
   def rechunkByteStringBySize(chunkSize: Int): Flow[ByteString, ByteString, Unit] = {
     def stage = new PushPullStage[ByteString, ByteString] {
@@ -252,7 +220,7 @@ trait FlowExt {
   }
 
   /**
-   * Fold and/or unfold the stream with an user-defined function
+   * Fold and/or unfold the stream with an user-defined function.
    * @param zero initial state
    * @param f takes current state and current elem, returns a seq of C elements to push downstream and the next state b
    *          if we want the stream to continue (if no new state b, the stream ends).
@@ -344,7 +312,7 @@ trait FlowExt {
   }
 
   /**
-   * Fold the stream and push the last B to downstream when upstream finishes
+   * Fold the stream and push the last B to downstream when upstream finishes.
    * @param zero
    * @param f
    * @tparam A
@@ -359,8 +327,8 @@ trait FlowExt {
   }
 
   /**
-   * Take the stream while condition is false.
-   * @param f
+   * Consume the stream while condition is false.
+   * @param f condition
    * @tparam A
    * @return
    */
@@ -391,7 +359,7 @@ trait FlowExt {
   }
 
   /**
-   * A flow that repeats each element of the source 'nb' times
+   * Repeat each element of the source 'nb' times.
    * @param nb the number of repetitions
    * @tparam A
    * @return

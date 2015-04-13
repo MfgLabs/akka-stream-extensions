@@ -11,8 +11,6 @@ import com.mfglabs.stream.internals.source.{UnfoldPullerAsync, BulkPullerAsync}
 
 import scala.concurrent._
 
-case class ExecutionContextForBlockingOps(value: ExecutionContext) extends AnyVal
-
 trait SourceExt {
   val defaultChunkSize = 8 * 1024
 
@@ -26,6 +24,13 @@ trait SourceExt {
     }
   }
 
+  /**
+   * Create a Source from an InputStream.
+   * @param is source input stream
+   * @param maxChunkSize max size of the chunks that the source will emit (in bytes).
+   * @param ec ec that will be used for the input stream's blocking operations
+   * @return
+   */
   def fromStream(is: InputStream, maxChunkSize: Int = defaultChunkSize)(implicit ec: ExecutionContextForBlockingOps): Source[ByteString, ActorRef] = {
     bulkPullerAsync[ByteString](0) { (counter, demand) =>
       Future {
@@ -36,33 +41,54 @@ trait SourceExt {
     }
   }
 
+  /**
+   * Create a Source from a zipped input stream and unzip it on the fly.
+   * @param is source input stream
+   * @param maxChunkSize max size of the chunks that the source will emit (in bytes).
+   * @param ec ec that will be used for the input stream's blocking operations
+   * @return
+   */
   def fromGZIPStream(is: InputStream, maxChunkSize: Int = defaultChunkSize)(implicit ec: ExecutionContextForBlockingOps): Source[ByteString, ActorRef] =
     fromStream(new GZIPInputStream(is), maxChunkSize)(ec)
 
+  /**
+   * Create a Source from a File.
+   * @param f file
+   * @param maxChunkSize max size of stream chunks in bytes
+   * @param ec ec that will be used for the input stream's blocking operations
+   * @return
+   */
   def fromFile(f: File, maxChunkSize: Int = defaultChunkSize)(implicit ec: ExecutionContextForBlockingOps): Source[ByteString, ActorRef] =
     fromStream(new FileInputStream(f), maxChunkSize)(ec)
 
+  /**
+   * Create a Source from a zip File and unzip it on the fly.
+   * @param f file
+   * @param maxChunkSize max size of the chunks that the source will emit (in bytes).
+   * @param ec
+   * @return
+   */
   def fromGZIPFile(f: File, maxChunkSize: Int = defaultChunkSize)(implicit ec: ExecutionContextForBlockingOps): Source[ByteString, ActorRef] =
     fromGZIPStream(new FileInputStream(f), maxChunkSize)(ec)
 
   /**
-   * Helper to create a source that calls the f function each time that downstream requests more elements.
+   * Create a source that calls the f function each time that downstream requests more elements.
    * @param offset initial offset
    * @param f pulling function that takes as first argument (offset + nb of already pushed elements into downstream) and
    *          as second argument the maximum number of elements that can be currently pushed downstream.
    *          Returns a sequence of elements to push, and a stop boolean (true means that this is the end of the stream)
    * @tparam A
-   * @return Pulling source
+   * @return
    */
   def bulkPullerAsync[A](offset: Long)(f: (Long, Int) => Future[(Seq[A], Boolean)]): Source[A, ActorRef] =
     Source[A](BulkPullerAsync.props(offset)(f))
 
   /**
-   * Helper to create a source that calls the f function each time that downstream requests more elements.
+   * Create a source that calls the f function each time that downstream requests more elements.
    * @param zero
    * @param f pulling unfold function that takes a state B and produce optionally an element to push to downstream. It produces
    *          a new state b if we want the stream to continue or no new state if we want the stream to end.
-   * @return Pulling source
+   * @return
    */
   def unfoldPullerAsync[A, B](zero: => B)(f: B => Future[(Option[A], Option[B])]): Source[A, ActorRef] =
     Source[A](UnfoldPullerAsync.props[A, B](zero)(f))

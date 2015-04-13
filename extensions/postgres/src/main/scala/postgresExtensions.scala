@@ -14,7 +14,13 @@ import scala.util.{Failure, Try, Success}
 
 trait PgStream {
   /**
-   * Get a postgres table as a stream source (each line is separated with '\n')
+   * Execute a SQL query and get its result as a stream.
+   * @param sqlQuery sql query
+   * @param options options of the Postgres COPY command. For example, Map("FORMAT" -> "CSV", "DELIMITER" -> "','")
+   * @param outputStreamTransformer optional output stream transformer
+   * @param conn Postgres connection
+   * @param ec ec that will be used for Postgres' blocking operations
+   * @return
    */
   def getQueryResultAsStream(sqlQuery: String, options: Map[String, String], outputStreamTransformer : OutputStream => OutputStream = identity)
                       (implicit conn: PGConnection, ec: ExecutionContextForBlockingOps): Source[ByteString, (akka.actor.ActorRef, Unit)] = {
@@ -47,8 +53,8 @@ trait PgStream {
   }
 
   /**
-   * Inserts a stream as a postgres table (one chunk will correspond to one line).
-   * Insertion order is guaranteed even with chunkInsertionConcurrency > 1
+   * Insert a stream in a Postgres table (one upstream chunk will correspond to one line).
+   * Insertion order is not guaranteed with chunkInsertionConcurrency > 1.
    * @return a stream of number of inserted lines by chunk
    * @param schema
    * @param table can be table_name or table_name(column1, column2) to insert data in specific columns
@@ -69,7 +75,7 @@ trait PgStream {
     Flow[ByteString]
       .map(_.utf8String)
       .grouped(nbLinesPerInsertionBatch)
-      .via(FlowExt.mapAsyncWithBoundedConcurrency(chunkInsertionConcurrency) { chunk =>
+      .via(FlowExt.mapAsyncUnorderedWithBoundedConcurrency(chunkInsertionConcurrency) { chunk =>
         val query = s"COPY ${schema}.${table} FROM STDIN ($optionsStr)"
         Future {
           copyManager.copyIn(query, new StringReader(chunk.mkString("\n")))

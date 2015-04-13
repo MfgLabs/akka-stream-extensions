@@ -5,9 +5,9 @@ import akka.stream.scaladsl.Sink
 
 trait SinkExt {
   /**
-   * consume a stream and return it as a list
-   * @tparam T records type
-   * @return a list of records
+   * Consume a stream and return it as a List.
+   * @tparam T
+   * @return
    */
   def collect[T] = Sink.fold[Seq[T],T](Seq.empty[T])(_ :+ _)
 }

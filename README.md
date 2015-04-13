@@ -48,10 +48,10 @@ implicit val blockingEc = ExecutionContextForBlockingOps(someEc)
 val queryStream: Source[ByteString] = 
   PgStream
     .getQueryResultAsStream("select a, b, c from table", 
-        options = Map("FORMAT" -> "CSV", "DELIMITER" -> "','"))
+        options = Map("FORMAT" -> "CSV"))
 
 val streamOfNbInsertedLines: Flow[ByteString, Long] = 
   someLineStream
     .via(PgStream.insertStreamToTable("schema", "table", 
-        options = Map("FORMAT" -> "CSV", "DELIMITER" -> "','")))
+        options = Map("FORMAT" -> "CSV")))
 ```
