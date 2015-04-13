@@ -6,7 +6,13 @@ version in ThisBuild := "0.6.0-SNAPSHOT"
 
 scalaVersion in ThisBuild := "2.11.5"
 
-publishTo in ThisBuild := Some("MFGLabs Snapshots" at "s3://mfg-mvn-repo/snapshots")
+publishTo in ThisBuild := {
+  val s3Repo = "s3://mfg-mvn-repo"
+  if (isSnapshot.value)
+    Some("snapshots" at s3Repo + "/snapshots")
+  else
+    Some("releases" at s3Repo + "/releases")
+}
 
 publishMavenStyle in ThisBuild := true
 
@@ -29,7 +35,7 @@ lazy val commons = project.in(file("commons"))
   .settings(
     name := "akka-stream-extensions",
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-stream-experimental" % "1.0-M4",
+      "com.typesafe.akka" %% "akka-stream-experimental" % "1.0-M5",
       "org.scalatest" %% "scalatest" % "2.1.6"
     )
   )
