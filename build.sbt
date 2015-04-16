@@ -54,6 +54,6 @@ lazy val shapeless = project.in(file("extensions/shapeless"))
   .settings(
     name := "akka-stream-extensions-shapeless",
     libraryDependencies ++= Seq(
-      "com.chuusai"       %% "shapeless"   % "2.1.0"
+      "com.chuusai"       %% "shapeless"   % "2.2.0-RC4"
     )
   )

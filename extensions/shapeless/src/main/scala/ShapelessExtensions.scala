@@ -143,11 +143,11 @@ class CoproductFlexiRoute[C <: Coproduct, HL <: HList](implicit
 
     override def initialState = State[Any](DemandFromAll(p.outs.toList[Outlet[_]](trav))) {
       (ctx, _, element) =>
-        println("e="+element)
+        // println("e="+element)
         val (outlet, Some(h)) = sel.apply(element, p.outs)
-        println(s"outlet:$outlet h:$h")
+        // println(s"outlet:$outlet h:$h")
         ctx.emit(outlet)(h)
-        println(s"after")
+        // println(s"after")
         SameState
     }
  
@@ -215,7 +215,6 @@ class CoproductFlexiMerge[C <: Coproduct, HL <: HList](implicit
 
     override def initialState = State[C](ReadAny(p.ins.toList[Inlet[C]](trav))) {
       (ctx, _, element) =>
-        println("e="+element)
         ctx.emit(element)
         SameState
     }
