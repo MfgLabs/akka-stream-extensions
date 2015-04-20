@@ -7,8 +7,8 @@ import org.elasticsearch.action.search.SearchType
 import org.elasticsearch.client.{Client => EsClient}
 import org.elasticsearch.index.query.QueryBuilder
 
-import scala.concurrent.Future
-import scala.concurrent.duration.FiniteDuration
+import scala.concurrent._
+import scala.concurrent.duration._
 
 trait EsStream {
 
