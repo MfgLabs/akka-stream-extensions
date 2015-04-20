@@ -11,6 +11,7 @@ import org.scalatest.{BeforeAndAfterAll, Matchers, FlatSpec}
 
 import scala.concurrent._
 import scala.concurrent.duration._
+import scala.util.Try
 
 class PostgresExtensionsSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll {
   implicit val as = ActorSystem()
@@ -20,22 +21,29 @@ class PostgresExtensionsSpec extends FlatSpec with Matchers with ScalaFutures wi
   implicit val blockingEc = ExecutionContextForBlockingOps(scala.concurrent.ExecutionContext.Implicits.global)
 
   "EsStream" should "execute a query a get the result as a stream" in {
-    implicit val client = new NodeBuilder().build().start().client()
+    val node = new NodeBuilder().build().start()
+    implicit val client = node.client()
 
-    val toIndex = for (i <- 1 to 10000) yield s"""{i: $i}"""
-    toIndex.foreach { json =>
-      client.prepareIndex("test", "type").setSource(json).get()
+    val index = "test"
+    val `type` = "type"
+
+    Try(client.admin.indices().prepareDelete(index).get())
+
+    val toIndex = for (i <- 1 to 5002) yield (i, s"""{i: $i}""")
+    toIndex.foreach { case (i, json) =>
+      client.prepareIndex(index, `type`).setSource(json).setId(i.toString).get()
     }
 
-    client.admin.indices.prepareRefresh().get() // to be sure that the data is indexed
+    client.admin.indices.prepareRefresh(index).get() // to be sure that the data is indexed
 
-    val res = EsStream.queryAsStream(QueryBuilders.matchAllQuery(), "test", "type", 1 minutes, 50)
+    val res = EsStream.queryAsStream(QueryBuilders.matchAllQuery(), index, `type`, 1 minutes, 50)
       .runWith(SinkExt.collect)
       .futureValue
 
-    res.sorted shouldEqual toIndex.toSeq.sorted
+    res.sorted shouldEqual toIndex.map(_._2).sorted
 
     client.close()
+    node.close()
   }
 
 }
