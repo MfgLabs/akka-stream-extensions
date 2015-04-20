@@ -2,7 +2,7 @@ organization in ThisBuild := "com.mfglabs"
 
 name in ThisBuild := "akka-stream-extensions"
 
-version in ThisBuild := "0.6.0-SNAPSHOT"
+version in ThisBuild := "0.6.0"
 
 scalaVersion in ThisBuild := "2.11.5"
 
