@@ -9,7 +9,8 @@ title:               MfgLabs Akka-Stream-Extensions
 tagline:             Akka-Stream toolig
 url:                 http://getpoole.com
 paginate:            1
-baseurl:             ""
+baseurl:             /akka-stream-extensions/
+apidocs:             /akka-stream-extensions/api/
 
 # Assets
 #
