@@ -37,7 +37,9 @@ class UnfoldPullerAsync[A, B](zero: => B)(f: B => Future[(Option[A], Option[B])]
 
     case Request(_) | Pull => // ignoring until we receive the future response
 
-    case Status.Failure(err) => onError(err)
+    case Status.Failure(err) =>
+      context.become(waitingForDownstreamReq(s))
+      onError(err)
 
     case Cancel => context.stop(self)
   }
