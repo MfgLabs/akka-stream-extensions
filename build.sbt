@@ -53,32 +53,7 @@ lazy val publishSettings = Seq(
       Some("snapshots" at nexus + "content/repositories/snapshots")
     else
       Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-  }/*,
-  pomExtra := (
-    <scm>
-      <url>git@github.com:non/cats.git</url>
-      <connection>scm:git:git@github.com:non/cats.git</connection>
-    </scm>
-    <developers>
-      <developer>
-        <id>non</id>
-        <name>Erik Osheim</name>
-        <url>http://github.com/non/</url>
-      </developer>
-    </developers>
-  ),
-  releaseProcess := Seq[ReleaseStep](
-    checkSnapshotDependencies,
-    inquireVersions,
-    runTest,
-    setReleaseVersion,
-    commitReleaseVersion,
-    tagRelease,
-    publishSignedArtifacts,
-    setNextVersion,
-    commitNextVersion,
-    pushChanges
-  )*/
+  }
 )
 
 lazy val docSettings = Seq(
