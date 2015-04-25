@@ -6,7 +6,7 @@ title: Unleashing Akka Stream Extensions
 
 Today, we are proud to release this opensource library extending the very promising & already great [Typesafe Akka-Stream](http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0-RC1/scala.html?_ga=1.42749861.1204922152.1421451776).
 
-For the impatient, if you want to use it immediately, let's go to our [Readme page](/akka-stream-extensions/readme/)
+For the impatient, if you want to use it immediately, let's go to our [QuickStart](/akka-stream-extensions/quickstart/)
 
 ## Introduction
 
