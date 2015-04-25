@@ -1,15 +1,18 @@
-Recommendations and requirements for how to best contribute to Algebird. 
+---
+layout: page
+title: Contributing
+---
 
-We strive to obey these as best as possible. As always, thanks for contributing--we hope these guidelines make it easier and shed some light on our approach and processes.
+Here are a very few recommendations and requirements for how to best contribute to Akka-Stream-Extensions. 
+
+> As always, thanks for contributing, you are the reason why & how opensource grows and becomes better
 
 ### Key branches
-- `master` is the latest, deployed version
-- `develop` is where development happens and all pull requests should be submitted
+- `master` is the latest on which we build new versions
 
 ### Pull requests
-- Submit pull requests against the `develop` branch
-- Try not to pollute your pull request with unintended changes--keep them simple and small
+- Submit pull requests against the `master` branch
+- Keep your PR simple, as small as possible and try to squash commits if possible
 
 ### License
-By contributing your code, you agree to license your contribution under the terms of the APLv2:
-https://github.com/twitter/algebird/blob/master/LICENSE
+By contributing your code, you agree to license your contribution under the terms of the [Apache v2 License](http://www.apache.org/licenses/LICENSE-2.0.html)

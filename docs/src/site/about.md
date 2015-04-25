@@ -3,28 +3,18 @@ layout: page
 title: About
 ---
 
-<p class="message">
-  Hey there! This page is included as an example. Feel free to customize it for your own use upon downloading. Carry on!
-</p>
+### Why
 
-In the novel, *The Strange Case of Dr. Jekyll and Mr. Hyde*, Mr. Poole is Dr. Jekyll's virtuous and loyal butler. Similarly, Poole is an upstanding and effective butler that helps you build Jekyll themes. It's made by [@mdo](https://twitter.com/mdo).
+Akka-Stream Extensions is the result of our everyday work at [MfgLabs](http://mfglabs.com) using Akka-Stream in production. As often, we have discovered that some primitives weren't provided by Akka-Stream out of the box and we were re-using always the same low-level bricks to build higher-level Sources/Flows/Sinks.
 
-There are currently two themes built on Poole:
+Those generic elements have become so useful in our daily job but we also think that lots of people have the same requirements as us and would be pleased to use our toolings, improve them and contribute some others. Our aim is to contribute making the Akka-Stream ecosyste bigger, more efficient, more dynamic with many low-level to high-level tools.
 
-* [Hyde](http://hyde.getpoole.com)
-* [Lanyon](http://lanyon.getpoole.com)
 
-Learn more and contribute on [GitHub](https://github.com/poole).
+MfgLabs has kindly accepted to opensource this library under Apache2 License making it really open & reusable in your professional projects.
 
-## Setup
+We hope you will like this library and will contribute to it and help us.
 
-Some fun facts about the setup of this project include:
 
-* Built for [Jekyll](http://jekyllrb.com)
-* Developed on GitHub and hosted for free on [GitHub Pages](https://pages.github.com)
-* Coded with [Sublime Text 2](http://sublimetext.com), an amazing code editor
-* Designed and developed while listening to music like [Blood Bros Trilogy](https://soundcloud.com/maddecent/sets/blood-bros-series)
+> This website has been quickly built using Jekyll theme [Lanyon](http://lanyon.getpoole.com) provided by [@mdo](https://twitter.com/mdo).
 
-Have questions or suggestions? Feel free to [open an issue on GitHub](https://github.com/poole/poole/issues/new) or [ask me on Twitter](https://twitter.com/mdo).
-
-Thanks for reading!
+Thanks for reading
