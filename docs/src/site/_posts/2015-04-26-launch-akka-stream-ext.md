@@ -3,86 +3,25 @@ layout: post
 title: Unleashing Akka Stream Extensions
 ---
 
-> Opensource Scala Library of generic, useful & higher-level `Sources`/`Flows`/`Sinks` for [Akka-Stream](http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0-RC1/scala.html?_ga=1.42749861.1204922152.1421451776) sponsored by [MfgLabs](http://mfglabs.com).
 
-## Resolver
+Today, we are proud to release this opensource library extending the very promising & already great [Typesafe Akka-Stream](http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0-RC1/scala.html?_ga=1.42749861.1204922152.1421451776).
 
-```scala
-resolvers ++= Seq(
-  "MFG releases" at "s3://mfg-mvn-repo/releases",
-  "MFG snapshots" at "s3://mfg-mvn-repo/snapshots"
-)
-```
+For the impatient, if you want to use it immediately, let's go to our [QuickStart](/akka-stream-extensions/quickstart/)
 
-## Dependencies
+## Introduction
 
-Currently depends on akka-stream-1.0-M5
+Our main purpose in this project is:
 
-```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.6.1-SNAPSHOT"
+1. to gather generic structures, low-level or higher-level built on top of existing Akka-Stream `Sources`/`Flows`/`Sinks`, well tested, production ready that can be reused in your projects
 
-// Postgres extensions
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.6.1-SNAPSHOT"
+2. to study/evaluate bleeding-edge concepts based on Akka-Stream
 
-// Elasticsearch extensions
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-elasticsearch" % "0.6.1-SNAPSHOT"
-```
+At [MfgLabs](http://mfglabs.com), we have been developing this library for our production projects because we have identified a few primitives that were common to many use-cases, not provided by Akka-Stream out of the box and not so easy to implement in a robust way.
 
-## Use
+We thank [MfgLabs](http://mfglabs.com) for accepting to opensource this library under [Apache V2](http://www.apache.org/licenses/LICENSE-2.0.html) but we believe it can be very useful & interesting to many people and we are sure some will help us debug & build more useful structures.
 
-### Commons
+> So don't hesitate to [contribute](/akka-stream-extensions/contributing/)
 
-```scala
-import com.mfglabs.stream._
+## What's provided?
 
-val formattedSource: Source[String, Unit] = 
-  SourceExt
-    .fromFile(new File("path"))(ExecutionContextForBlockingOps(someEc))
-    .via(FlowExt.rechunkByteStringBySeparator(ByteString("\n"), maxChunkSize = 5 * 1024))
-    .map(_.utf8String)
-    .via(FlowExt.zipWithIndex)
-    .map { case (line, i) => s"Line $i: $line" }
-```
-
-### Postgres extension
-
-```scala
-import com.mfglabs.stream._
-import com.mfglabs.stream.extensions.postgres._
-
-implicit val pgConnection = PgStream.sqlConnAsPgConnUnsafe(sqlConnection)
-implicit val blockingEc = ExecutionContextForBlockingOps(someEc)
-
-val queryStream: Source[ByteString, Unit] = PgStream
-    .getQueryResultAsStream(
-        "select a, b, c from table", 
-        options = Map("FORMAT" -> "CSV")
-     )
-
-val streamOfNbInsertedLines: Flow[ByteString, Long, Unit] = someLineStream
-    .via(PgStream.insertStreamToTable(
-        "schema", "table", 
-        options = Map("FORMAT" -> "CSV")
-     ))
-```
-
-### Elasticsearch extension
-
-```scala
-import com.mfglabs.stream._
-import com.mfglabs.stream.extensions.elasticsearch._
-import org.elasticsearch.client.Client
-import org.elasticsearch.index.query.QueryBuilders
-
-implicit val blockingEc = ExecutionContextForBlockingOps(someEc)
-implicit val esClient: Client = // ...
-
-val queryStream: Source[String, Unit] = EsStream
-    .queryAsAsStream(
-        QueryBuilders.matchAllQuery(),
-        index = "index",
-        `type` = "type",
-        scrollKeepAlive = 1 minutes,
-        scrollSize = 1000
-    )
-```
+TODO

@@ -10,7 +10,7 @@ markdown:            redcarpet
 
 # Setup
 title:               Akka-Stream Extensions
-tagline:             'by MfgLabs'
+tagline:             'by <a href="http://mfglabs.com">MfgLabs</a>'
 description:         'Opensource Library providing useful primitives & resources for Akka Stream.'
 url:                 http://mfglabs.github.com/akka-stream-extensions
 baseurl:             /akka-stream-extensions
