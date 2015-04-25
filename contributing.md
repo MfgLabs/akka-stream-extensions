@@ -11,8 +11,8 @@ We strive to obey these as best as possible. As always, thanks for contributing-
 - `master` is the latest, deployed version
 
 ### Pull requests
-- Submit pull requests against the `develop` branch
-- Try not to pollute your pull request with unintended changes--keep them simple and small
+- Submit pull requests against the `master` branch
+- Keep your PR simple, as small as possible and try to squash commits if possible
 
 ### License
 By contributing your code, you agree to license your contribution under the terms of the [Apache v2 License](http://www.apache.org/licenses/LICENSE-2.0.html)
