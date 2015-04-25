@@ -13,8 +13,8 @@ title:               Akka-Stream Extensions
 tagline:             'by MfgLabs'
 description:         'Opensource Library providing useful primitives & resources for Akka Stream.'
 url:                 http://mfglabs.github.com/akka-stream-extensions
-baseurl:             /akka-stream-extensions/
-apidocs:             /akka-stream-extensions/api/
+baseurl:             akka-stream-extensions
+apidocs:             akka-stream-extensions/api/
 # baseurl:             ''
 paginate:            5
 
