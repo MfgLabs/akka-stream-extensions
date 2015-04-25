@@ -20,7 +20,7 @@
     {% for node in pages_list %}
       {% if node.title != null %}
         {% if node.layout == "page" %}
-          <a class="sidebar-nav-item{% if page.url == node.url %} active{% endif %}" href="{{ site.baseurl }}/{{ node.url }}">{{ node.title }}</a>
+          <a class="sidebar-nav-item{% if page.url == node.url %} active{% endif %}" href="{{ site.baseurl }}{{ node.url }}">{{ node.title }}</a>
         {% endif %}
       {% endif %}
     {% endfor %}
@@ -28,6 +28,7 @@
     <!--a class="sidebar-nav-item" href="{{ site.github.repo }}/archive/v{{ site.version }}.zip">Download</a-->
     <a class="sidebar-nav-item" href="{{ site.github.repo }}">GitHub project</a>
     <a class="sidebar-nav-item" href="{{ site.apidocs }}">Scaladoc</a>
+    <a class="sidebar-nav-item" href="{{ site.baseurl }}contributing.html">Contributing</a>
     <span class="sidebar-nav-item">Currently v{{ site.version }}</span>
   </nav>
 
