@@ -10,7 +10,7 @@ markdown:            redcarpet
 
 # Setup
 title:               Akka-Stream Extensions
-tagline:             'by <img src="{{ site.baseurl }}/public/logo-mfg.png"/>'
+tagline:             'by <img src="/akka-stream-extensions/public/logo-mfg.png"/>'
 description:         'Opensource Library providing useful primitives & resources for Akka Stream.'
 url:                 http://mfglabs.github.com/akka-stream-extensions
 baseurl:             /akka-stream-extensions
