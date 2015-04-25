@@ -3,12 +3,12 @@ layout: page
 title: Contributing
 ---
 
-## Recommendations and requirements for how to best contribute to Akka-Stream-Extensions. 
+Here are a very few recommendations and requirements for how to best contribute to Akka-Stream-Extensions. 
 
-We strive to obey these as best as possible. As always, thanks for contributing--we hope these guidelines make it easier and shed some light on our approach and processes.
+> As always, thanks for contributing, you are the reason why & how opensource grows and becomes better
 
 ### Key branches
-- `master` is the latest, deployed version
+- `master` is the latest on which we build new versions
 
 ### Pull requests
 - Submit pull requests against the `master` branch
