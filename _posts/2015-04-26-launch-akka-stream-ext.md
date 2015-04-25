@@ -5,7 +5,8 @@ title: Unleashing Akka Stream Extensions
 
 > Opensource Scala Library of generic, useful & higher-level `Sources`/`Flows`/`Sinks` for [Akka-Stream](http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0-RC1/scala.html?_ga=1.42749861.1204922152.1421451776) sponsored by [MfgLabs](http://mfglabs.com).
 
-## Resolver:
+## Resolver
+
 ```scala
 resolvers ++= Seq(
   "MFG releases" at "s3://mfg-mvn-repo/releases",
@@ -14,6 +15,7 @@ resolvers ++= Seq(
 ```
 
 ## Dependencies
+
 Currently depends on akka-stream-1.0-M5
 
 ```scala
@@ -28,7 +30,7 @@ libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-elasticsearch" %
 
 ## Use
 
-Commons:
+### Commons
 
 ```scala
 import com.mfglabs.stream._
@@ -42,7 +44,7 @@ val formattedSource: Source[String, Unit] =
     .map { case (line, i) => s"Line $i: $line" }
 ```
 
-Postgres extension:
+### Postgres extension
 
 ```scala
 import com.mfglabs.stream._
@@ -64,7 +66,7 @@ val streamOfNbInsertedLines: Flow[ByteString, Long, Unit] = someLineStream
      ))
 ```
 
-Elasticsearch extension:
+### Elasticsearch extension
 
 ```scala
 import com.mfglabs.stream._
