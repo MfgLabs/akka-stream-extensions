@@ -103,3 +103,7 @@ EsStream
     scrollSize = 1000
   )
 ```
+
+## Testing
+To test postgres-extensions, you need to have Docker installed and running on your computer (the tests will automatically 
+launch a docker container with a Postgres db).
