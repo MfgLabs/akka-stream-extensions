@@ -2,14 +2,16 @@ package com.mfglabs.stream
 
 import akka.stream.scaladsl.Sink
 
+import scala.concurrent.Future
+
 
 trait SinkExt {
   /**
-   * Consume a stream and return it as a List.
+   * Consume a stream as a Seq.
    * @tparam T
    * @return
    */
-  def collect[T] = Sink.fold[Seq[T],T](Seq.empty[T])(_ :+ _)
+  def collect[T] = Sink.fold[Seq[T], T](Vector.empty)(_ :+ _)
 }
 
 object SinkExt extends SinkExt
