@@ -33,13 +33,32 @@ Commons:
 ```scala
 import com.mfglabs.stream._
 
-val formattedSource: Source[String, Unit] = 
-  SourceExt
-    .fromFile(new File("path"))(ExecutionContextForBlockingOps(someEc))
-    .via(FlowExt.rechunkByteStringBySeparator(ByteString("\n"), maxChunkSize = 5 * 1024))
-    .map(_.utf8String)
-    .via(FlowExt.zipWithIndex)
-    .map { case (line, i) => s"Line $i: $line" }
+// Source from a paginated REST Api
+SourceExt
+  .bulkPullerAsync(0L) { (currentPosition, downstreamDemand) =>
+    val futResult: Future[Seq[Page]] = WSService.get(offset = currentPosition, nbPages = downstreamDemand)
+    futResult
+  }
+  .via(FlowExt.rateLimiter(200 millis))
+  .via(FlowExt.mapAsyncWithBoundedConcurrency(maxConcurrency = 8)(asyncTransform))
+
+// Source from a Java InputStream
+SourceExt
+  .fromStream(inputStream)(ExecutionContextForBlockingOps(someEc))
+  .via(FlowExt.rechunkByteStringBySeparator(ByteString("\n"), maxChunkSize = 5 * 1024))
+  .map(_.utf8String)
+  .via(
+    FlowExt.customStatefulProcessor(Vector.empty[String])( // grouping by 100 except when we encounter a "flush" line
+      (acc, line) => {
+        if (acc.length == 100) (None, acc)
+        else if (line == "flush") (None, acc :+ line)
+        else (Some(acc :+ line), Vector.empty)
+      },
+      lastPushIfUpstreamEnds = acc => acc
+    )
+  )
+
+// Many more helpers, check the Scala doc !
 ```
 
 Postgres extension:
@@ -50,17 +69,19 @@ import com.mfglabs.stream.extensions.postgres._
 implicit val pgConnection = PgStream.sqlConnAsPgConnUnsafe(sqlConnection)
 implicit val blockingEc = ExecutionContextForBlockingOps(someEc)
 
-val queryStream: Source[ByteString, Unit] = PgStream
-    .getQueryResultAsStream(
-        "select a, b, c from table", 
-        options = Map("FORMAT" -> "CSV")
-     )
+PgStream
+  .getQueryResultAsStream(
+    "select a, b, c from table", 
+    options = Map("FORMAT" -> "CSV")
+  )
+  .via(FlowExt.rechunkByteStringBySeparator(ByteString("\n"), maxChunkSize = 5 * 1024))
 
-val streamOfNbInsertedLines: Flow[ByteString, Long, Unit] = someLineStream
-    .via(PgStream.insertStreamToTable(
-        "schema", "table", 
-        options = Map("FORMAT" -> "CSV")
-     ))
+someLineStream
+  .via(PgStream.insertStreamToTable(
+    "schema", 
+    "table", 
+    options = Map("FORMAT" -> "CSV")
+  ))
 ```
 
 Elasticsearch extension:
@@ -73,12 +94,16 @@ import org.elasticsearch.index.query.QueryBuilders
 implicit val blockingEc = ExecutionContextForBlockingOps(someEc)
 implicit val esClient: Client = // ...
 
-val queryStream: Source[String, Unit] = EsStream
-    .queryAsAsStream(
-        QueryBuilders.matchAllQuery(),
-        index = "index",
-        `type` = "type",
-        scrollKeepAlive = 1 minutes,
-        scrollSize = 1000
-    )
+EsStream
+  .queryAsAsStream(
+    QueryBuilders.matchAllQuery(),
+    index = "index",
+    `type` = "type",
+    scrollKeepAlive = 1 minutes,
+    scrollSize = 1000
+  )
 ```
+
+## Testing
+To test postgres-extensions, you need to have Docker installed and running on your computer (the tests will automatically 
+launch a docker container with a Postgres db).
