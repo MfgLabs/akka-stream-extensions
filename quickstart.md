@@ -4,9 +4,11 @@ title: QuickStart
 ---
 
 # Akka Stream Extensions
+
 Library of useful Sources / Flows / Sinks for Akka Stream.
 
 ## Resolver:
+
 ```scala
 resolvers ++= Seq(
   "MFG releases" at "s3://mfg-mvn-repo/releases",
@@ -29,7 +31,8 @@ libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-elasticsearch" %
 
 ## Use
 
-Commons:
+### Commons
+
 ```scala
 import com.mfglabs.stream._
 
@@ -61,7 +64,8 @@ SourceExt
 // Many more helpers, check the Scala doc !
 ```
 
-Postgres extension:
+### Postgres extension
+
 ```scala
 import com.mfglabs.stream._
 import com.mfglabs.stream.extensions.postgres._
@@ -84,7 +88,8 @@ someLineStream
   ))
 ```
 
-Elasticsearch extension:
+### Elasticsearch extension
+
 ```scala
 import com.mfglabs.stream._
 import com.mfglabs.stream.extensions.elasticsearch._
@@ -105,5 +110,6 @@ EsStream
 ```
 
 ## Testing
+
 To test postgres-extensions, you need to have Docker installed and running on your computer (the tests will automatically 
 launch a docker container with a Postgres db).
