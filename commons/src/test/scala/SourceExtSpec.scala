@@ -133,11 +133,11 @@ class SourceExtSpec extends FlatSpec with Matchers with ScalaFutures {
     val t2 = System.nanoTime()
 
     whenReady(source.runWith(SinkExt.collect)) {
-      case t :: _ =>
+      case t +: _ =>
         assert(t > t2)
         val t3 = System.nanoTime()
         whenReady(source.runWith(SinkExt.collect)) {
-          case tt :: _ =>
+          case tt +: _ =>
             assert(tt > t3)
             assert(tt > t)
         }
@@ -147,7 +147,7 @@ class SourceExtSpec extends FlatSpec with Matchers with ScalaFutures {
     val source2 = Source(futTs)
     val t4 = System.nanoTime()
     whenReady(source2.runWith(SinkExt.collect)) {
-      case t :: _ => assert(t < t4)
+      case t +: _ => assert(t < t4)
     }
   }
 
@@ -158,11 +158,11 @@ class SourceExtSpec extends FlatSpec with Matchers with ScalaFutures {
     val t2 = System.nanoTime()
 
     whenReady(source.runWith(SinkExt.collect)) {
-      case t :: _ =>
+      case t +: _ =>
         assert(t > t2)
         val t3 = System.nanoTime()
         whenReady(source.runWith(SinkExt.collect)) {
-          case tt :: _ =>
+          case tt +: _ =>
             assert(tt > t3)
             assert(tt > t)
         }
@@ -172,7 +172,7 @@ class SourceExtSpec extends FlatSpec with Matchers with ScalaFutures {
     val source2 = Source(futTs)
     val t4 = System.nanoTime()
     whenReady(source2.runWith(SinkExt.collect)) {
-      case t :: _ => assert(t < t4)
+      case t +: _ => assert(t < t4)
     }
   }
 
@@ -182,11 +182,11 @@ class SourceExtSpec extends FlatSpec with Matchers with ScalaFutures {
     val t2 = System.nanoTime()
 
     whenReady(source.runWith(SinkExt.collect)) {
-      case t :: _ =>
+      case t +: _ =>
         assert(t > t2)
         val t3 = System.nanoTime()
         whenReady(source.runWith(SinkExt.collect)) {
-          case tt :: _ =>
+          case tt +: _ =>
             assert(tt > t3)
             assert(tt > t)
         }
@@ -196,7 +196,7 @@ class SourceExtSpec extends FlatSpec with Matchers with ScalaFutures {
     val source2 = Source.single(System.nanoTime())
     val t4 = System.nanoTime()
     whenReady(source2.runWith(SinkExt.collect)) {
-      case t :: _ => assert(t < t4)
+      case t +: _ => assert(t < t4)
     }
   }
 

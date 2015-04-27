@@ -37,24 +37,24 @@ lazy val commonSettings = Seq(
     "git@github.com:MfgLabs/akka-stream-extensions.git"))
 )
 
-lazy val publishSettings = Seq(
-  homepage := Some(url("https://github.com/MfgLabs/akka-stream-extensions")),
-  licenses := Seq("APLv2" -> url("http://www.apache.org/licenses/LICENSE-2.0.html")),
-  autoAPIMappings := true,
-  apiURL := Some(url("https://MfgLabs.github.io/akka-stream-extensions/api/")),
-  publishMavenStyle := true,
-  publishArtifact in packageDoc := false,
-  publishArtifact in Test := false,
-  pomIncludeRepository := { _ => false },
-  publishTo <<= version { (v: String) =>
-    val nexus = "https://oss.sonatype.org/"
-
-    if (v.trim.endsWith("SNAPSHOT"))
-      Some("snapshots" at nexus + "content/repositories/snapshots")
-    else
-      Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-  }
-)
+//lazy val publishSettings = Seq(
+//  homepage := Some(url("https://github.com/MfgLabs/akka-stream-extensions")),
+//  licenses := Seq("APLv2" -> url("http://www.apache.org/licenses/LICENSE-2.0.html")),
+//  autoAPIMappings := true,
+//  apiURL := Some(url("https://MfgLabs.github.io/akka-stream-extensions/api/")),
+//  publishMavenStyle := true,
+//  publishArtifact in packageDoc := false,
+//  publishArtifact in Test := false,
+//  pomIncludeRepository := { _ => false },
+//  publishTo <<= version { (v: String) =>
+//    val nexus = "https://oss.sonatype.org/"
+//
+//    if (v.trim.endsWith("SNAPSHOT"))
+//      Some("snapshots" at nexus + "content/repositories/snapshots")
+//    else
+//      Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+//  }
+//)
 
 lazy val docSettings = Seq(
   autoAPIMappings := true,
@@ -70,11 +70,11 @@ lazy val docSettings = Seq(
     "-doc-source-url", scmInfo.value.get.browseUrl + "/tree/master€{FILE_PATH}.scala",
     "-sourcepath", baseDirectory.in(LocalRootProject).value.getAbsolutePath
   ),
-  git.remoteRepo := "git@github.com:MfgLabs/akka-stream-extensions.git",
-  includeFilter in makeSite := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.gif" | "*.js" | "*.swf" | "*.yml" | "*.md"
+  git.remoteRepo := "git@github.com:MfgLabs/akka-stream-extensions.git"
+//  includeFilter in makeSite := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.gif" | "*.js" | "*.swf" | "*.yml" | "*.md"
 ) //++ site.jekyllSupport()
 
-lazy val theSettings = commonSettings ++ publishSettings
+lazy val theSettings = commonSettings
 
 lazy val all = project.in(file("."))
   .aggregate(commons, postgres, shapeless, elasticsearch, docs)

@@ -11,7 +11,7 @@ trait SinkExt {
    * @tparam T
    * @return
    */
-  def collect[T] = Sink.fold[Seq[T], T](Vector.empty)(_ :+ _)
+  def collect[T] = Sink.fold[IndexedSeq[T], T](Vector.empty)(_ :+ _)
 }
 
 object SinkExt extends SinkExt
