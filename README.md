@@ -31,6 +31,8 @@ libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-elasticsearch" %
 
 ## Use
 
+[Scaladoc](http://mfglabs.github.io/akka-stream-extensions/api/#package)
+
 ### Commons
 
 ```scala
