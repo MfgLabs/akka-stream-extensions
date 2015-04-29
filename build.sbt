@@ -12,6 +12,8 @@ organization in ThisBuild := "com.mfglabs"
 
 name in ThisBuild := "akka-stream-extensions"
 
+version in ThisBuild := "0.6.1-SNAPSHOT"
+
 scalaVersion in ThisBuild := "2.11.6"
 
 publishTo in ThisBuild := {
