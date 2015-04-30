@@ -105,6 +105,10 @@ EsStream
   )
 ```
 
+### AWS
+
+Check our project [MfgLabs/commons-aws](https://github.com/MfgLabs/commons-aws).
+
 ## Testing
 
 To test postgres-extensions, you need to have Docker installed and running on your computer (the tests will automatically 
