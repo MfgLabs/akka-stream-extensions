@@ -3,6 +3,8 @@ layout: default
 title: Home
 ---
 
+{% capture quickstart %}{% include quickstart.md %}{% endcapture %}
+{{ quickstart | markdownify }}
 {% include quickstart.md %}
 
 
