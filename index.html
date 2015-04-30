@@ -5,15 +5,7 @@ title: Home
 
 {% include quickstart.html %}
 
-{% assign pages_list = site.pages | sort:"url" %}
-{% for node in pages_list %}
-  {% if node.title == "Quickstart" %}
-  <div class="page">
-    <h1 class="page-title">{{ node.title }}</h1>
-    {{ page.content }}
-  </div>
-  {% endif %}
-{% endfor %}
+
 
 <!--div class="posts">
   {% for post in paginator.posts %}
