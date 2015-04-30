@@ -3,15 +3,7 @@ layout: default
 title: Home
 ---
 
-{% assign pages_list = site.pages | sort:"url" %}
-{% for node in pages_list %}
-  {% if node.title == "Quickstart" %}
-  <div class="page">
-    <h1 class="page-title">{{ node.title }}</h1>
-    {{ content }}
-  </div>
-  {% endif %}
-{% endfor %}
+{% include quickstart.md %}
 
 <!--div class="posts">
   {% for post in paginator.posts %}
