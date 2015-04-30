@@ -13,7 +13,6 @@ The main purpose of this project is to:
 We have been developing this library in the context of [MfgLabs](http://mfglabs.com) for our production projects after identifying a few primitive structures that were common to many use-cases, not provided by Akka-Stream out of the box and not so easy to implement in a robust way.
 
 <br/>
-<br/>
 ## How-To
 
 > Scaladoc is available [there](http://mfglabs.github.io/akka-stream-extensions/api/#package)
@@ -41,7 +40,6 @@ libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-elasticsearch" %
 // ...
 ```
 
-<br/>
 ### Sample
 
 ```scala
@@ -77,7 +75,6 @@ SourceExt
 
 
 <br/>
-<br/>
 ## Postgres extension
 
 > This extension provides tools to stream data from/to Postgres
@@ -88,7 +85,6 @@ SourceExt
 libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.7"
 ```
 
-<br/>
 ### Sample
 
 ```scala
@@ -144,12 +140,10 @@ EsStream
 ```
 
 <br/>
-<br/>
 ## Testing
 
 To test postgres-extensions, you need to have Docker installed and running on your computer (the tests will automatically launch a docker container with a Postgres db).
 
-<br/>
 <br/>
 ## Tributes
 
@@ -159,7 +153,6 @@ We believed it could be very useful & interesting to many people and we are sure
 
 > So don't hesitate to [contribute](/akka-stream-extensions/contributing/)
 
-<br/>
 <br/>
 ## License
 
