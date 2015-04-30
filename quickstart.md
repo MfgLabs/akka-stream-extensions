@@ -1,32 +1,26 @@
----
-layout: page
-title: QuickStart
----
-
 # Akka Stream Extensions
 
 Library of useful Sources / Flows / Sinks for Akka Stream.
 
-## Resolver:
+## Resolver
 
 ```scala
-resolvers ++= Seq(
-  "MFG releases" at "s3://mfg-mvn-repo/releases",
-  "MFG snapshots" at "s3://mfg-mvn-repo/snapshots"
-)
+resolvers += Resolver.bintrayRepo("mfglabs", "maven")
 ```
 
 ## Dependencies
 Currently depends on akka-stream-1.0-M5
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.6.1-SNAPSHOT"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.7"
 
 // Postgres extensions
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.6.1-SNAPSHOT"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.7"
 
 // Elasticsearch extensions
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-elasticsearch" % "0.6.1-SNAPSHOT"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-elasticsearch" % "0.7"
+
+// ...
 ```
 
 ## Use
@@ -115,3 +109,13 @@ EsStream
 
 To test postgres-extensions, you need to have Docker installed and running on your computer (the tests will automatically 
 launch a docker container with a Postgres db).
+
+## License
+
+This software is licensed under the Apache 2 license, quoted below.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
