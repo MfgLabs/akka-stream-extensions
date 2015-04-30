@@ -30,14 +30,6 @@ resolvers += Resolver.bintrayRepo("mfglabs", "maven")
 
 ```scala
 libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.7"
-
-// Postgres extensions
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.7"
-
-// Elasticsearch extensions
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-elasticsearch" % "0.7"
-
-// ...
 ```
 
 ### Sample
