@@ -2,15 +2,15 @@
 
 We are proud to opensource `Akka-Stream-Extensions` extending the very promising [Typesafe Akka-Stream](http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0-RC1/scala.html?_ga=1.42749861.1204922152.1421451776).
 
->The main purpose of this project is to:
->
->1. Provide generic Akka-Stream `Sources`/`Flows`/`Sinks` not provided out-of-the-box by Akka-Stream.
->
->2. Make those structures very well tested & production ready.
->
->3. Study/evaluate bleeding-edge concepts based on Akka-Stream & other technologies.
->
->We have been developing this library in the context of [MfgLabs](http://mfglabs.com) for our production projects after identifying a few primitive structures that were common to many use-cases, not provided by Akka-Stream out of the box and not so easy to implement in a robust way.
+The main purpose of this project is to:
+
+1. Provide generic Akka-Stream `Sources`/`Flows`/`Sinks` not provided out-of-the-box by Akka-Stream.
+
+2. Make those structures very well tested & production ready.
+
+3. Study/evaluate bleeding-edge concepts based on Akka-Stream & other technologies.
+
+We have been developing this library in the context of [MfgLabs](http://mfglabs.com) for our production projects after identifying a few primitive structures that were common to many use-cases, not provided by Akka-Stream out of the box and not so easy to implement in a robust way.
 
 ## How-To
 
