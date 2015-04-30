@@ -54,7 +54,7 @@ lazy val docSettings = Seq(
   ghpagesNoJekyll := false,
   siteMappings ++= Seq(
     file("CONTRIBUTING.md") -> "contributing.md",
-    file("README.md") -> "quickstart.md"
+    file("README.md") -> "_includes/README.md"
   ),
   scalacOptions in (ScalaUnidoc, unidoc) ++= Seq(
     "-doc-source-url", scmInfo.value.get.browseUrl + "/tree/master€{FILE_PATH}.scala",
