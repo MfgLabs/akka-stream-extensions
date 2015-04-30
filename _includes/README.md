@@ -4,7 +4,7 @@ We are proud to opensource `Akka-Stream-Extensions` extending the very promising
 
 The main purpose of this project is to:
 
-1. Provide generic Akka-Stream `Sources`/`Flows`/`Sinks` not provided out-of-the-box by Akka-Stream.
+1. Develop generic Akka-Stream `Sources`/`Flows`/`Sinks` not provided out-of-the-box by Akka-Stream.
 
 2. Make those structures very well tested & production ready.
 
@@ -17,13 +17,13 @@ We have been developing this library in the context of [MfgLabs](http://mfglabs.
 > Scaladoc is available [there](http://mfglabs.github.io/akka-stream-extensions/api/#package)
 
 
-### Add resolvers to your `build.sbt`
+#### Add resolvers to your `build.sbt`
 
 ```scala
 resolvers += Resolver.bintrayRepo("mfglabs", "maven")
 ```
 
-## Add dependencies to your `build.sbt`
+#### Add dependencies to your `build.sbt`
 
 > Currently depends on `akka-stream-1.0-M5`
 
@@ -39,7 +39,8 @@ libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-elasticsearch" %
 // ...
 ```
 
-### Sample
+<br/>
+#### Sample
 
 ```scala
 import com.mfglabs.stream._
@@ -73,9 +74,9 @@ SourceExt
 > Many more helpers, check the [Scaladoc](http://mfglabs.github.io/akka-stream-extensions/api/#package) !
 
 
-## Extensions
-
-### Postgres extension
+<br/>
+<br/>
+## Postgres extension
 
 > This extension provides tools to stream data from/to Postgres
 
@@ -85,6 +86,7 @@ SourceExt
 libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.7"
 ```
 
+<br/>
 #### Sample
 
 ```scala
@@ -109,7 +111,8 @@ someLineStream
   ))
 ```
 
-### Elasticsearch extension
+<br/>
+## Elasticsearch extension
 
 #### Dependencies
 
@@ -138,11 +141,14 @@ EsStream
   )
 ```
 
+<br/>
+<br/>
 ## Testing
 
 To test postgres-extensions, you need to have Docker installed and running on your computer (the tests will automatically launch a docker container with a Postgres db).
 
-
+<br/>
+<br/>
 ## Tributes
 
 We thank [MfgLabs](http://mfglabs.com) for sponsoring the development and the opensourcing of this library.
@@ -151,7 +157,8 @@ We believed it could be very useful & interesting to many people and we are sure
 
 > So don't hesitate to [contribute](/akka-stream-extensions/contributing/)
 
-
+<br/>
+<br/>
 ## License
 
 >This software is licensed under the Apache 2 license, quoted below.
