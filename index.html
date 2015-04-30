@@ -5,11 +5,10 @@ title: Home
 
 {% assign pages_list = site.pages | sort:"url" %}
 {% for node in pages_list %}
-title:{{node.title}}
-  {% if node.title == "quickstart" %}
+  {% if node.title == "Quickstart" %}
   <div class="page">
-    <h1 class="page-title">{{ readme.title }}</h1>
-    {{ readme.content }}
+    <h1 class="page-title">{{ node.title }}</h1>
+    {{ node.content }}
   </div>
   {% endif %}
 {% endfor %}
