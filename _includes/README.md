@@ -29,7 +29,7 @@ resolvers += Resolver.bintrayRepo("mfglabs", "maven")
 > Currently depends on `akka-stream-1.0-M5`
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.7"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.7.0"
 ```
 
 ### Sample
@@ -74,7 +74,7 @@ SourceExt
 ### Dependencies
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.7"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.7.0"
 ```
 
 ### Sample
@@ -107,7 +107,7 @@ someLineStream
 ### Dependencies
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-elasticsearch" % "0.7"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-elasticsearch" % "0.7.0"
 ```
 
 ### Sample
