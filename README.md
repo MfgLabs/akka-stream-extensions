@@ -7,26 +7,25 @@ title: QuickStart
 
 Library of useful Sources / Flows / Sinks for Akka Stream.
 
-## Resolver:
+## Resolver
 
 ```scala
-resolvers ++= Seq(
-  "MFG releases" at "s3://mfg-mvn-repo/releases",
-  "MFG snapshots" at "s3://mfg-mvn-repo/snapshots"
-)
+resolvers += Resolver.bintrayRepo("mfglabs", "maven")
 ```
 
 ## Dependencies
 Currently depends on akka-stream-1.0-M5
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.6.1-SNAPSHOT"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.7"
 
 // Postgres extensions
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.6.1-SNAPSHOT"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.7"
 
 // Elasticsearch extensions
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-elasticsearch" % "0.6.1-SNAPSHOT"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-elasticsearch" % "0.7"
+
+// ...
 ```
 
 ## Use
