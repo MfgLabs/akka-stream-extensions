@@ -1,3 +1,8 @@
+---
+layout: page
+title: quickstart
+---
+
 # Akka Stream Extensions
 
 Library of useful Sources / Flows / Sinks for Akka Stream.
