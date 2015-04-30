@@ -55,6 +55,7 @@ trait PgStream {
   /**
    * Insert a stream in a Postgres table (one upstream chunk will correspond to one line).
    * Insertion order is not guaranteed with chunkInsertionConcurrency > 1.
+   *
    * @return a stream of number of inserted lines by chunk
    * @param schema
    * @param table can be table_name or table_name(column1, column2) to insert data in specific columns
@@ -67,18 +68,39 @@ trait PgStream {
   def insertStreamToTable(schema: String, table: String, options: Map[String, String], nbLinesPerInsertionBatch: Int = 20000,
                           chunkInsertionConcurrency: Int = 1)
                          (implicit conn: PGConnection, ec: ExecutionContextForBlockingOps): Flow[ByteString, Long, Unit] = {
-    val optionsStr = options
-      .map { case (k, v) => s"$k $v" }
-      .mkString(",")
+    val optionsStr =
+      if (options.isEmpty) ""
+        else
+        " (" + options
+          .map { case (k, v) => s"$k $v" }
+          .mkString(",") + ")"
+    val query = s"COPY ${schema}.${table} FROM STDIN $optionsStr"
+    insertStreamToTable(query,nbLinesPerInsertionBatch,chunkInsertionConcurrency)(conn,ec)
+  }
 
+  /**
+   * equivalent of insertStreamToTable, but for PostgreSQL 8.x
+   */
+  def insertStreamToTableV8(schema: String, table: String, options: Map[String, String], nbLinesPerInsertionBatch: Int = 20000,
+                          chunkInsertionConcurrency: Int = 1)
+                         (implicit conn: PGConnection, ec: ExecutionContextForBlockingOps): Flow[ByteString, Long, Unit] = {
+    def optToStr(st : Map[String,String]) = st.map { case (k, v) => (k,s"$k $v")}.mkString(" ")
+    val csvOptionKeys = Set("header", "quote", "escape", "force quote")
+    val (csvOptions, commonOptions) = options.partition{ case (k,v) => csvOptionKeys.contains(k.toLowerCase())}
+    val csvOptsStr = if (csvOptions.isEmpty) "" else " CSV " + optToStr(csvOptions)
+    val query = s"COPY ${schema}.${table} FROM STDIN ${optToStr(commonOptions)} $csvOptsStr"
+    insertStreamToTable(query,nbLinesPerInsertionBatch,chunkInsertionConcurrency)(conn,ec)
+  }
+
+  private def insertStreamToTable(copyQuery : String, nbLinesPerInsertionBatch: Int, chunkInsertionConcurrency: Int)
+                                 (implicit conn: PGConnection, ec: ExecutionContextForBlockingOps): Flow[ByteString, Long, Unit] = {
     val copyManager = conn.getCopyAPI()
     Flow[ByteString]
       .map(_.utf8String)
       .grouped(nbLinesPerInsertionBatch)
       .mapAsyncUnordered(chunkInsertionConcurrency) { chunk =>
-        val query = s"COPY ${schema}.${table} FROM STDIN ($optionsStr)"
         Future {
-          copyManager.copyIn(query, new StringReader(chunk.mkString("\n")))
+          copyManager.copyIn(copyQuery, new StringReader(chunk.mkString("\n")))
         }(ec.value)
       }
   }
