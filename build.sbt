@@ -7,22 +7,13 @@ import sbtrelease.ReleaseStateTransformations._
 import sbtrelease.Utilities._
 import sbtunidoc.Plugin.UnidocKeys._
 
+import bintray.Plugin._
 
 organization in ThisBuild := "com.mfglabs"
 
 name in ThisBuild := "akka-stream-extensions"
 
-version in ThisBuild := "0.6.1-SNAPSHOT"
-
 scalaVersion in ThisBuild := "2.11.6"
-
-publishTo in ThisBuild := {
-  val s3Repo = "s3://mfg-mvn-repo"
-  if (isSnapshot.value)
-    Some("snapshots" at s3Repo + "/snapshots")
-  else
-    Some("releases" at s3Repo + "/releases")
-}
 
 publishMavenStyle in ThisBuild := true
 
@@ -39,30 +30,27 @@ lazy val commonSettings = Seq(
     "git@github.com:MfgLabs/akka-stream-extensions.git"))
 )
 
-//lazy val publishSettings = Seq(
-//  homepage := Some(url("https://github.com/MfgLabs/akka-stream-extensions")),
-//  licenses := Seq("APLv2" -> url("http://www.apache.org/licenses/LICENSE-2.0.html")),
-//  autoAPIMappings := true,
-//  apiURL := Some(url("https://MfgLabs.github.io/akka-stream-extensions/api/")),
-//  publishMavenStyle := true,
-//  publishArtifact in packageDoc := false,
-//  publishArtifact in Test := false,
-//  pomIncludeRepository := { _ => false },
-//  publishTo <<= version { (v: String) =>
-//    val nexus = "https://oss.sonatype.org/"
-//
-//    if (v.trim.endsWith("SNAPSHOT"))
-//      Some("snapshots" at nexus + "content/repositories/snapshots")
-//    else
-//      Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-//  }
-//)
+lazy val publishSettings = Seq(
+  homepage := Some(url("https://github.com/MfgLabs/akka-stream-extensions")),
+  licenses := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.html")),
+  autoAPIMappings := true,
+  apiURL := Some(url("https://MfgLabs.github.io/akka-stream-extensions/api/")),
+  publishMavenStyle := true,
+  publishArtifact in packageDoc := false,
+  publishArtifact in Test := false,
+  pomIncludeRepository := { _ => false }
+) ++ bintrayPublishSettings
+
+lazy val noPublishSettings = Seq(
+  publish := (),
+  publishLocal := (),
+  publishArtifact := false
+)
 
 lazy val docSettings = Seq(
   autoAPIMappings := true,
   unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(commons),
   site.addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), "api"),
-  // site.addMappingsToSiteDir(tut, "_tut"),
   ghpagesNoJekyll := false,
   siteMappings ++= Seq(
     file("CONTRIBUTING.md") -> "contributing.md",
@@ -74,22 +62,19 @@ lazy val docSettings = Seq(
   ),
   git.remoteRepo := "git@github.com:MfgLabs/akka-stream-extensions.git",
   includeFilter in makeSite := "*.html" || "*.css" || "*.png" || "*.jpg" || "*.gif" || "*.js" || "*.swf" || "*.yml" || "*.md"
-) //++ site.jekyllSupport()
-
-lazy val theSettings = commonSettings
+)
 
 lazy val all = project.in(file("."))
   .aggregate(commons, postgres, shapeless, elasticsearch, docs)
   .settings(
-    name := "commons-all"
+    name := "commons-all",
+    noPublishSettings
   )
-  .settings(theSettings)
-  .settings(noPublishSettings)
   .dependsOn(commons, postgres, shapeless, elasticsearch, docs)
 
 lazy val docs = project
   .settings(moduleName := "akka-stream-ext-docs")
-  .settings(theSettings)
+  .settings(commonSettings)
   .settings(noPublishSettings)
   .settings(unidocSettings)
   .settings(site.settings)
@@ -106,9 +91,10 @@ lazy val commons = project.in(file("commons"))
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-stream-experimental" % "1.0-M5",
       "org.scalatest" %% "scalatest" % "2.1.6"
-    )
+    ),
+    commonSettings,
+    publishSettings
   )
-  .settings(theSettings)
 
 lazy val postgres = project.in(file("extensions/postgres"))
   .dependsOn(commons)
@@ -116,7 +102,9 @@ lazy val postgres = project.in(file("extensions/postgres"))
     name := "akka-stream-extensions-postgres",
     libraryDependencies ++= Seq(
       "org.postgresql" % "postgresql"  % "9.3-1102-jdbc4"
-    )
+    ),
+    commonSettings,
+    publishSettings
   )
 
 lazy val elasticsearch = project.in(file("extensions/elasticsearch"))
@@ -125,7 +113,9 @@ lazy val elasticsearch = project.in(file("extensions/elasticsearch"))
     name := "akka-stream-extensions-elasticsearch",
     libraryDependencies ++= Seq(
       "org.elasticsearch" % "elasticsearch" % "1.3.2"
-    )
+    ),
+    commonSettings,
+    publishSettings
   )
 
 lazy val shapeless = project.in(file("extensions/shapeless"))
@@ -134,11 +124,7 @@ lazy val shapeless = project.in(file("extensions/shapeless"))
     name := "akka-stream-extensions-shapeless",
     libraryDependencies ++= Seq(
       "com.chuusai"       %% "shapeless"   % "2.2.0-RC4"
-    )
+    ),
+    commonSettings,
+    publishSettings
   )
-
-lazy val noPublishSettings = Seq(
-  publish := (),
-  publishLocal := (),
-  publishArtifact := false
-)
