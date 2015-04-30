@@ -1,7 +1,3 @@
----
-layout: page
-title: Quickstart
----
 
 # Akka Stream Extensions
 
