@@ -3,12 +3,15 @@ layout: default
 title: Home
 ---
 
-{{ site.pages.keys }}
-{% assign readme = site.pages["quickstart"] %}
-<div class="page">
-  <h1 class="page-title">{{ readme.title }}</h1>
-  {{ readme.content }}
-</div>
+{% assign pages_list = site.pages | sort:"url" %}
+{% for node in pages_list %}
+  {% if node.title == "quickstart" %}
+  <div class="page">
+    <h1 class="page-title">{{ readme.title }}</h1>
+    {{ readme.content }}
+  </div>
+  {% endif %}
+{% endfor %}
 
 <!--div class="posts">
   {% for post in paginator.posts %}
