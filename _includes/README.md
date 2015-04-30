@@ -1,5 +1,3 @@
-# Akka Stream Extensions
-
 We are proud to opensource `Akka-Stream-Extensions` extending the very promising [Typesafe Akka-Stream](http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0-RC1/scala.html?_ga=1.42749861.1204922152.1421451776).
 
 The main purpose of this project is to:
