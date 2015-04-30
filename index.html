@@ -3,7 +3,13 @@ layout: default
 title: Home
 ---
 
-<div class="posts">
+{% assign readme = site.pages["QuickStart"] %}
+<div class="page">
+  <h1 class="page-title">{{ readme.title }}</h1>
+  {{ readme.content }}
+</div>
+
+<!--div class="posts">
   {% for post in paginator.posts %}
   <div class="post">
     <h1 class="post-title">
@@ -34,5 +40,5 @@ title: Home
   {% else %}
     <span class="pagination-item newer">Newer</span>
   {% endif %}
-</div>
+</div-->
 
