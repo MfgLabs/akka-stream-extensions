@@ -4,11 +4,11 @@ We are proud to opensource `Akka-Stream-Extensions` extending the very promising
 
 The main purpose of this project is to:
 
-1. Develop generic Akka-Stream `Sources`/`Flows`/`Sinks` not provided out-of-the-box by Akka-Stream.
+1. Develop generic `Sources`/`Flows`/`Sinks` not provided out-of-the-box by Akka-Stream.
 
 2. Make those structures very well tested & production ready.
 
-3. Study/evaluate bleeding-edge concepts based on Akka-Stream & other technologies.
+3. Study/evaluate bleeding-edge streaming concepts based on Akka-Stream & other technologies (for now, Postgres & ElasticSearch).
 
 We have been developing this library in the context of [MfgLabs](http://mfglabs.com) for our production projects after identifying a few primitive structures that were common to many use-cases, not provided by Akka-Stream out of the box and not so easy to implement in a robust way.
 
