@@ -12,18 +12,20 @@ The main purpose of this project is to:
 
 We have been developing this library in the context of [MfgLabs](http://mfglabs.com) for our production projects after identifying a few primitive structures that were common to many use-cases, not provided by Akka-Stream out of the box and not so easy to implement in a robust way.
 
+<br/>
+<br/>
 ## How-To
 
 > Scaladoc is available [there](http://mfglabs.github.io/akka-stream-extensions/api/#package)
 
 
-#### Add resolvers to your `build.sbt`
+### Add resolvers to your `build.sbt`
 
 ```scala
 resolvers += Resolver.bintrayRepo("mfglabs", "maven")
 ```
 
-#### Add dependencies to your `build.sbt`
+### Add dependencies to your `build.sbt`
 
 > Currently depends on `akka-stream-1.0-M5`
 
@@ -40,7 +42,7 @@ libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-elasticsearch" %
 ```
 
 <br/>
-#### Sample
+### Sample
 
 ```scala
 import com.mfglabs.stream._
@@ -80,14 +82,14 @@ SourceExt
 
 > This extension provides tools to stream data from/to Postgres
 
-#### Dependencies
+### Dependencies
 
 ```scala
 libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.7"
 ```
 
 <br/>
-#### Sample
+### Sample
 
 ```scala
 import com.mfglabs.stream._
@@ -114,13 +116,13 @@ someLineStream
 <br/>
 ## Elasticsearch extension
 
-#### Dependencies
+### Dependencies
 
 ```scala
 libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-elasticsearch" % "0.7"
 ```
 
-#### Sample
+### Sample
 
 ```scala
 import com.mfglabs.stream._
