@@ -8,7 +8,7 @@ The main purpose of this project is to:
 
 2. Make those structures very well tested & production ready.
 
-3. Study/evaluate bleeding-edge streaming concepts based on Akka-Stream & other technologies (for now, Postgres & ElasticSearch).
+3. Study/evaluate streaming concepts based on Akka-Stream & other technologies (AWS, Postgres, ElasticSearch, ...).
 
 We have been developing this library in the context of [MfgLabs](http://mfglabs.com) for our production projects after identifying a few primitive structures that were common to many use-cases, not provided by Akka-Stream out of the box and not so easy to implement in a robust way.
 
@@ -38,17 +38,13 @@ libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.7.0"
 import com.mfglabs.stream._
 
 // Source from a paginated REST Api
-SourceExt
+val pagesStream: Source[Page, Unit] = SourceExt
   .bulkPullerAsync(0L) { (currentPosition, downstreamDemand) =>
     val futResult: Future[Seq[Page]] = WSService.get(offset = currentPosition, nbPages = downstreamDemand)
     futResult
   }
-  .via(FlowExt.rateLimiter(200 millis))
-  .via(FlowExt.mapAsyncWithBoundedConcurrency(maxConcurrency = 8)(asyncTransform))
 
-// Source from a Java InputStream
-SourceExt
-  .fromStream(inputStream)(ExecutionContextForBlockingOps(someEc))
+someBinaryStream
   .via(FlowExt.rechunkByteStringBySeparator(ByteString("\n"), maxChunkSize = 5 * 1024))
   .map(_.utf8String)
   .via(

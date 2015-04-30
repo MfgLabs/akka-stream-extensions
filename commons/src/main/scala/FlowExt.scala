@@ -1,6 +1,7 @@
 package com.mfglabs.stream
 
-import akka.stream.{OverflowStrategy, FlattenStrategy}
+import akka.stream._
+import akka.stream.scaladsl._
 import akka.stream.stage._
 import akka.util.ByteString
 
@@ -10,42 +11,6 @@ import scala.concurrent.duration._
 import akka.stream.scaladsl._
 
 trait FlowExt {
-
-  /**
-   * Perform an unordered map async with a bounded number of futures running concurrently.
-   * @param maxConcurrency
-   * @param f
-   * @tparam A
-   * @tparam B
-   * @return
-   */
-  def mapAsyncUnorderedWithBoundedConcurrency[A, B](maxConcurrency: Int)(f: A => Future[B]): Flow[A, B, Unit] =
-    Flow[A].section(OperationAttributes.inputBuffer(initial = maxConcurrency, max = maxConcurrency)) { sectionFlow =>
-      sectionFlow.mapAsyncUnordered(f).buffer(maxConcurrency, OverflowStrategy.backpressure)
-    }
-
-  /**
-   * Perform an ordered map async with a bounded number of futures running concurrently.
-   * @param maxConcurrency
-   * @param f
-   * @tparam A
-   * @tparam B
-   * @return
-   */
-  def mapAsyncWithBoundedConcurrency[A, B](maxConcurrency: Int)(f: A => Future[B]): Flow[A, B, Unit] =
-    Flow[A].section(OperationAttributes.inputBuffer(initial = maxConcurrency, max = maxConcurrency)) { sectionFlow =>
-      sectionFlow.mapAsync(f).buffer(maxConcurrency, OverflowStrategy.backpressure)
-    }
-
-  /**
-   * Perform a map async that executes futures in-order.
-   * It can for instance be used to guarantee the ordering of side-effects in futures.
-   * @param f
-   * @tparam A
-   * @tparam B
-   * @return
-   */
-  def mapAsyncWithOrderedSideEffect[A, B](f: A => Future[B]): Flow[A, B, Unit] = mapAsyncWithBoundedConcurrency(1)(f)
 
   /**
    * Create a Flow whose creation depends on the first element of the upstream.
@@ -92,14 +57,14 @@ trait FlowExt {
       private var buffer = ByteString.empty
       private var nextPossibleMatch = 0
 
-      override def onPush(chunk: ByteString, ctx: Context[ByteString]): Directive = {
+      override def onPush(chunk: ByteString, ctx: Context[ByteString]): SyncDirective = {
         buffer ++= chunk
         emitChunkOrPull(ctx)
       }
 
-      override def onPull(ctx: Context[ByteString]): Directive = emitChunkOrPull(ctx)
+      override def onPull(ctx: Context[ByteString]): SyncDirective = emitChunkOrPull(ctx)
 
-      private def emitChunkOrPull(ctx: Context[ByteString]): Directive = {
+      private def emitChunkOrPull(ctx: Context[ByteString]): SyncDirective = {
         val possibleMatchPos = buffer.indexOf(firstSeparatorByte, from = nextPossibleMatch)
         if (possibleMatchPos == -1) {
           // No matching character, we need to accumulate more bytes into the buffer
@@ -170,9 +135,7 @@ trait FlowExt {
     }
 
     // We need to limit input buffer to 1 to guarantee the rate limiting feature
-    Flow[A].section(OperationAttributes.inputBuffer(initial = 1, max = 1)) { sectionFlow =>
-      sectionFlow.via(flow)
-    }
+    flow.withAttributes(OperationAttributes.inputBuffer(initial = 1, max = 1))
   }
 
   /**
@@ -184,14 +147,14 @@ trait FlowExt {
     def stage = new PushPullStage[ByteString, ByteString] {
       private var buffer = ByteString.empty
 
-      override def onPush(elem: ByteString, ctx: Context[ByteString]): Directive = {
+      override def onPush(elem: ByteString, ctx: Context[ByteString]): SyncDirective = {
         buffer ++= elem
         emitChunkOrPull(ctx)
       }
 
-      override def onPull(ctx: Context[ByteString]): Directive = emitChunkOrPull(ctx)
+      override def onPull(ctx: Context[ByteString]): SyncDirective = emitChunkOrPull(ctx)
 
-      private def emitChunkOrPull(ctx: Context[ByteString]): Directive = {
+      private def emitChunkOrPull(ctx: Context[ByteString]): SyncDirective = {
         if (ctx.isFinishing) {
           if (buffer.isEmpty) {
             ctx.finish()
@@ -237,7 +200,7 @@ trait FlowExt {
       private var buffer = Vector.empty[C]
       private var finishing = false
 
-      override def onPush(elem: A, ctx: Context[C]): Directive = {
+      override def onPush(elem: A, ctx: Context[C]): SyncDirective = {
         if (state == null) state = zero // to keep the laziness of zero
         f(state, elem) match {
           case (Some(b), cs) =>
@@ -251,12 +214,12 @@ trait FlowExt {
         }
       }
 
-      override def onPull(ctx: Context[C]): Directive = {
+      override def onPull(ctx: Context[C]): SyncDirective = {
         if (state == null) state = zero // to keep the laziness of zero
         emitChunkOrPull(ctx)
       }
 
-      private def emitChunkOrPull(ctx: Context[C]): Directive = {
+      private def emitChunkOrPull(ctx: Context[C]): SyncDirective = {
         if (finishing) { // customProcessor is ending
           buffer match {
             case Seq() => ctx.finish()

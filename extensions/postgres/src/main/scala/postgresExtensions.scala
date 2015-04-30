@@ -75,12 +75,12 @@ trait PgStream {
     Flow[ByteString]
       .map(_.utf8String)
       .grouped(nbLinesPerInsertionBatch)
-      .via(FlowExt.mapAsyncUnorderedWithBoundedConcurrency(chunkInsertionConcurrency) { chunk =>
+      .mapAsyncUnordered(chunkInsertionConcurrency) { chunk =>
         val query = s"COPY ${schema}.${table} FROM STDIN ($optionsStr)"
         Future {
           copyManager.copyIn(query, new StringReader(chunk.mkString("\n")))
         }(ec.value)
-      })
+      }
   }
 
   def sqlConnAsPgConnUnsafe(conn: Connection) = conn.asInstanceOf[PGConnection]

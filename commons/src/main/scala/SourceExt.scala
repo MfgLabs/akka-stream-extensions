@@ -3,8 +3,8 @@ package com.mfglabs.stream
 import java.io.{BufferedInputStream, FileInputStream, InputStream, File}
 import java.util.zip.GZIPInputStream
 
-import akka.stream.FlattenStrategy
-import akka.stream.scaladsl.Source
+import akka.stream._
+import akka.stream.scaladsl._
 import akka.util.ByteString
 import akka.actor.ActorRef
 import com.mfglabs.stream.internals.source.{UnfoldPullerAsync, BulkPullerAsync}
@@ -31,6 +31,7 @@ trait SourceExt {
    * @param ec ec that will be used for the input stream's blocking operations
    * @return
    */
+  @deprecated("Akka Stream RC1 introduced a built-in way to create a Source from an InputStream, so this version is deprecated.", "")
   def fromStream(is: InputStream, maxChunkSize: Int = defaultChunkSize)(implicit ec: ExecutionContextForBlockingOps): Source[ByteString, ActorRef] = {
     bulkPullerAsync[ByteString](0) { (counter, demand) =>
       Future {
@@ -48,6 +49,7 @@ trait SourceExt {
    * @param ec ec that will be used for the input stream's blocking operations
    * @return
    */
+  @deprecated("Akka Stream RC1 introduced a built-in way to create a Source from an InputStream, so this version is deprecated.", "")
   def fromGZIPStream(is: InputStream, maxChunkSize: Int = defaultChunkSize)(implicit ec: ExecutionContextForBlockingOps): Source[ByteString, ActorRef] =
     fromStream(new GZIPInputStream(is), maxChunkSize)(ec)
 
@@ -58,16 +60,19 @@ trait SourceExt {
    * @param ec ec that will be used for the input stream's blocking operations
    * @return
    */
+  @deprecated("Akka Stream RC1 introduced a built-in way to create a Source from an InputStream, so this version is deprecated.", "")
   def fromFile(f: File, maxChunkSize: Int = defaultChunkSize)(implicit ec: ExecutionContextForBlockingOps): Source[ByteString, ActorRef] =
     fromStream(new FileInputStream(f), maxChunkSize)(ec)
 
   /**
    * Create a Source from a zip File and unzip it on the fly.
+   * Note: Akka Stream RC1 introduced a built-in way to create a Source from an InputStream, therefore this version is deprecated.
    * @param f file
    * @param maxChunkSize max size of the chunks that the source will emit (in bytes).
    * @param ec
    * @return
    */
+  @deprecated("Akka Stream RC1 introduced a built-in way to create a Source from an InputStream, so this version is deprecated.", "")
   def fromGZIPFile(f: File, maxChunkSize: Int = defaultChunkSize)(implicit ec: ExecutionContextForBlockingOps): Source[ByteString, ActorRef] =
     fromGZIPStream(new FileInputStream(f), maxChunkSize)(ec)
 
@@ -81,7 +86,7 @@ trait SourceExt {
    * @return
    */
   def bulkPullerAsync[A](offset: Long)(f: (Long, Int) => Future[(Seq[A], Boolean)]): Source[A, ActorRef] =
-    Source[A](BulkPullerAsync.props(offset)(f))
+    Source.actorPublisher(BulkPullerAsync.props(offset)(f))
 
   /**
    * Create a source that calls the f function each time that downstream requests more elements.
@@ -91,7 +96,7 @@ trait SourceExt {
    * @return
    */
   def unfoldPullerAsync[A, B](zero: => B)(f: B => Future[(Option[A], Option[B])]): Source[A, ActorRef] =
-    Source[A](UnfoldPullerAsync.props[A, B](zero)(f))
+    Source.actorPublisher(UnfoldPullerAsync.props[A, B](zero)(f))
 
   /**
    * Create a source from the result of a Future redeemed when the stream is materialized.
@@ -112,7 +117,7 @@ trait SourceExt {
    * @tparam A
    * @return
    */
-  def singleLazyAsync[A](fut: => Future[A]): Source[A, Unit] = singleLazy(fut).mapAsync(identity)
+  def singleLazyAsync[A](fut: => Future[A]): Source[A, Unit] = singleLazy(fut).mapAsync(1)(identity)
 
   /**
    * Create a source from a Lazy Value that will be evaluated only when the stream is materialized.
@@ -130,7 +135,7 @@ trait SourceExt {
    * @tparam A
    * @return
    */
-  def constantLazyAsync[A](fut: => Future[A]): Source[A, ActorRef] = constantLazy(fut).mapAsync(identity)
+  def constantLazyAsync[A](fut: => Future[A]): Source[A, ActorRef] = constantLazy(fut).mapAsync(1)(identity)
 
   /**
    * Create an infinite source of the same Lazy value evaluated only when the stream is materialized.

@@ -34,30 +34,6 @@ class FlowExtSpec extends FlatSpec with Matchers with ScalaFutures {
     p.future
   }
 
-  "mapAsyncWithOrderedSideEffect" should "perform side-effect in order" in {
-    val range = 1 to 30
-    @volatile var seq = Seq.empty[Int]
-    Source(range).via(FlowExt.mapAsyncWithOrderedSideEffect { el =>
-      Future {
-        if (el % 2 == 0) {
-          Future {
-            seq = seq :+ el
-            el
-          }
-        }
-        else fireIn(500 millis).map { _ =>
-          seq = seq :+ el
-          el
-        }
-      }.flatMap(identity)
-    })
-    .runForeach(_ => ())
-    .futureValue
-
-    seq.length shouldEqual range.length
-    seq shouldEqual range.toSeq
-  }
-
   "withHead" should "allows to define a flow according the first element of the upstream" in {
     val range = 10 to 97
     val futSeq = Source(range)
