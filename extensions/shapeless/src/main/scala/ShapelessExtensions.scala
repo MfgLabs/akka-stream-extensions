@@ -6,7 +6,7 @@ import shapeless.ops.hlist._
 import shapeless.ops.nat._
 import shapeless.ops.coproduct.Inject
 
-import akka.stream.{FlowMaterializer, ActorFlowMaterializer, FanInShape, FanOutShape, Graph, UniformFanInShape, Outlet, Inlet}
+import akka.stream.{FlowMaterializer, ActorFlowMaterializer, FanInShape, FanOutShape, Graph, UniformFanInShape, Outlet, Inlet, OperationAttributes}
 import akka.stream.scaladsl._
 import akka.stream.stage._
 import akka.event.Logging
@@ -14,10 +14,115 @@ import akka.event.Logging
 import com.mfglabs.stream.FlowExt
 
 
+object ShapelessStream extends ShapelessStream
+
+trait ShapelessStream {
+
+  /**
+   * Builds at compile-time a fully typed-controlled flow that transforms a HList of Flows to a Flow of the Coproduct of inputs ot Coproduct of outputs.
+   *
+   * Flow[A1, B1] :: FLow[A2, B2] :: ... :: Flow[An, Bn] :: HNil => Flow[A1 :+: A2 :+: ... :+: An :+: CNil, B1 :+: B2 :+: ... +: Bn :+: CNil]
+   *
+   *
+   *
+   *                                             +-------- Flow[A1, B1] ---------+
+   *                                             |                               |
+   *                                             |-------- Flow[A2, B2] ---------|
+   *                                             |                               |
+   *   --> A1 :+: A2 :+: ... :+: An :+: CNil ----+-------- ............ ---------+-------> B1 :+: B2 :+: ... :+: Bn :+: CNil
+   *                                             |                               |
+   *                                             |                               |
+   *                                             +-------- Flow[An, Bn] ---------+
+   * 
+   *
+   * The flows is built with a custom FlexiRoute with `DemandFromAll` condition & FlexiMerge using `ReadAny` condition.
+   *
+   * Be careful, the order is NOT guaranteed due to the nature of used FlexiRoute & FlexiMerge and potentially to the flow you provide in your HList.
+   * 
+   * @param a Hlist of flows Flow[A1, B1] :: FLow[A2, B2] :: ... :: Flow[An, Bn] :: HNil
+   * @return the flow of the Coproduct of inputs and the Coproduct of outputs Flow[A1 :+: A2 :+: ... :+: An :+: CNil, B1 :+: B2 :+: ... +: Bn :+: CNil, Unit]
+   */
+  def coproductFlow[HL <: HList, CIn <: Coproduct, COut <: Coproduct, CInOutlets <: HList, COutInlets <: HList](
+    flows: HL
+  )(
+    implicit
+      flowTypes: FlowTypes.Aux[HL, CIn, COut],
+      obuild: OutletBuilder.Aux[CIn, CInOutlets],
+      ibuild: InletBuilder.Aux[COut, COut, COutInlets],
+      otrav: ToTraversable.Aux[CInOutlets, List, Outlet[_]],
+      itrav: ToTraversable.Aux[COutInlets, List, Inlet[COut]],
+      selOutletValue: SelectOutletValue.Aux[CIn, CInOutlets],
+      flowBuilder: FlowBuilderC.Aux[CIn, COut, CInOutlets, HL, COutInlets]
+  ): Flow[CIn, COut, Unit] =
+    Flow() { implicit builder =>
+    
+      import FlowGraph.Implicits._
+
+      val router = builder.add(new CoproductFlexiRoute[CIn, CInOutlets]())
+      val merger = builder.add(new CoproductFlexiMerge[COut, COutInlets]())
+
+      flowBuilder.build(router.outs, flows, merger.ins)
+      router.in -> merger.out
+    }
+
+  /**
+   * Builds at compile-time a flow that transforms a HList of Flows to a Flow of the Coproduct of inputs ot Coproduct of outputs.
+   *
+   * Flow[A1, B1] :: FLow[A2, B2] :: ... :: Flow[An, Bn] :: HNil => Any
+   *
+   *
+   *
+   *                                             +-------- Flow[A1, B1] ---------+
+   *                                             |                               |
+   *                                             |-------- Flow[A2, B2] ---------|
+   *                                             |                               |
+   *   --> A1 :+: A2 :+: ... :+: An :+: CNil ----+-------- ............ ---------+-------> Any
+   *                                             |                               |
+   *                                             |                               |
+   *                                             +-------- Flow[An, Bn] ---------+
+   * 
+   *
+   * The flows is built with a custom FlexiRoute with `DemandFromAll` condition & Merge using `ReadAny` condition.
+   *
+   * Be careful, the order is NOT guaranteed due to the nature of used FlexiRoute & FlexiMerge and potentially to the flow you provide in your HList.
+   *
+   * @param a Hlist of flows Flow[A1, B1] :: FLow[A2, B2] :: ... :: Flow[An, Bn] :: HNil
+   * @return the flow of the Coproduct of inputs and the Coproduct of outputs Flow[A1 :+: A2 :+: ... :+: An :+: CNil, Any, Unit]
+   */
+  def coproductFlowAny[HL <: HList, CIn <: Coproduct, COut <: Coproduct, CInOutlets <: HList, Size <: Nat, N <: Nat](
+    flows: HL
+  )(
+    implicit
+      flowTypes: FlowTypes.Aux[HL, CIn, COut],
+      build: OutletBuilder.Aux[CIn, CInOutlets],
+      trav: ToTraversable.Aux[CInOutlets, List, Outlet[_]],
+      selOutletValue: SelectOutletValue.Aux[CIn, CInOutlets],
+      length: shapeless.ops.coproduct.Length.Aux[CIn, Size],
+      toIntN: ToInt[Size],
+      flowBuilder: FlowBuilder.Aux[CIn, COut, CInOutlets, HL, N]
+  ): Flow[CIn, Any, Unit] =
+    Flow() { implicit builder =>
+    
+      import FlowGraph.Implicits._
+
+      val router = builder.add(new CoproductFlexiRoute[CIn, CInOutlets]())
+      val merge = builder.add(Merge[Any](toIntN()))
+
+      flowBuilder.build(router.outs, flows, merge)
+      router.in -> merge.out
+    }
+
+}
+
+
+/** The terrible Shapeless structures */
+
+/** A universal graph outlet builder function */
 trait OutletFunction {
   def apply[H]: Outlet[H]
 }
 
+/** A typed outlet builder using a universal outlet builder function that builds a HList of outlets from the types in a coproduct */
 trait OutletBuilder[C <: Coproduct] {
   type Out <: HList
 
@@ -43,12 +148,12 @@ object OutletBuilder {
 }
 
 
-
-
-
+/** Takes a coproduct instance and searches in a HList of outlets for corresponding typed outlet
+ *  and returns the outlet and the value
+ */
 trait SelectOutletValue[C <: Coproduct] {
   type Outlets <: HList
-  def apply(c: C, outlets: Outlets): (Outlet[_], Option[_])
+  def apply(c: C, outlets: Outlets): (Outlet[_], Any)
 }
 
 object SelectOutletValue{
@@ -58,10 +163,10 @@ object SelectOutletValue{
     implicit sel0: Selector[HL, Outlet[H]]
   ): SelectOutletValue.Aux[H :+: CNil, HL] = new SelectOutletValue[H :+: CNil] {
     type Outlets = HL
-    def apply(c: H :+: CNil, outlets: HL): (Outlet[_], Option[_]) =
+    def apply(c: H :+: CNil, outlets: HL): (Outlet[_], Any) =
       c match {
-        case Inl(h) => outlets.select[Outlet[H]] -> Some(h)
-        case Inr(_) => throw new RuntimeException("toto")
+        case Inl(h) => outlets.select[Outlet[H]] -> h
+        case Inr(_) => throw new RuntimeException("impossible case")
       }
   }
 
@@ -71,9 +176,9 @@ object SelectOutletValue{
       selO: Selector[HL, Outlet[H]]
   ): SelectOutletValue.Aux[H :+: T, HL] = new SelectOutletValue[H :+: T] {
     type Outlets = HL
-    def apply(c: H :+: T, outlets: HL): (Outlet[_], Option[_]) = 
+    def apply(c: H :+: T, outlets: HL): (Outlet[_], Any) = 
       c match {
-        case Inl(h) => outlets.select[Outlet[H]] -> Some(h)
+        case Inl(h) => outlets.select[Outlet[H]] -> h
         case Inr(t) => sel.apply(t, outlets)
       }
   }
@@ -81,48 +186,13 @@ object SelectOutletValue{
 
 }
 
-
-// trait SelectInletValue[C <: Coproduct] {
-//   type Inlets <: HList
-//   def apply(c: C, inlets: Inlets): (Inlet[C], Option[C])
-// }
-
-// object SelectInletValue{
-//   type Aux[C <: Coproduct, HL <: HList] = SelectInletValue[C] { type Inlets = HL }
-
-//   implicit def last[H, HL <: HList](
-//     implicit sel0: Selector[HL, Inlet[H]]
-//   ): SelectInletValue.Aux[H :+: CNil, HL] = new SelectInletValue[H :+: CNil] {
-//     type Inlets = HL
-//     def apply(c: H :+: CNil, inlets: HL): (Inlet[_], Option[_]) =
-//       c match {
-//         case Inl(h) => inlets.select[Inlet[H]] -> Some(h)
-//         case Inr(_) => throw new RuntimeException("impossible case")
-//       }
-//   }
-
-//   implicit def head[H, T <: Coproduct, HL <: HList](
-//     implicit
-//       sel: SelectInletValue.Aux[T, HL],
-//       selO: Selector[HL, Inlet[H]]
-//   ): SelectInletValue.Aux[H :+: T, HL] = new SelectInletValue[H :+: T] {
-//     type Inlets = HL
-//     def apply(c: H :+: T, inlets: HL): (Inlet[_], Option[_]) = 
-//       c match {
-//         case Inl(h) => inlets.select[Inlet[H]] -> Some(h)
-//         case Inr(t) => sel.apply(t, inlets)
-//       }
-//   }
-
-// }
-
+/** The custom FanOutShape used by CoproductFlexiRoute to build typed outlets from types in the Coproduct */
 class CoproductFanOutShape[C <: Coproduct, HL <: HList](
   val builder: OutletBuilder.Aux[C, HL],
   _init: FanOutShape.Init[C] = FanOutShape.Name[C]("CoproductFanOutShape")
 ) extends FanOutShape[C](_init) {
   self =>
   val rnd = new scala.util.Random
-  // val outs = oo.toList[Outlet[_]](trav)
   val outs = builder.apply(new OutletFunction{
     def apply[H] = self.newOutlet[H](rnd.nextString(5))
   })
@@ -130,6 +200,7 @@ class CoproductFanOutShape[C <: Coproduct, HL <: HList](
   protected override def construct(i: FanOutShape.Init[C]) = new CoproductFanOutShape(builder, i)
 }
 
+/** The custom CoproductFlexiRoute that dispatches instance of the Coproduct to the right route according to the type using a DemandFromAll condition */
 class CoproductFlexiRoute[C <: Coproduct, HL <: HList](implicit
   builder: OutletBuilder.Aux[C, HL],
   trav: ToTraversable.Aux[HL, List, Outlet[_]],
@@ -143,11 +214,8 @@ class CoproductFlexiRoute[C <: Coproduct, HL <: HList](implicit
 
     override def initialState = State[Any](DemandFromAll(p.outs.toList[Outlet[_]](trav))) {
       (ctx, _, element) =>
-        // println("e="+element)
-        val (outlet, Some(h)) = sel.apply(element, p.outs)
-        // println(s"outlet:$outlet h:$h")
+        val (outlet, h) = sel.apply(element, p.outs)
         ctx.emit(outlet)(h)
-        // println(s"after")
         SameState
     }
  
@@ -155,11 +223,12 @@ class CoproductFlexiRoute[C <: Coproduct, HL <: HList](implicit
   }
 }
 
-
+/** Universal Inlet builder function */
 trait InletFunction {
   def apply[H]: Inlet[H]
 }
 
+/** Typed inlet builder that builds a HList of Inlets from the types in a coproduct using a universal builder function */
 trait InletBuilder[C <: Coproduct] {
   type Sub <: Coproduct
   type Out <: HList
@@ -187,6 +256,7 @@ object InletBuilder {
 
 }
 
+/** The custom FanInShape used by CoproductFlexiMerge to build typed inlets from types in the Coproduct */
 class CoproductFanInShape[C <: Coproduct, HL <: HList](
   val builder: InletBuilder.Aux[C, C, HL],
   _init: FanInShape.Init[C] = FanInShape.Name("CoproductFanInShape")
@@ -202,6 +272,7 @@ class CoproductFanInShape[C <: Coproduct, HL <: HList](
 }
 
 
+/** The custom CoproductFlexiMerge that merges elements received on all inlets to output Coproduct using ReadAny condition */
 class CoproductFlexiMerge[C <: Coproduct, HL <: HList](implicit
   builder: InletBuilder.Aux[C, C, HL],
   trav: ToTraversable.Aux[HL, List, Inlet[C]]
@@ -231,6 +302,7 @@ class CoproductFlexiMerge[C <: Coproduct, HL <: HList](implicit
   }
 }
 
+/** Extracts from a HList of flows a Coproduct of Input types and a Coproduct of Output types */
 trait FlowTypes[HL <: HList] {
   type CIn <: Coproduct
   type COut <: Coproduct
@@ -255,13 +327,14 @@ object FlowTypes {
 
 }
 
+/** Builds a Flow[CIn, Any] using provided FlowGraph.Builder */
 trait FlowBuilder[CIn <: Coproduct, COut <: Coproduct] {
   type HLO <: HList
   type HLF <: HList
   type N <: Nat
 
   def build(outlets: HLO, flows: HLF, merge: UniformFanInShape[Any, Any])
-           (implicit builder: FlowGraph.Builder): Unit
+           (implicit builder: FlowGraph.Builder[Unit]): Unit
 }
 
 object FlowBuilder{
@@ -279,7 +352,7 @@ object FlowBuilder{
       type HLF = HLF0
       type N = Nat._1
 
-      def build(outlets: HLO0, flows: HLF0, merge: UniformFanInShape[Any, Any])(implicit builder: FlowGraph.Builder): Unit = {
+      def build(outlets: HLO0, flows: HLF0, merge: UniformFanInShape[Any, Any])(implicit builder: FlowGraph.Builder[Unit]): Unit = {
         import FlowGraph.Implicits._
         val outlet = outlets.select[Outlet[HI]]
         val flow = flows.select[Flow[HI, HO, Unit]]
@@ -299,7 +372,7 @@ object FlowBuilder{
       type HLF = HLF0
       type N = Succ[N0]
 
-      def build(outlets: HLO0, flows: HLF0, merge: UniformFanInShape[Any, Any])(implicit builder: FlowGraph.Builder): Unit = {
+      def build(outlets: HLO0, flows: HLF0, merge: UniformFanInShape[Any, Any])(implicit builder: FlowGraph.Builder[Unit]): Unit = {
         import FlowGraph.Implicits._
         
         val outlet = outlets.select[Outlet[HI]]
@@ -312,13 +385,14 @@ object FlowBuilder{
 
 }
 
+/** Builds a Flow[CIn, COut] using provided FlowGraph.Builder */
 trait FlowBuilderC[CIn <: Coproduct, COut <: Coproduct] {
   type HLO <: HList
   type HLF <: HList
   type HLI <: HList
 
   def build(outlets: HLO, flows: HLF, inlets: HLI)
-           (implicit builder: FlowGraph.Builder): Unit
+           (implicit builder: FlowGraph.Builder[Unit]): Unit
 }
 
 object FlowBuilderC{
@@ -335,7 +409,7 @@ object FlowBuilderC{
       type HLF = Flow[HI, HO, Unit] :: HNil
       type HLI = Inlet[C] :: HNil
 
-      def build(outlets: Outlet[HI] :: HNil, flows: Flow[HI, HO, Unit] :: HNil, inlets: Inlet[C] :: HNil)(implicit builder: FlowGraph.Builder): Unit = {
+      def build(outlets: Outlet[HI] :: HNil, flows: Flow[HI, HO, Unit] :: HNil, inlets: Inlet[C] :: HNil)(implicit builder: FlowGraph.Builder[Unit]): Unit = {
         import FlowGraph.Implicits._
         val outlet = outlets.head
         val inlet = inlets.head
@@ -355,7 +429,7 @@ object FlowBuilderC{
       type HLF = Flow[HI, HO, Unit] :: HLF0
       type HLI = Inlet[C] :: HLI0
 
-      def build(outlets: Outlet[HI] :: HLO0, flows: Flow[HI, HO, Unit] :: HLF0, inlets: Inlet[C] :: HLI0)(implicit builder: FlowGraph.Builder): Unit = {
+      def build(outlets: Outlet[HI] :: HLO0, flows: Flow[HI, HO, Unit] :: HLF0, inlets: Inlet[C] :: HLI0)(implicit builder: FlowGraph.Builder[Unit]): Unit = {
         import FlowGraph.Implicits._
         
         val outlet = outlets.head
@@ -368,72 +442,4 @@ object FlowBuilderC{
     }
 
 }
-object ShapelessStream {
 
-  def coproductFlow[A, B, O1, O2](
-    fa: Flow[A, O1, Unit], fb: Flow[B, O2, Unit]
-  )(
-    implicit
-      builder: OutletBuilder.Aux[A :+: B :+: CNil, Outlet[A] :: Outlet[B] :: HNil],
-      trav: ToTraversable.Aux[Outlet[A] :: Outlet[B] :: HNil, List, Outlet[_]],
-      selOutletValue: SelectOutletValue.Aux[A :+: B :+: CNil, Outlet[A] :: Outlet[B] :: HNil]
-  ): Flow[A :+: B :+: CNil, Any, Unit] =
-    Flow() { implicit builder =>
-    
-      import FlowGraph.Implicits._
-
-      val router = builder.add(new CoproductFlexiRoute[A :+: B :+: CNil, Outlet[A] :: Outlet[B] :: HNil])
-      val merge = builder.add(Merge[Any](2))
-
-      router.outs.select[Outlet[A]] ~> fa ~> merge.in(0)
-      router.outs.select[Outlet[B]] ~> fb ~> merge.in(1)
-      router.in -> merge.out
-    }
-
-
-  def coproductFlowAny[HL <: HList, CIn <: Coproduct, COut <: Coproduct, CInOutlets <: HList, Size <: Nat, N <: Nat](
-    flows: HL
-  )(
-    implicit
-      flowTypes: FlowTypes.Aux[HL, CIn, COut],
-      build: OutletBuilder.Aux[CIn, CInOutlets],
-      trav: ToTraversable.Aux[CInOutlets, List, Outlet[_]],
-      selOutletValue: SelectOutletValue.Aux[CIn, CInOutlets],
-      length: shapeless.ops.coproduct.Length.Aux[CIn, Size],
-      toIntN: ToInt[Size],
-      flowBuilder: FlowBuilder.Aux[CIn, COut, CInOutlets, HL, N]
-  ): Flow[CIn, Any, Unit] =
-    Flow() { implicit builder =>
-    
-      import FlowGraph.Implicits._
-
-      val router = builder.add(new CoproductFlexiRoute[CIn, CInOutlets]())
-      val merge = builder.add(Merge[Any](toIntN()))
-
-      flowBuilder.build(router.outs, flows, merge)
-      router.in -> merge.out
-    }
-
-  def coproductFlow[HL <: HList, CIn <: Coproduct, COut <: Coproduct, CInOutlets <: HList, COutInlets <: HList](
-    flows: HL
-  )(
-    implicit
-      flowTypes: FlowTypes.Aux[HL, CIn, COut],
-      obuild: OutletBuilder.Aux[CIn, CInOutlets],
-      ibuild: InletBuilder.Aux[COut, COut, COutInlets],
-      otrav: ToTraversable.Aux[CInOutlets, List, Outlet[_]],
-      itrav: ToTraversable.Aux[COutInlets, List, Inlet[COut]],
-      selOutletValue: SelectOutletValue.Aux[CIn, CInOutlets],
-      flowBuilder: FlowBuilderC.Aux[CIn, COut, CInOutlets, HL, COutInlets]
-  ): Flow[CIn, COut, Unit] =
-    Flow() { implicit builder =>
-    
-      import FlowGraph.Implicits._
-
-      val router = builder.add(new CoproductFlexiRoute[CIn, CInOutlets]())
-      val merger = builder.add(new CoproductFlexiMerge[COut, COutInlets]())
-
-      flowBuilder.build(router.outs, flows, merger.ins)
-      router.in -> merger.out
-    }
-}

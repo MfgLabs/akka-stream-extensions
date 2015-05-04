@@ -1,5 +1,5 @@
 package com.mfglabs.stream
-package extensions.postgres
+package extensions.shapeless
 
 import java.io.File
 import java.sql.{Connection, DriverManager}
@@ -28,8 +28,10 @@ class ShapelessExtensionsSpec extends FlatSpec with Matchers with ScalaFutures w
   implicit val fm = ActorFlowMaterializer()
   implicit override val patienceConfig =
     PatienceConfig(timeout = Span(5, Minutes), interval = Span(5, Millis))
-/*
-  "ShapelessStream" should "stream" in {
+
+  "ShapelessStream" should "streamAny" in {
+
+    type C = Int :+: String :+: Boolean :+: CNil
 
     // WARNING Don't forget to change the access_token with a valid one
     val sink = Sink.fold[Seq[Any], Any](Seq())(_ :+ _)
@@ -37,13 +39,13 @@ class ShapelessExtensionsSpec extends FlatSpec with Matchers with ScalaFutures w
     val f = FlowGraph.closed(sink) { implicit builder => sink =>
       import FlowGraph.Implicits._
       val s = Source(() => Seq(
-        Coproduct[Int :+: String :+: Boolean :+: CNil](1),
-        Coproduct[Int :+: String :+: Boolean :+: CNil]("foo"),
-        Coproduct[Int :+: String :+: Boolean :+: CNil](2),
-        Coproduct[Int :+: String :+: Boolean :+: CNil](false),
-        Coproduct[Int :+: String :+: Boolean :+: CNil]("bar"),
-        Coproduct[Int :+: String :+: Boolean :+: CNil](3),
-        Coproduct[Int :+: String :+: Boolean :+: CNil](true)
+        Coproduct[C](1),
+        Coproduct[C]("foo"),
+        Coproduct[C](2),
+        Coproduct[C](false),
+        Coproduct[C]("bar"),
+        Coproduct[C](3),
+        Coproduct[C](true)
       ).toIterator)
 
 
@@ -57,9 +59,17 @@ class ShapelessExtensionsSpec extends FlatSpec with Matchers with ScalaFutures w
            fr.outlet ~> sink
     }
 
-    whenReady(f.run()) { l => println("FINISHED:"+l)}
+    f.run().futureValue.toSet should equal (Set[Any](
+      1,
+      "foo",
+      2,
+      false,
+      "bar",
+      3,
+      true
+    ))
   }
-*/
+
   it should "stream" in {
 
     type C = Int :+: String :+: Boolean :+: CNil
@@ -88,38 +98,17 @@ class ShapelessExtensionsSpec extends FlatSpec with Matchers with ScalaFutures w
            fr.outlet ~> sink
     }
 
-    whenReady(f.run()) { l => println("FINISHED:"+l)}
+    f.run().futureValue.toSet should equal (Set(
+      Coproduct[C](1),
+      Coproduct[C]("foo"),
+      Coproduct[C](2),
+      Coproduct[C](false),
+      Coproduct[C]("bar"),
+      Coproduct[C](3),
+      Coproduct[C](true)
+    ))
   }
 }
 
 
-    // implicitly[FlowTypes.Aux[
-    //   Flow[Int, Int, Unit] :: Flow[String, String, Unit] :: HNil,
-    //   Int :+: String :+: CNil,
-    //   Int :+: String :+: CNil]
-    // ]
 
-    // implicitly[
-    //   BuildOutlet.Aux[Int :+: String :+: CNil, Outlet[Int] :: Outlet[String] :: HNil]
-    // ]
-
-    // implicitly[
-    //   Sel.Aux[Int :+: String :+: CNil, Outlet[Int] :: Outlet[String] :: HNil]
-    // ]
-
-    // Outlet2Flow.head[
-    //   Int, String :+: CNil, Int, String :+: CNil,
-    //   Outlet[Int] :: Outlet[String] :: HNil,
-    //   Flow[Int, Int, Unit] :: Flow[String, String, Unit] :: HNil,
-    //   Nat._1
-    // ]
-
-    // implicitly[
-    //   Outlet2Flow.Aux[
-    //     Int :+: String :+: CNil,
-    //     Int :+: String :+: CNil, 
-    //     Outlet[Int] :: Outlet[String] :: HNil,
-    //     Flow[Int, Int, Unit] :: Flow[String, String, Unit] :: HNil,
-    //     Nat._2
-    //   ]
-    // ]

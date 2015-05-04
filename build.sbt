@@ -120,14 +120,14 @@ lazy val elasticsearch = project.in(file("extensions/elasticsearch"))
     publishSettings
   )
 
-//lazy val shapeless = project.in(file("extensions/shapeless"))
-//  .dependsOn(commons)
-//  .settings(
-//    name := "akka-stream-extensions-shapeless",
-//    libraryDependencies ++= Seq(
-//      "com.typesafe.akka" %% "akka-stream-experimental" % "1.0-RC2",
-//      "com.chuusai"       %% "shapeless"   % "2.2.0-RC4"
-//    ),
-//    commonSettings,
-//    publishSettings
-//  )
+lazy val shapeless = project.in(file("extensions/shapeless"))
+ .dependsOn(commons)
+ .settings(
+   name := "akka-stream-extensions-shapeless",
+   libraryDependencies ++= Seq(
+     "com.typesafe.akka" %% "akka-stream-experimental" % "1.0-RC2",
+     "com.chuusai"       %% "shapeless"                % "2.2.0-RC5"
+   ),
+   commonSettings,
+   publishSettings
+ )
