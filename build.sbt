@@ -65,12 +65,12 @@ lazy val docSettings = Seq(
 )
 
 lazy val all = project.in(file("."))
-  .aggregate(commons, postgres, elasticsearch, docs)
+  .aggregate(commons, shapeless, postgres, elasticsearch, docs)
   .settings(
     name := "commons-all",
     noPublishSettings
   )
-  .dependsOn(commons, postgres, elasticsearch, docs)
+  .dependsOn(commons, shapeless, postgres, elasticsearch, docs)
 
 lazy val docs = project
   .settings(moduleName := "akka-stream-ext-docs")
@@ -81,7 +81,7 @@ lazy val docs = project
   .settings(ghpages.settings)
   .settings(tutSettings)
   .settings(docSettings)
-  .dependsOn(commons, postgres, elasticsearch)
+  .dependsOn(commons, postgres, shapeless, elasticsearch)
 
 site.jekyllSupport()
 
