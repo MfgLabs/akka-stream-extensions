@@ -77,7 +77,7 @@
     
     {% include footer.html %}
 
-    <script>
+    <script type="text/javascript">
     	$(document).ready(function(e) {
     		//PAGEFADE
     		$("body").css("display", "none");
@@ -186,11 +186,11 @@
 			  	//Event listener
 			    $('.sidebar-nav ul li').click( function (e) {
 			    	if(h2_list[$(this).index()]['text'] == 'License'){
-			    		$('body').stop().animate({scrollTop: (h2_list[$(this).index()]['el'].offset().top - 108)},'slow');
+			    		$('html, body').stop().animate({scrollTop: (h2_list[$(this).index()]['el'].offset().top - 108)},'slow');
 			    		e.preventDefault();
 			    	}
 			    	else {
-			    		$('body').stop().animate({scrollTop: (h2_list[$(this).index()]['el'].offset().top - 60)},'slow');
+			    		$('html, body').stop().animate({scrollTop: (h2_list[$(this).index()]['el'].offset().top - 60)},'slow');
 			    		e.preventDefault();	
 			    	}
 			    }); 

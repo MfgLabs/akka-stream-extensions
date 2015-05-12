@@ -1,4 +1,4 @@
-# Akka Stream Extensions
+## Akka Stream Extensions
 
 We are proud to opensource `Akka-Stream-Extensions` extending the very promising [Typesafe Akka-Stream](http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0-RC1/scala.html?_ga=1.42749861.1204922152.1421451776).
 
@@ -8,14 +8,13 @@ The main purpose of this project is to:
 
 2. Make those structures very well tested & production ready.
 
-3. Study/evaluate bleeding-edge streaming concepts based on Akka-Stream & other technologies (for now, Postgres & ElasticSearch).
+3. Study/evaluate streaming concepts based on Akka-Stream & other technologies (AWS, Postgres, ElasticSearch, ...).
 
-We have been developing this library in the context of [MfgLabs](http://mfglabs.com) for our production projects after identifying a few primitive structures that were common to many use-cases, not provided by Akka-Stream out of the box and not so easy to implement in a robust way.
+We have been developing this library in the context of [MFG Labs](http://mfglabs.com) for our production projects after identifying a few primitive structures that were common to many use-cases, not provided by Akka-Stream out of the box and not so easy to implement in a robust way.
 
-<br/>
 ## How-To
 
-> Scaladoc is available [there](http://mfglabs.github.io/akka-stream-extensions/api/#package)
+Scaladoc is available [there](http://mfglabs.github.io/akka-stream-extensions/api/#package).
 
 
 ### Add resolvers to your `build.sbt`
@@ -26,10 +25,10 @@ resolvers += Resolver.bintrayRepo("mfglabs", "maven")
 
 ### Add dependencies to your `build.sbt`
 
-> Currently depends on `akka-stream-1.0-M5`
+Currently depends on `akka-stream-1.0-RC2`
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.7.0"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.7.1"
 ```
 
 ### Sample
@@ -38,17 +37,13 @@ libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.7.0"
 import com.mfglabs.stream._
 
 // Source from a paginated REST Api
-SourceExt
+val pagesStream: Source[Page, Unit] = SourceExt
   .bulkPullerAsync(0L) { (currentPosition, downstreamDemand) =>
     val futResult: Future[Seq[Page]] = WSService.get(offset = currentPosition, nbPages = downstreamDemand)
     futResult
   }
-  .via(FlowExt.rateLimiter(200 millis))
-  .via(FlowExt.mapAsyncWithBoundedConcurrency(maxConcurrency = 8)(asyncTransform))
 
-// Source from a Java InputStream
-SourceExt
-  .fromStream(inputStream)(ExecutionContextForBlockingOps(someEc))
+someBinaryStream
   .via(FlowExt.rechunkByteStringBySeparator(ByteString("\n"), maxChunkSize = 5 * 1024))
   .map(_.utf8String)
   .via(
@@ -62,19 +57,16 @@ SourceExt
     )
   )
 ```
+Many more helpers, check the [Scaladoc](http://mfglabs.github.io/akka-stream-extensions/api/#package)!
 
-> Many more helpers, check the [Scaladoc](http://mfglabs.github.io/akka-stream-extensions/api/#package) !
-
-
-<br/>
 ## Postgres extension
 
-> This extension provides tools to stream data from/to Postgres
+This extension provides tools to stream data from/to Postgres.
 
 ### Dependencies
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.7.0"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.7.1"
 ```
 
 ### Sample
@@ -101,13 +93,12 @@ someLineStream
   ))
 ```
 
-<br/>
 ## Elasticsearch extension
 
 ### Dependencies
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-elasticsearch" % "0.7.0"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-elasticsearch" % "0.7.1"
 ```
 
 ### Sample
@@ -133,31 +124,40 @@ EsStream
 
 ## AWS
 
-Check our project [MfgLabs/commons-aws](https://github.com/MfgLabs/commons-aws) also providing streaming extensions for Amazon S3 & SQS.
+Check our project [MFG Labs/commons-aws](https://github.com/MfgLabs/commons-aws) also providing streaming extensions for Amazon S3 & SQS.
 
-
-<br/>
 ## Testing
 
 To test postgres-extensions, you need to have Docker installed and running on your computer (the tests will automatically launch a docker container with a Postgres db).
 
-<br/>
 ## Tributes
 
-We thank [MfgLabs](http://mfglabs.com) for sponsoring the development and the opensourcing of this library.
+We thank [MFG Labs](http://mfglabs.com) for sponsoring the development and the opensourcing of this library.
 
 We believed it could be very useful & interesting to many people and we are sure some will help us debug & build more useful structures.
 
-> So don't hesitate to [contribute](/akka-stream-extensions/contributing/)
+<div class="push">
+  <p>So don't hesitate to contribute</p>
+  
+  <a href="{{ site.baseurl }}/contributing/" alt="go one contribute page" class="btn-round grey">
+    <span class="ico arrow_g"></span>
+  </a>
+</div>
 
-<br/>
-## License
-
->This software is licensed under the Apache 2 license, quoted below.
->
->Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
->
->http://www.apache.org/licenses/LICENSE-2.0
->
->Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+<div class="license">
+  <h2>License</h2>
+  
+  <p>This software is licensed under the Apache 2 license, quoted below.</p>
+  
+  <p>
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance 
+    with the License. You may obtain a copy of the License <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank" alt="go to apache.org">here</a>.
+  </p>
+  
+  <p>
+    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
+    on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+    the specific language governing permissions and limitations under the License.
+  </p>
+</div>
 

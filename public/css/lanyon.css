@@ -215,7 +215,7 @@ a:focus, a:hover{text-decoration: none;}
 	.cln-left {
 		width: 100%; height: 100%;
 		position: fixed;
-		top: 0; right: 0;
+		top: 0; left: 0;
 		box-sizing: border-box;
 		-moz-box-sizing: border-box;
 		padding-top: 60px;
@@ -245,7 +245,7 @@ a:focus, a:hover{text-decoration: none;}
 	width: 100%%;
 	}
 	.cln-right{width: 87.5%;}
-	.cln-left{padding-top: 50px;}
+	.cln-left{padding-top: 55px;}
 }
 
 
@@ -662,7 +662,6 @@ a.btn-round.blue:hover{
 .wrapper-fix{
 	position: relative;
 	width: 100%;
-	overflow-y: auto;
 }
 
 .wrapper-fix.fixed{
@@ -1061,6 +1060,11 @@ footer p{
 	.table{
 		display: table-cell;
 		vertical-align: middle;
+		overflow-y: auto;
+	}
+	
+	.wrapper-fix{
+		margin-top: -60px;
 	}
 	
 	.sidebar {
@@ -1168,9 +1172,15 @@ footer p{
 	}
 	
 	/* SIDEBAR */
-	.table{display: block;height: 100%;}
+	.table{
+		display: block;height: 100%;
+		overflow-y: auto;
+	}
 	
-	.wrapper-fix{height: 100%;}
+	.wrapper-fix{
+		height: 100%;
+		margin-top: 0px;
+	}
 	
 	.sidebar {
 		width: 100%; height: 100%;
