@@ -37,10 +37,13 @@ libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.7.1"
 import com.mfglabs.stream._
 
 // Source from a paginated REST Api
-val pagesStream: Source[Page, Unit] = SourceExt
+val pagesStream: Source[Page, ActorRef] = SourceExt
   .bulkPullerAsync(0L) { (currentPosition, downstreamDemand) =>
     val futResult: Future[Seq[Page]] = WSService.get(offset = currentPosition, nbPages = downstreamDemand)
-    futResult
+    futResult.map {
+      case Nil => Nil -> true // stop the stream if the REST Api delivers no more results
+      case p   => p -> false
+    }
   }
 
 someBinaryStream
