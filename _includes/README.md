@@ -131,6 +131,11 @@ EsStream
   )
 ```
 
+## AWS
+
+Check our project [MfgLabs/commons-aws](https://github.com/MfgLabs/commons-aws) also providing streaming extensions for Amazon S3 & SQS.
+
+
 <br/>
 ## Testing
 

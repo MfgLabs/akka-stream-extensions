@@ -1,41 +1,74 @@
-<!-- Target for toggling the sidebar `.sidebar-checkbox` is for regular
-     styles, `#sidebar-checkbox` for behavior. -->
-<input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
 
 <!-- Toggleable sidebar -->
-<div class="sidebar" id="sidebar">
-  <div class="sidebar-item">
-    <p>{{ site.description }}</p>
-  </div>
 
-  <nav class="sidebar-nav">
-    <a class="sidebar-nav-item{% if page.url == site.baseurl %} active{% endif %}" href="{{ site.baseurl }}/">Home</a>
-
-    {% comment %}
-      The code below dynamically generates a sidebar nav of pages with
-      `layout: page` in the front-matter. See readme for usage.
-    {% endcomment %}
-
-    {% assign pages_list = site.pages | sort:"url" %}
-    {% for node in pages_list %}
-      {% if node.title != null %}
-        {% if node.layout == "page" %}
-          <a class="sidebar-nav-item{% if page.url == node.url %} active{% endif %}" href="{{ site.baseurl }}{{ node.url }}">{{ node.title }}</a>
-        {% endif %}
-      {% endif %}
-    {% endfor %}
-
-    <!--a class="sidebar-nav-item" href="{{ site.github.repo }}/archive/v{{ site.version }}.zip">Download</a-->
-    <a class="sidebar-nav-item" href="{{ site.github.repo }}">GitHub project</a>
-    <a class="sidebar-nav-item" href="{{ site.apidocs }}">Scaladoc</a>
-    <span class="sidebar-nav-item">Currently v{{ site.version }}</span>
-    <span class="sidebar-nav-item">Licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache v2</a></span>
-  </nav>
-
-
-  <div class="sidebar-item">
-    <p>
-      Sponsored by <a class="sidebar-nav-item" href="http://mfglabs.com"><img src="{{ site.baseurl }}/public/logo-mfg.png"/></a>
-    </p>
-  </div>
+<div class="table">
+	<div class="wrapper-fix">
+		<div class="sidebar" id="sidebar">
+	  
+			<nav class="sidebar-nav">
+		    <a class="sidebar-nav-item{% if page.url == site.baseurl %} active{% endif %}" href="{{ site.baseurl }}/">Home</a>
+		
+		    {% comment %}
+		      The code below dynamically generates a sidebar nav of pages with
+		      `layout: page` in the front-matter. See readme for usage.
+		    {% endcomment %}
+		
+		    {% assign pages_list = site.pages | sort:"url" %}
+		    {% for node in pages_list %}
+		      {% if node.title != null %}
+		      	
+		      	{% if node.title != "Home" %}
+		      	    {% if node.layout == "page" %}
+		      	      <a class="sidebar-nav-item {% if page.url == node.url %} active{% endif %}" href="{{ site.baseurl }}{{ node.url }}">
+			      	      {{ node.title }}
+			      	      <div></div>
+		      	      </a>
+		      	    {% endif %}
+		      	{% endif %}
+		      	
+		      	{% if node.title == "Home" %}
+		      	  <a class="sidebar-nav-item {% if page.url == node.url %} active{% endif %}" href="{{ site.baseurl }}{{ node.url }}">
+		      	  	{{ site.title }} 
+		      	  	<span id="site-version">v{{ site.version }}</span>
+		      	  	<div></div>
+		      	  </a>
+		      	{% endif %}
+		      {% endif %}
+		    {% endfor %}
+		
+		    <!--a class="sidebar-nav-item" href="{{ site.github.repo }}/archive/v{{ site.version }}.zip">Download</a-->
+		    <a class="sidebar-nav-item" href="{{ site.github.repo }}" target="_blank">
+		    	GitHub project 
+		    	<span class="ico ext-link"></span>
+		    	<div></div>
+		    </a>
+		    <a class="sidebar-nav-item" href="{{ site.apidocs }}" target="_blank">
+		    	Scaladoc 
+		    	<span class="ico ext-link"></span>
+		    	<div></div>
+		    </a>
+		    <!--<span class="sidebar-nav-item">Currently v{{ site.version }}</span>-->
+		    <!--<span class="sidebar-nav-item">Licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache v2</a></span>-->
+		  </nav>
+			
+			<!--<div class="separator"></div>
+			
+			<div class="sidebar-item">
+		    	<p>{{ site.description }}</p>
+		    </div>-->
+		</div>
+		
+		<a href="{{ site.github.repo }}" target="_blank" alt="Fork the project on Git" class="btn-fork">
+		<span>
+			<div>
+				<span class="ico fork"></span>
+				Fork me on Github
+			</div>
+		</span>
+		</a>
+	</div>
 </div>
+
+
+
+
