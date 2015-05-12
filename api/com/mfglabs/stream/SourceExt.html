@@ -323,78 +323,6 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.mfglabs.stream.SourceExt#fromFile" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="fromFile(f:java.io.File,maxChunkSize:Int)(implicitec:com.mfglabs.stream.ExecutionContextForBlockingOps):akka.stream.scaladsl.Source[akka.util.ByteString,akka.actor.ActorRef]"></a>
-      <a id="fromFile(File,Int)(ExecutionContextForBlockingOps):Source[ByteString,ActorRef]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">fromFile</span><span class="params">(<span name="f">f: <span class="extype" name="java.io.File">File</span></span>, <span name="maxChunkSize">maxChunkSize: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a> = <span class="symbol"><span class="name"><a href="#defaultChunkSize:Int">defaultChunkSize</a></span></span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ec">ec: <a href="ExecutionContextForBlockingOps.html" class="extype" name="com.mfglabs.stream.ExecutionContextForBlockingOps">ExecutionContextForBlockingOps</a></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<span class="extype" name="akka.util.ByteString">ByteString</span>, <span class="extype" name="akka.actor.ActorRef">ActorRef</span>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.mfglabs.stream.SourceExt@fromFile(f:java.io.File,maxChunkSize:Int)(implicitec:com.mfglabs.stream.ExecutionContextForBlockingOps):akka.stream.scaladsl.Source[akka.util.ByteString,akka.actor.ActorRef]" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Create a Source from a File.</p><div class="fullcomment"><div class="comment cmt"><p>Create a Source from a File.</p></div><dl class="paramcmts block"><dt class="param">f</dt><dd class="cmt"><p>file</p></dd><dt class="param">maxChunkSize</dt><dd class="cmt"><p>max size of stream chunks in bytes</p></dd><dt class="param">ec</dt><dd class="cmt"><p>ec that will be used for the input stream's blocking operations</p></dd><dt>returns</dt><dd class="cmt"><p>
-</p></dd></dl></div>
-    </li><li name="com.mfglabs.stream.SourceExt#fromGZIPFile" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="fromGZIPFile(f:java.io.File,maxChunkSize:Int)(implicitec:com.mfglabs.stream.ExecutionContextForBlockingOps):akka.stream.scaladsl.Source[akka.util.ByteString,akka.actor.ActorRef]"></a>
-      <a id="fromGZIPFile(File,Int)(ExecutionContextForBlockingOps):Source[ByteString,ActorRef]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">fromGZIPFile</span><span class="params">(<span name="f">f: <span class="extype" name="java.io.File">File</span></span>, <span name="maxChunkSize">maxChunkSize: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a> = <span class="symbol"><span class="name"><a href="#defaultChunkSize:Int">defaultChunkSize</a></span></span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ec">ec: <a href="ExecutionContextForBlockingOps.html" class="extype" name="com.mfglabs.stream.ExecutionContextForBlockingOps">ExecutionContextForBlockingOps</a></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<span class="extype" name="akka.util.ByteString">ByteString</span>, <span class="extype" name="akka.actor.ActorRef">ActorRef</span>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.mfglabs.stream.SourceExt@fromGZIPFile(f:java.io.File,maxChunkSize:Int)(implicitec:com.mfglabs.stream.ExecutionContextForBlockingOps):akka.stream.scaladsl.Source[akka.util.ByteString,akka.actor.ActorRef]" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Create a Source from a zip File and unzip it on the fly.</p><div class="fullcomment"><div class="comment cmt"><p>Create a Source from a zip File and unzip it on the fly.</p></div><dl class="paramcmts block"><dt class="param">f</dt><dd class="cmt"><p>file</p></dd><dt class="param">maxChunkSize</dt><dd class="cmt"><p>max size of the chunks that the source will emit (in bytes).</p></dd><dt class="param">ec</dt><dd class="cmt"></dd><dt>returns</dt><dd class="cmt"><p>
-</p></dd></dl></div>
-    </li><li name="com.mfglabs.stream.SourceExt#fromGZIPStream" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="fromGZIPStream(is:java.io.InputStream,maxChunkSize:Int)(implicitec:com.mfglabs.stream.ExecutionContextForBlockingOps):akka.stream.scaladsl.Source[akka.util.ByteString,akka.actor.ActorRef]"></a>
-      <a id="fromGZIPStream(InputStream,Int)(ExecutionContextForBlockingOps):Source[ByteString,ActorRef]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">fromGZIPStream</span><span class="params">(<span name="is">is: <span class="extype" name="java.io.InputStream">InputStream</span></span>, <span name="maxChunkSize">maxChunkSize: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a> = <span class="symbol"><span class="name"><a href="#defaultChunkSize:Int">defaultChunkSize</a></span></span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ec">ec: <a href="ExecutionContextForBlockingOps.html" class="extype" name="com.mfglabs.stream.ExecutionContextForBlockingOps">ExecutionContextForBlockingOps</a></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<span class="extype" name="akka.util.ByteString">ByteString</span>, <span class="extype" name="akka.actor.ActorRef">ActorRef</span>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.mfglabs.stream.SourceExt@fromGZIPStream(is:java.io.InputStream,maxChunkSize:Int)(implicitec:com.mfglabs.stream.ExecutionContextForBlockingOps):akka.stream.scaladsl.Source[akka.util.ByteString,akka.actor.ActorRef]" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Create a Source from a zipped input stream and unzip it on the fly.</p><div class="fullcomment"><div class="comment cmt"><p>Create a Source from a zipped input stream and unzip it on the fly.</p></div><dl class="paramcmts block"><dt class="param">is</dt><dd class="cmt"><p>source input stream</p></dd><dt class="param">maxChunkSize</dt><dd class="cmt"><p>max size of the chunks that the source will emit (in bytes).</p></dd><dt class="param">ec</dt><dd class="cmt"><p>ec that will be used for the input stream's blocking operations</p></dd><dt>returns</dt><dd class="cmt"><p>
-</p></dd></dl></div>
-    </li><li name="com.mfglabs.stream.SourceExt#fromStream" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="fromStream(is:java.io.InputStream,maxChunkSize:Int)(implicitec:com.mfglabs.stream.ExecutionContextForBlockingOps):akka.stream.scaladsl.Source[akka.util.ByteString,akka.actor.ActorRef]"></a>
-      <a id="fromStream(InputStream,Int)(ExecutionContextForBlockingOps):Source[ByteString,ActorRef]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">fromStream</span><span class="params">(<span name="is">is: <span class="extype" name="java.io.InputStream">InputStream</span></span>, <span name="maxChunkSize">maxChunkSize: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a> = <span class="symbol"><span class="name"><a href="#defaultChunkSize:Int">defaultChunkSize</a></span></span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ec">ec: <a href="ExecutionContextForBlockingOps.html" class="extype" name="com.mfglabs.stream.ExecutionContextForBlockingOps">ExecutionContextForBlockingOps</a></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<span class="extype" name="akka.util.ByteString">ByteString</span>, <span class="extype" name="akka.actor.ActorRef">ActorRef</span>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.mfglabs.stream.SourceExt@fromStream(is:java.io.InputStream,maxChunkSize:Int)(implicitec:com.mfglabs.stream.ExecutionContextForBlockingOps):akka.stream.scaladsl.Source[akka.util.ByteString,akka.actor.ActorRef]" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Create a Source from an InputStream.</p><div class="fullcomment"><div class="comment cmt"><p>Create a Source from an InputStream.</p></div><dl class="paramcmts block"><dt class="param">is</dt><dd class="cmt"><p>source input stream</p></dd><dt class="param">maxChunkSize</dt><dd class="cmt"><p>max size of the chunks that the source will emit (in bytes).</p></dd><dt class="param">ec</dt><dd class="cmt"><p>ec that will be used for the input stream's blocking operations</p></dd><dt>returns</dt><dd class="cmt"><p>
-</p></dd></dl></div>
     </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <a id="getClass():Class[_]"></a>
@@ -681,7 +609,95 @@
 
         
 
-        
+        <div id="values" class="values members">
+              <h3>Deprecated Value Members</h3>
+              <ol><li name="com.mfglabs.stream.SourceExt#fromFile" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="fromFile(f:java.io.File,maxChunkSize:Int)(implicitec:com.mfglabs.stream.ExecutionContextForBlockingOps):akka.stream.scaladsl.Source[akka.util.ByteString,akka.actor.ActorRef]"></a>
+      <a id="fromFile(File,Int)(ExecutionContextForBlockingOps):Source[ByteString,ActorRef]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version ) Akka Stream RC1 introduced a built-in way to create a Source from an InputStream, so this version is deprecated.">fromFile</span><span class="params">(<span name="f">f: <span class="extype" name="java.io.File">File</span></span>, <span name="maxChunkSize">maxChunkSize: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a> = <span class="symbol"><span class="name"><a href="#defaultChunkSize:Int">defaultChunkSize</a></span></span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ec">ec: <a href="ExecutionContextForBlockingOps.html" class="extype" name="com.mfglabs.stream.ExecutionContextForBlockingOps">ExecutionContextForBlockingOps</a></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<span class="extype" name="akka.util.ByteString">ByteString</span>, <span class="extype" name="akka.actor.ActorRef">ActorRef</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.mfglabs.stream.SourceExt@fromFile(f:java.io.File,maxChunkSize:Int)(implicitec:com.mfglabs.stream.ExecutionContextForBlockingOps):akka.stream.scaladsl.Source[akka.util.ByteString,akka.actor.ActorRef]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Create a Source from a File.</p><div class="fullcomment"><div class="comment cmt"><p>Create a Source from a File.</p></div><dl class="paramcmts block"><dt class="param">f</dt><dd class="cmt"><p>file</p></dd><dt class="param">maxChunkSize</dt><dd class="cmt"><p>max size of stream chunks in bytes</p></dd><dt class="param">ec</dt><dd class="cmt"><p>ec that will be used for the input stream's blocking operations</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version )</i> Akka Stream RC1 introduced a built-in way to create a Source from an InputStream, so this version is deprecated.</p></dd></dl></div>
+    </li><li name="com.mfglabs.stream.SourceExt#fromGZIPFile" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="fromGZIPFile(f:java.io.File,maxChunkSize:Int)(implicitec:com.mfglabs.stream.ExecutionContextForBlockingOps):akka.stream.scaladsl.Source[akka.util.ByteString,akka.actor.ActorRef]"></a>
+      <a id="fromGZIPFile(File,Int)(ExecutionContextForBlockingOps):Source[ByteString,ActorRef]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version ) Akka Stream RC1 introduced a built-in way to create a Source from an InputStream, so this version is deprecated.">fromGZIPFile</span><span class="params">(<span name="f">f: <span class="extype" name="java.io.File">File</span></span>, <span name="maxChunkSize">maxChunkSize: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a> = <span class="symbol"><span class="name"><a href="#defaultChunkSize:Int">defaultChunkSize</a></span></span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ec">ec: <a href="ExecutionContextForBlockingOps.html" class="extype" name="com.mfglabs.stream.ExecutionContextForBlockingOps">ExecutionContextForBlockingOps</a></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<span class="extype" name="akka.util.ByteString">ByteString</span>, <span class="extype" name="akka.actor.ActorRef">ActorRef</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.mfglabs.stream.SourceExt@fromGZIPFile(f:java.io.File,maxChunkSize:Int)(implicitec:com.mfglabs.stream.ExecutionContextForBlockingOps):akka.stream.scaladsl.Source[akka.util.ByteString,akka.actor.ActorRef]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Create a Source from a zip File and unzip it on the fly.</p><div class="fullcomment"><div class="comment cmt"><p>Create a Source from a zip File and unzip it on the fly.
+Note: Akka Stream RC1 introduced a built-in way to create a Source from an InputStream, therefore this version is deprecated.</p></div><dl class="paramcmts block"><dt class="param">f</dt><dd class="cmt"><p>file</p></dd><dt class="param">maxChunkSize</dt><dd class="cmt"><p>max size of the chunks that the source will emit (in bytes).</p></dd><dt class="param">ec</dt><dd class="cmt"></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version )</i> Akka Stream RC1 introduced a built-in way to create a Source from an InputStream, so this version is deprecated.</p></dd></dl></div>
+    </li><li name="com.mfglabs.stream.SourceExt#fromGZIPStream" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="fromGZIPStream(is:java.io.InputStream,maxChunkSize:Int)(implicitec:com.mfglabs.stream.ExecutionContextForBlockingOps):akka.stream.scaladsl.Source[akka.util.ByteString,akka.actor.ActorRef]"></a>
+      <a id="fromGZIPStream(InputStream,Int)(ExecutionContextForBlockingOps):Source[ByteString,ActorRef]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version ) Akka Stream RC1 introduced a built-in way to create a Source from an InputStream, so this version is deprecated.">fromGZIPStream</span><span class="params">(<span name="is">is: <span class="extype" name="java.io.InputStream">InputStream</span></span>, <span name="maxChunkSize">maxChunkSize: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a> = <span class="symbol"><span class="name"><a href="#defaultChunkSize:Int">defaultChunkSize</a></span></span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ec">ec: <a href="ExecutionContextForBlockingOps.html" class="extype" name="com.mfglabs.stream.ExecutionContextForBlockingOps">ExecutionContextForBlockingOps</a></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<span class="extype" name="akka.util.ByteString">ByteString</span>, <span class="extype" name="akka.actor.ActorRef">ActorRef</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.mfglabs.stream.SourceExt@fromGZIPStream(is:java.io.InputStream,maxChunkSize:Int)(implicitec:com.mfglabs.stream.ExecutionContextForBlockingOps):akka.stream.scaladsl.Source[akka.util.ByteString,akka.actor.ActorRef]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Create a Source from a zipped input stream and unzip it on the fly.</p><div class="fullcomment"><div class="comment cmt"><p>Create a Source from a zipped input stream and unzip it on the fly.</p></div><dl class="paramcmts block"><dt class="param">is</dt><dd class="cmt"><p>source input stream</p></dd><dt class="param">maxChunkSize</dt><dd class="cmt"><p>max size of the chunks that the source will emit (in bytes).</p></dd><dt class="param">ec</dt><dd class="cmt"><p>ec that will be used for the input stream's blocking operations</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version )</i> Akka Stream RC1 introduced a built-in way to create a Source from an InputStream, so this version is deprecated.</p></dd></dl></div>
+    </li><li name="com.mfglabs.stream.SourceExt#fromStream" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="fromStream(is:java.io.InputStream,maxChunkSize:Int)(implicitec:com.mfglabs.stream.ExecutionContextForBlockingOps):akka.stream.scaladsl.Source[akka.util.ByteString,akka.actor.ActorRef]"></a>
+      <a id="fromStream(InputStream,Int)(ExecutionContextForBlockingOps):Source[ByteString,ActorRef]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version ) Akka Stream RC1 introduced a built-in way to create a Source from an InputStream, so this version is deprecated.">fromStream</span><span class="params">(<span name="is">is: <span class="extype" name="java.io.InputStream">InputStream</span></span>, <span name="maxChunkSize">maxChunkSize: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a> = <span class="symbol"><span class="name"><a href="#defaultChunkSize:Int">defaultChunkSize</a></span></span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ec">ec: <a href="ExecutionContextForBlockingOps.html" class="extype" name="com.mfglabs.stream.ExecutionContextForBlockingOps">ExecutionContextForBlockingOps</a></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<span class="extype" name="akka.util.ByteString">ByteString</span>, <span class="extype" name="akka.actor.ActorRef">ActorRef</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.mfglabs.stream.SourceExt@fromStream(is:java.io.InputStream,maxChunkSize:Int)(implicitec:com.mfglabs.stream.ExecutionContextForBlockingOps):akka.stream.scaladsl.Source[akka.util.ByteString,akka.actor.ActorRef]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Create a Source from an InputStream.</p><div class="fullcomment"><div class="comment cmt"><p>Create a Source from an InputStream.</p></div><dl class="paramcmts block"><dt class="param">is</dt><dd class="cmt"><p>source input stream</p></dd><dt class="param">maxChunkSize</dt><dd class="cmt"><p>max size of the chunks that the source will emit (in bytes).</p></dd><dt class="param">ec</dt><dd class="cmt"><p>ec that will be used for the input stream's blocking operations</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version )</i> Akka Stream RC1 introduced a built-in way to create a Source from an InputStream, so this version is deprecated.</p></dd></dl></div>
+    </li></ol>
+            </div>
         </div>
 
         <div id="inheritedMembers">
