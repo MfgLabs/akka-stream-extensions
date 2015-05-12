@@ -28,8 +28,8 @@ class BulkPullerAsync[A](offset: Long)(f: (Long, Int) => Future[(Seq[A], Boolean
     case (as: Seq[A], stop: Boolean) =>
       val (requestedAs, unwantedAs) = as.splitAt(beforeFutDemand.toInt)
       requestedAs.foreach(onNext)
-      if (!unwantedAs.isEmpty) {
-        log.warning(s"Requested $beforeFutDemand elements, but received too many elements ${unwantedAs}. Ignoring unwanted elements.")
+      if (unwantedAs.nonEmpty) {
+        log.warning(s"Requested $beforeFutDemand elements, but received too many elements. Ignoring ${unwantedAs.size} unwanted element(s).")
       }
       if (stop) {
         onComplete()
