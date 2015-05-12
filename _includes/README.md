@@ -132,9 +132,9 @@ To test postgres-extensions, you need to have Docker installed and running on yo
 
 ## Tributes
 
-We thank [MFG Labs](http://mfglabs.com) for sponsoring the development and the opensourcing of this library.
+[MFG Labs](http://mfglabs.com) sponsored the development and the opensourcing of this library.
 
-We believed it could be very useful & interesting to many people and we are sure some will help us debug & build more useful structures.
+We hope this library will be useful & interesting to a few ones and that some of you will help us debug & build more useful structures.
 
 <div class="push">
   <p>So don't hesitate to contribute</p>
