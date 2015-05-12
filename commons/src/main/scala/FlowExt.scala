@@ -290,7 +290,7 @@ trait FlowExt {
   }
 
   /**
-   * Consume the stream while condition is false.
+   * Consume the stream while condition is true.
    * @param f condition
    * @tparam A
    * @return
