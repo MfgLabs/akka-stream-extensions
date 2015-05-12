@@ -52,11 +52,11 @@ html {
   font-size: 16px;
   line-height: 1.5;
 }
-@media (min-width: 38em) {
+/*@media (min-width: 38em) {
   html {
     font-size: 20px;
   }
-}
+}*/
 
 body {
   color: #515151;
@@ -219,12 +219,12 @@ blockquote {
 blockquote p:last-child {
   margin-bottom: 0;
 }
-@media (min-width: 30em) {
+/*@media (min-width: 30em) {
   blockquote {
     padding-right: 5rem;
     padding-left: 1.25rem;
   }
-}
+}*/
 
 img {
   display: block;
@@ -404,7 +404,7 @@ a.pagination-item:hover {
   background-color: #f5f5f5;
 }
 
-@media (min-width: 30em) {
+/*@media (min-width: 30em) {
   .pagination {
     margin: 3rem 0;
   }
@@ -422,4 +422,4 @@ a.pagination-item:hover {
     border-top-right-radius:    4px;
     border-bottom-right-radius: 4px;
   }
-}
+}*/
