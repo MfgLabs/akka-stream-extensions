@@ -172,12 +172,14 @@ a:focus, a:hover{text-decoration: none;}
 .wrap {
   position: relative;
   width: 100%;
+  margin: auto;
 }
 
 .container {
   max-width: 1420px;
   position: relative;
   width: 73.95833333333334%;
+  margin: auto;
 }
 
 .cln-right{
@@ -1134,7 +1136,7 @@ footer p{
 	
 	/* GENERAL */
 	.wrap{
-		margin-top: 50px;
+		margin-top: 55px;
 	}
 	
 	/* TOPBAR */

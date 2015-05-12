@@ -15,15 +15,15 @@
  * Courtesy of GitHub.com
  */
 
-.highlight pre, pre, .highlight .hll { background-color: #f8f8f8; padding: 6px 10px; border-radius: 5pt; }
+/*.highlight pre, pre, .highlight .hll { background-color: #f8f8f8; padding: 20px 20px; border-radius: 2px; }*/
 .highlight .c { color: #999988; font-style: italic; }
 .highlight .err { color: #a61717; background-color: #e3d2d2; }
-.highlight .k { font-weight: bold; }
-.highlight .o { font-weight: bold; }
+.highlight .k { font-weight: 400; color: #A9175D;}
+.highlight .o { color: #A9175D; font-weight: 400; }
 .highlight .cm { color: #999988; font-style: italic; }
-.highlight .cp { color: #999999; font-weight: bold; }
-.highlight .c1 { color: #999988; font-style: italic; }
-.highlight .cs { color: #999999; font-weight: bold; font-style: italic; }
+.highlight .cp { color: #999999; font-weight: 400; }
+.highlight .c1 { color: #8E95A6 /*#999988*/; font-style: italic; }
+.highlight .cs { color: #999999; font-weight: 400; font-style: italic; }
 .highlight .gd { color: #000000; background-color: #ffdddd; }
 .highlight .gd .x { color: #000000; background-color: #ffaaaa; }
 .highlight .ge { font-style: italic; }
@@ -33,33 +33,34 @@
 .highlight .gi .x { color: #000000; background-color: #aaffaa; }
 .highlight .go { color: #888888; }
 .highlight .gp { color: #555555; }
-.highlight .gs { font-weight: bold; }
-.highlight .gu { color: #800080; font-weight: bold; }
+.highlight .gs { font-weight: 400; }
+.highlight .gu { color: #800080; font-weight: 400; }
 .highlight .gt { color: #aa0000; }
-.highlight .kc { font-weight: bold; }
-.highlight .kd { font-weight: bold; }
-.highlight .kn { font-weight: bold; }
-.highlight .kp { font-weight: bold; }
-.highlight .kr { font-weight: bold; }
-.highlight .kt { color: #445588; font-weight: bold; }
+.highlight .kc { font-weight: 400; }
+.highlight .kd { font-weight: 400; }
+.highlight .kn { font-weight: 400; }
+.highlight .kp { font-weight: 400; }
+.highlight .kr { font-weight: 400; }
+.highlight .kt { color: #795da3 /*#445588*/; font-weight: 400;  
+}
 .highlight .m { color: #009999; }
-.highlight .s { color: #dd1144; }
-.highlight .n { color: #333333; }
+.highlight .s { color: #183691; /*#dd1144*/  }
+.highlight .n { color: /*#795BA5*/ #333333;  }
 .highlight .na { color: teal; }
 .highlight .nb { color: #0086b3; }
-.highlight .nc { color: #445588; font-weight: bold; }
+.highlight .nc { color: #795da3 /*#445588*/; font-weight: 400;  }
 .highlight .no { color: teal; }
 .highlight .ni { color: purple; }
-.highlight .ne { color: #990000; font-weight: bold; }
-.highlight .nf { color: #990000; font-weight: bold; }
-.highlight .nn { color: #555555; }
+.highlight .ne { color: #990000; font-weight: 400; }
+.highlight .nf { color: #990000; font-weight: 400; }
+.highlight .nn { color: #EF6A3B /*#555555*/;  }
 .highlight .nt { color: navy; }
 .highlight .nv { color: teal; }
-.highlight .ow { font-weight: bold; }
+.highlight .ow { font-weight: 400; }
 .highlight .w { color: #bbbbbb; }
 .highlight .mf { color: #009999; }
 .highlight .mh { color: #009999; }
-.highlight .mi { color: #009999; }
+.highlight .mi { color: #0088C6 /*#009999*/;  }
 .highlight .mo { color: #009999; }
 .highlight .sb { color: #dd1144; }
 .highlight .sc { color: #dd1144; }
@@ -78,3 +79,7 @@
 .highlight .vi { color: teal; }
 .highlight .il { color: #009999; }
 .highlight .gc { color: #999; background-color: #EAF2F5; }
+
+/*visible on git*/
+.highlight .pl-en{ color: #795da3;}
+.highlight .pl-k{ color: #A9175D;}
