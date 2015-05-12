@@ -61,7 +61,7 @@ lazy val docSettings = Seq(
     "-sourcepath", baseDirectory.in(LocalRootProject).value.getAbsolutePath
   ),
   git.remoteRepo := "git@github.com:MfgLabs/akka-stream-extensions.git",
-  includeFilter in makeSite := "*.html" || "*.css" || "*.png" || "*.jpg" || "*.gif" || "*.js" || "*.swf" || "*.yml" || "*.md"
+  includeFilter in makeSite := "*.html" || "*.css" || "*.png" || "*.jpg" || "*.gif" || "*.js" || "*.swf" || "*.yml" || "*.md" || "*.svg" || "*.eot" || "*.ttf" || "*.woff" || "*.woff2"
 )
 
 lazy val all = project.in(file("."))

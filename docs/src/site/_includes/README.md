@@ -137,27 +137,27 @@ We thank [MFG Labs](http://mfglabs.com) for sponsoring the development and the o
 We believed it could be very useful & interesting to many people and we are sure some will help us debug & build more useful structures.
 
 <div class="push">
-  <p>So don't hesitate to contribute</p>
-  
-  <a href="{{ site.baseurl }}/contributing/" alt="go one contribute page" class="btn-round grey">
-    <span class="ico arrow_g"></span>
-  </a>
+	<p>So don't hesitate to contribute</p>
+	
+	<a href="{{ site.baseurl }}/contributing/" alt="go one contribute page" class="btn-round grey">
+		<span class="ico arrow_g"></span>
+	</a>
 </div>
 
 <div class="license">
-  <h2>License</h2>
-  
-  <p>This software is licensed under the Apache 2 license, quoted below.</p>
-  
-  <p>
-    Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance 
-    with the License. You may obtain a copy of the License <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank" alt="go to apache.org">here</a>.
-  </p>
-  
-  <p>
-    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
-    on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
-    the specific language governing permissions and limitations under the License.
-  </p>
+	<h2>License</h2>
+	
+	<p>This software is licensed under the Apache 2 license, quoted below.</p>
+	
+	<p>
+		Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance 
+		with the License. You may obtain a copy of the License <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank" alt="go to apache.org">here</a>.
+	</p>
+	
+	<p>
+		Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
+		on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+		the specific language governing permissions and limitations under the License.
+	</p>
 </div>
 

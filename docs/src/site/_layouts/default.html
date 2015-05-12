@@ -4,44 +4,199 @@
   {% include head.html %}
 
   <body>
-
-    {% include sidebar.html %}
-
+  
     <!-- Wrap is the content to shift when toggling the sidebar. We wrap the
          content to avoid any CSS collisions with our real content. -->
     <div class="wrap">
       <div class="masthead">
         <div class="container">
-          <h3 class="masthead-title">
-            <a href="{{ site.baseurl }}/" title="Home">{{ site.title }}</a>
-            <small>{{ site.tagline }}</small>
-          </h3>
+        	<a href="http://mfglabs.com/" target="_blank" title="Go to MFG Labs website">
+	          <h3 class="masthead-logo">
+	          </h3>
+	         </a>
+          <div class="clear"></div>
+          
+          <a class="burger" href="#" alt="menu">
+          	<span class="label">menu</span><span class="ico-menu"></span>
+          </a>
+         
         </div>
       </div>
+      
+      
+      {% if page.title == "Home" %}
+        <header>
+        	<div class="container">
+              <h1 class="fadeInUp" style="-webkit-animation-delay: .2s;animation-delay: .2s">
+              	{{ site.title }}
+              </h1>
+              <div class="subtitle fadeInUp" style="-webkit-animation-delay: .6s;animation-delay: .6s">{{ site.description }}</div>
+              
+              <figure class="illustration">
+              	<img src="{{ site.baseurl }}/public/mfg_akkastream_illustration.jpg" alt="" />
+              </figure>
+        	</div>
+        </header>
+      {% endif %}
+     
 
       <div class="container content">
-        {{ content }}
+      	<div class="cln-left">
+      		{% include sidebar.html %}
+      	</div>
+      	
+      	<div class="cln-right">
+        	{{ content }}
+        	
+        	{% if page.title == "Home" %}
+        	  <div class="push-hire">
+        	  	<h3>We are hiring!</h3>
+        	  		
+        	  	<div class="subtitle">Checkout our current propositions on our website</div>
+        	  	
+        	  	<a href="http://mfglabs.com/careers" target="_blank" alt="go to MFG Labs" class="btn-round blue">
+        	  		<span class="ico arrow_g"></span>
+        	  	</a>	
+        	  </div>
+        	{% endif %}
+        </div>
+        <div class="clear"></div>
       </div>
     </div>
+    
+    <div class="wrapper-btn-fork">
+    	<a href="{{ site.github.repo }}" target="_blank" alt="Fork the project on Git" class="btn-fork">
+    	<span>
+    		<div>
+    			<span class="ico fork"></span>
+    			Fork me on Github
+    		</div>
+    	</span>
+    	</a>
+    </div>
+    
+    {% include footer.html %}
 
-    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+    <script type="text/javascript">
+    	$(document).ready(function(e) {
+    		//PAGEFADE
+    		$("body").css("display", "none");
+    		$("body").fadeIn(1300);
+    		
+    		var deployed = false;
+    		
+    		//BURGER
+    		$('.burger').click( function (e) {
+    				$('.cln-left').toggleClass('active');
+    				$(this).find('.ico-menu').toggleClass('active');
+    				e.preventDefault();
+    		})
+    		
+    		//CLOSE BURGER OVERLAY
+    		$('.cln-left').click(function () {
+    			$('.burger').click();
+    		})
+    		
+    		
+    		//FIX & RESIZE SIDEBAR
+    		//declaration
+    		var winW = $(window).width();
+    		var reset;
+    		
+    		if(winW > 768){
+    			reset = false;
+    		}
+    		else {
+    			reset = true;
+    		}
+    		
+    		window.onresize = displayWindowSize;
+    		window.onload = displayWindowSize;
+	    	function displayWindowSize() {	
+	    		//déclration
+	    		winW = $(window).width();
+	    		
+	    		if(winW > 768){ 
+		    		var sideBarW = $('.cln-left').width();
+    				$('.wrapper-fix').css('width', sideBarW+'px');
+    				reset = false;
+		    	}
+		    	else{
+		    		reset = true;
+		    		$('.wrapper-fix').removeClass('fixed');
+		    		$('.wrapper-fix').removeAttr('style');
+		    	}
+		    }
+		    
+		    //SCROLL
+		     $(window).scroll(function(){
+			    if(winW > 768 && reset == false){
+			    	
+			    	var sideBarW = $('.cln-left').width();
+			    	$('.wrapper-fix').css('width', sideBarW+'px');
+			    	   	
+		    		//declaration
+		    		var breakPoint = $(window).scrollTop();
+		    		var winH = $(window).height();
+		    		var menuPos = $('.cln-left').offset().top - 60;
+		    		
+		    		//fix pos
+		    		var sideBarW = $('.cln-left').width();
+		    		$('.wrapper-fix').css('width', sideBarW+'px');
+		    		
+		    		if(breakPoint > menuPos){
+		    			$('.wrapper-fix').addClass('fixed');
+		    		}else {
+		    			$('.wrapper-fix').removeClass('fixed');
+		    		}
+				    
+			    }
+			    
+			    else {
+			    	$('.wrapper-fix').removeClass('fixed');
+			    	$('.wrapper-fix').removeAttr('style');
+			    	reset = true;
+			    }
+		    })
 
-    <script>
-      (function(document) {
-        var toggle = document.querySelector('.sidebar-toggle');
-        var sidebar = document.querySelector('#sidebar');
-        var checkbox = document.querySelector('#sidebar-checkbox');
-
-        document.addEventListener('click', function(e) {
-          var target = e.target;
-
-          if(!checkbox.checked ||
-             sidebar.contains(target) ||
-             (target === checkbox || target === toggle)) return;
-
-          checkbox.checked = false;
-        }, false);
-      })(document);
+		    
+		    //INK NAV
+		    //Get the h2 and their position
+		    $(window).bind('load', function (){
+			    var h2_list = new Array();
+			    var i = 0;
+			    $('.cln-right h2').each(function () {
+			    	var h2_el = $(this);
+			    	var h2_text = $(this).text();
+			    	
+			    	h2_list[i] = {
+			    		el: h2_el,
+			    		text: h2_text
+			    	};
+			    	i++;
+			    });
+			    
+			    //Print the list
+			    var h2_content = new Array();
+			    for(var i = 0; i < h2_list.length; i++){
+			    	h2_content.push('<li><div></div><a href="#"><span>'+h2_list[i]["text"]+'</span></a></li>');
+			    }
+			    $('.sidebar-nav-item.active').after('<ul>'+h2_content.join("")+'</ul>');
+	
+			  	//Event listener
+			    $('.sidebar-nav ul li').click( function (e) {
+			    	if(h2_list[$(this).index()]['text'] == 'License'){
+			    		$('html, body').stop().animate({scrollTop: (h2_list[$(this).index()]['el'].offset().top - 108)},'slow');
+			    		e.preventDefault();
+			    	}
+			    	else {
+			    		$('html, body').stop().animate({scrollTop: (h2_list[$(this).index()]['el'].offset().top - 60)},'slow');
+			    		e.preventDefault();	
+			    	}
+			    }); 
+			})
+		   
+    	});
     </script>
   </body>
 </html>
