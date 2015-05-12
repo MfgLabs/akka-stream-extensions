@@ -643,7 +643,6 @@ a.btn-round.blue:hover{
 	margin-top: -15px;
 	
 	font-family: "droidserif";
-	font-style: italic;
 	font-size: 18px;
 	text-align: center;
 	color: #8E95A6;
@@ -1116,6 +1115,10 @@ footer p{
 	}
 	
 	/* CONTENT */
+	.page{
+		margin-top: 120px;
+	}
+	
 	.push{
 		padding: 30px;
 	}
@@ -1124,6 +1127,12 @@ footer p{
 	}
 	a.btn-round .ico{	
 		margin: 18px auto 0 auto;
+	}
+	
+	/* FOOTER */
+	footer .cln-right p{
+		margin-bottom: 0px;
+		padding-bottom: 95px;
 	}
 }
 
@@ -1135,9 +1144,7 @@ footer p{
 @media (max-width: 320px) {
 	
 	/* GENERAL */
-	.wrap{
-		margin-top: 55px;
-	}
+	.wrap{margin-top: 55px;}
 	
 	/* TOPBAR */
 	.masthead {
@@ -1170,7 +1177,7 @@ footer p{
 	}
 	.illustration{
 		width: 100%;
-		margin: 40px auto 0 auto;
+		margin: 40px auto 0px auto;
 	}
 	
 	/* SIDEBAR */
@@ -1185,7 +1192,7 @@ footer p{
 	}
 	
 	.sidebar {
-		width: 100%; height: 100%;
+		width: 100%;
 		padding: 25px 0;
 	
 		font-size: 16px;
@@ -1221,6 +1228,10 @@ footer p{
 		font-size: 14px;
 		letter-spacing: 0.57px;
 		line-height: 18px;
+	}
+	
+	.page{
+		margin-top: 100px;
 	}
 	
 	.cln-right p{margin-bottom: 20px;}
@@ -1309,6 +1320,10 @@ footer p{
 	
 	/* FOOTER */
 	footer{padding-top: 60px;}
+	
+	footer .cln-right p{
+		padding-bottom: 85px;
+	}
 	
 }
 
