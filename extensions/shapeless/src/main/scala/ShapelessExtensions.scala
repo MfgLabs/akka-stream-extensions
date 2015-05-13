@@ -19,7 +19,7 @@ object ShapelessStream extends ShapelessStream
 trait ShapelessStream {
 
   /**
-   * Builds at compile-time a fully typed-controlled flow that transforms a HList of Flows to a Flow of the Coproduct of inputs ot Coproduct of outputs.
+   * Builds at compile-time a fully typed-controlled flow that transforms a HList of Flows to a Flow from the Coproduct of inputs to the Coproduct of outputs.
    *
    * Flow[A1, B1] :: FLow[A2, B2] :: ... :: Flow[An, Bn] :: HNil => Flow[A1 :+: A2 :+: ... :+: An :+: CNil, B1 :+: B2 :+: ... +: Bn :+: CNil]
    *
@@ -66,7 +66,7 @@ trait ShapelessStream {
     }
 
   /**
-   * Builds at compile-time a flow that transforms a HList of Flows to a Flow of the Coproduct of inputs ot Coproduct of outputs.
+   * Builds at compile-time a flow that transforms a HList of Flows to a Flow from the Coproduct of inputs to the Coproduct of outputs.
    *
    * Flow[A1, B1] :: FLow[A2, B2] :: ... :: Flow[An, Bn] :: HNil => Any
    *
