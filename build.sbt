@@ -49,7 +49,7 @@ lazy val noPublishSettings = Seq(
 
 lazy val docSettings = Seq(
   autoAPIMappings := true,
-  unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(commons),
+  unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(commons, postgres, elasticsearch, shapeless),
   site.addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), "api"),
   ghpagesNoJekyll := false,
   siteMappings ++= Seq(
