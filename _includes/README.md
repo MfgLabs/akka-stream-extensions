@@ -37,10 +37,13 @@ libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.7.1"
 import com.mfglabs.stream._
 
 // Source from a paginated REST Api
-val pagesStream: Source[Page, Unit] = SourceExt
+val pagesStream: Source[Page, ActorRef] = SourceExt
   .bulkPullerAsync(0L) { (currentPosition, downstreamDemand) =>
     val futResult: Future[Seq[Page]] = WSService.get(offset = currentPosition, nbPages = downstreamDemand)
-    futResult
+    futResult.map {
+      case Nil => Nil -> true // stop the stream if the REST Api delivers no more results
+      case p   => p -> false
+    }
   }
 
 someBinaryStream
@@ -132,9 +135,9 @@ To test postgres-extensions, you need to have Docker installed and running on yo
 
 ## Tributes
 
-[MFG Labs](http://mfglabs.com) sponsored the development and the opensourcing of this library.
+We thank [MFG Labs](http://mfglabs.com) for sponsoring the development and the opensourcing of this library.
 
-We hope this library will be useful & interesting to a few ones and that some of you will help us debug & build more useful structures.
+We believed it could be very useful & interesting to many people and we are sure some will help us debug & build more useful structures.
 
 <div class="push">
   <p>So don't hesitate to contribute</p>
