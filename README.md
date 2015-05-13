@@ -139,7 +139,7 @@ libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-shapeless" % "0.
 
 ### Sample
 
-```
+```scala
 // 1 - Create a type alias for your coproduct
 type C = Int :+: String :+: Boolean :+: CNil
 
