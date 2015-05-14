@@ -195,6 +195,12 @@ Check our project [MFG Labs/commons-aws](https://github.com/MfgLabs/commons-aws)
 
 To test postgres-extensions, you need to have Docker installed and running on your computer (the tests will automatically launch a docker container with a Postgres db).
 
+If the default postgres port is not available, you can specify another one by passing `postgres_port` as property to sbt.
+
+```
+sbt -Dpostgres_port=5433 test
+```
+
 ## Tributes
 
 [MFG Labs](http://mfglabs.com) sponsored the development and the opensourcing of this library.
