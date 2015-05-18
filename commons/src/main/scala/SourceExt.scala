@@ -37,6 +37,7 @@ trait SourceExt {
       Future {
         val fulfillments = Vector.fill(demand)(readFromStream(is, maxChunkSize)).flatten
         val stop = (fulfillments.size != demand)
+        if (stop) is.close()
         (fulfillments, stop)
       }(ec.value)
     }
