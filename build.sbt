@@ -100,6 +100,7 @@ lazy val postgres = project.in(file("extensions/postgres"))
   .dependsOn(commons)
   .settings(
     name := "akka-stream-extensions-postgres",
+    resolvers += Resolver.bintrayRepo("softprops", "maven"),
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-stream-experimental" % "1.0-RC2",
       "org.postgresql" % "postgresql"  % "9.3-1102-jdbc4",
