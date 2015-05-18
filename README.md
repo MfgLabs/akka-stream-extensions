@@ -28,7 +28,7 @@ resolvers += Resolver.bintrayRepo("mfglabs", "maven")
 Currently depends on `akka-stream-1.0-RC2`
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.7.1"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.7.2"
 ```
 
 ### Sample
