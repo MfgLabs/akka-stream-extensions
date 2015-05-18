@@ -46,7 +46,7 @@ class SourceExtSpec extends FlatSpec with Matchers with ScalaFutures {
     ) { res => assert(res == elements) }
   }
 
-  it should "ignore unwanted elements by downstream (with a warning)" in {
+  it should "buffer unwanted elements by downstream" in {
     whenReady(
       bulkPullerAsync(0L) { (counter, nbElemToPush) =>
         val toPush = elements.drop(counter.toInt).take(nbElemToPush + 10)

@@ -10,38 +10,39 @@ class BulkPullerAsync[A](offset: Long)(f: (Long, Int) => Future[(Seq[A], Boolean
   import akka.stream.actor.ActorPublisherMessage._
   implicit val ec = context.dispatcher
 
-  def receive = waitingForDownstreamReq(offset)
+  def receive = waitingForDownstreamReq(offset, Seq.empty, stopAfterBuf = false)
 
   case object Pull
 
-  def waitingForDownstreamReq(s: Long): Receive = {
+  def waitingForDownstreamReq(s: Long, buf: Seq[A], stopAfterBuf: Boolean): Receive = {
     case Request(_) | Pull =>
       if (totalDemand > 0 && isActive) {
-        f(s, totalDemand.toInt).pipeTo(self)
-        context.become(waitingForFut(s, totalDemand))
+        nextElements(s, totalDemand.toInt, buf, stopAfterBuf).pipeTo(self)
+        context.become(waitingForFut(s, buf, totalDemand))
       }
 
     case Cancel => context.stop(self)
   }
 
-  def waitingForFut(s: Long, beforeFutDemand: Long): Receive = {
+  private def nextElements(s: Long, n: Int, buf: Seq[A], stopAfterBuf: Boolean): Future[(Seq[A], Boolean)] =
+    if (buf.nonEmpty && buf.size >= n) Future.successful((Seq.empty, stopAfterBuf))
+    else f(s, n) map { r ⇒ (r._1, r._2) }
+
+  def waitingForFut(s: Long, buf: Seq[A], beforeFutDemand: Long): Receive = {
     case (as: Seq[A], stop: Boolean) =>
-      val (requestedAs, unwantedAs) = as.splitAt(beforeFutDemand.toInt)
+      val (requestedAs, keep) = (buf ++ as).splitAt(beforeFutDemand.toInt)
       requestedAs.foreach(onNext)
-      if (unwantedAs.nonEmpty) {
-        log.warning(s"Requested $beforeFutDemand elements, but received too many elements. Ignoring ${unwantedAs.size} unwanted element(s).")
-      }
-      if (stop) {
+      if (keep.isEmpty && stop) {
         onComplete()
       } else {
         if (totalDemand > 0) self ! Pull
-        context.become(waitingForDownstreamReq(s + requestedAs.length))
+        context.become(waitingForDownstreamReq(s + as.length, keep, stop))
       }
 
     case Request(_) | Pull => // ignoring until we receive the future response
 
     case Status.Failure(err) =>
-      context.become(waitingForDownstreamReq(s))
+      context.become(waitingForDownstreamReq(s, Seq.empty, stopAfterBuf = false))
       onError(err)
 
     case Cancel => context.stop(self)
