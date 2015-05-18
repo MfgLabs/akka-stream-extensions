@@ -102,7 +102,8 @@ lazy val postgres = project.in(file("extensions/postgres"))
     name := "akka-stream-extensions-postgres",
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-stream-experimental" % "1.0-RC2",
-      "org.postgresql" % "postgresql"  % "9.3-1102-jdbc4"
+      "org.postgresql" % "postgresql"  % "9.3-1102-jdbc4",
+      "me.lessis" %% "tugboat" % "0.2.0" % "test"
     ),
     commonSettings,
     publishSettings
