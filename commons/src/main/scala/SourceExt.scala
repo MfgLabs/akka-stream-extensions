@@ -10,7 +10,6 @@ import akka.actor.ActorRef
 import com.mfglabs.stream.internals.source.{UnfoldPullerAsync, BulkPullerAsync}
 
 import scala.concurrent._
-import scala.util.Try
 
 trait SourceExt {
   val defaultChunkSize = 8 * 1024
@@ -38,7 +37,7 @@ trait SourceExt {
       Future {
         val fulfillments = Vector.fill(demand)(readFromStream(is, maxChunkSize)).flatten
         val stop = (fulfillments.size != demand)
-        if (stop) Try(is.close())
+        if (stop) is.close()
         (fulfillments, stop)
       }(ec.value)
     }
