@@ -1,9 +1,9 @@
 <!DOCTYPE html >
 <html>
         <head>
-          <title>BulkPullerAsync - com.mfglabs.stream.internals.source.BulkPullerAsync</title>
-          <meta name="description" content="BulkPullerAsync - com.mfglabs.stream.internals.source.BulkPullerAsync" />
-          <meta name="keywords" content="BulkPullerAsync com.mfglabs.stream.internals.source.BulkPullerAsync" />
+          <title>CoproductFlexiMerge - com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge</title>
+          <meta name="description" content="CoproductFlexiMerge - com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge" />
+          <meta name="keywords" content="CoproductFlexiMerge com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
@@ -16,7 +16,7 @@
       <script type="text/javascript">
          if(top === self) {
             var url = '../../../../../index.html';
-            var hash = 'com.mfglabs.stream.internals.source.BulkPullerAsync$';
+            var hash = 'com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge';
             var anchor = window.location.hash;
             var anchor_opt = '';
             if (anchor.length >= 1)
@@ -26,16 +26,14 @@
    	  </script>
     
         </head>
-        <body class="value">
+        <body class="type">
       <div id="definition">
-        <a href="BulkPullerAsync.html" title="See companion class"><img src="../../../../../lib/object_to_class_big.png" /></a>
-        <p id="owner"><a href="../../../../package.html" class="extype" name="com">com</a>.<a href="../../../package.html" class="extype" name="com.mfglabs">mfglabs</a>.<a href="../../package.html" class="extype" name="com.mfglabs.stream">stream</a>.<a href="../package.html" class="extype" name="com.mfglabs.stream.internals">internals</a>.<a href="package.html" class="extype" name="com.mfglabs.stream.internals.source">source</a></p>
-        <h1><a href="BulkPullerAsync.html" title="See companion class">BulkPullerAsync</a></h1><h3><span class="morelinks"><div>
-            Related Docs:
-            <a href="BulkPullerAsync.html" title="See companion class">class BulkPullerAsync</a>
-            | <a href="package.html" class="extype" name="com.mfglabs.stream.internals.source">package source</a>
+        <img src="../../../../../lib/class_big.png" />
+        <p id="owner"><a href="../../../../package.html" class="extype" name="com">com</a>.<a href="../../../package.html" class="extype" name="com.mfglabs">mfglabs</a>.<a href="../../package.html" class="extype" name="com.mfglabs.stream">stream</a>.<a href="../package.html" class="extype" name="com.mfglabs.stream.extensions">extensions</a>.<a href="package.html" class="extype" name="com.mfglabs.stream.extensions.shapeless">shapeless</a></p>
+        <h1>CoproductFlexiMerge</h1><h3><span class="morelinks"><div>Related Doc:
+            <a href="package.html" class="extype" name="com.mfglabs.stream.extensions.shapeless">package shapeless</a>
           </div></span></h3><span class="permalink">
-      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.BulkPullerAsync$" title="Permalink" target="_top">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
@@ -44,16 +42,16 @@
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">object</span>
+        <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">BulkPullerAsync</span>
+        <span class="name">CoproductFlexiMerge</span><span class="tparams">[<span name="C">C &lt;: <span class="extype" name="shapeless.Coproduct">Coproduct</span></span>, <span name="HL">HL &lt;: <span class="extype" name="shapeless.HList">HList</span></span>]</span><span class="result"> extends <span class="extype" name="akka.stream.scaladsl.FlexiMerge">FlexiMerge</span>[<span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.C">C</span>, <a href="CoproductFanInShape.html" class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFanInShape">CoproductFanInShape</a>[<span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.C">C</span>, <span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.HL">HL</span>]]</span>
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/MfgLabs/akka-stream-extensions/tree/master/commons/src/main/scala/internals/source/BulkPullerAsync.scala" target="_blank">BulkPullerAsync.scala</a></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>The custom CoproductFlexiMerge that merges elements received on all inlets to output Coproduct using ReadAny condition</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/MfgLabs/akka-stream-extensions/tree/master/extensions/shapeless/src/main/scala/ShapelessExtensions.scala" target="_blank">ShapelessExtensions.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a>, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Any" class="extype" target="_top">Any</a></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="akka.stream.scaladsl.FlexiMerge">FlexiMerge</span>[<span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.C">C</span>, <a href="CoproductFanInShape.html" class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFanInShape">CoproductFanInShape</a>[<span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.C">C</span>, <span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.HL">HL</span>]], <span class="extype" name="akka.stream.Graph">Graph</span>[<a href="CoproductFanInShape.html" class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFanInShape">CoproductFanInShape</a>[<span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.C">C</span>, <span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.HL">HL</span>], <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Unit" class="extype" target="_top">Unit</a>], <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a>, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Any" class="extype" target="_top">Any</a></div>
         </div></div>
         
 
@@ -71,7 +69,7 @@
                 <span class="filtertype">Inherited<br />
                 </span>
                 <ol id="linearization">
-                  <li class="in" name="com.mfglabs.stream.internals.source.BulkPullerAsync"><span>BulkPullerAsync</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                  <li class="in" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge"><span>CoproductFlexiMerge</span></li><li class="in" name="akka.stream.scaladsl.FlexiMerge"><span>FlexiMerge</span></li><li class="in" name="akka.stream.Graph"><span>Graph</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                 </ol>
               </div><div id="ancestors">
             <span class="filtertype"></span>
@@ -89,9 +87,66 @@
 
       <div id="template">
         <div id="allMembers">
-        
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;()(implicitbuilder:com.mfglabs.stream.extensions.shapeless.InletBuilder.Aux[C,C,HL],implicittrav:shapeless.ops.hlist.ToTraversable.Aux[HL,List,akka.stream.Inlet[C]]):com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge[C,HL]"></a>
+      <a id="&lt;init&gt;:CoproductFlexiMerge[C,HL]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">CoproductFlexiMerge</span><span class="params">()</span><span class="params">(<span class="implicit">implicit </span><span name="builder">builder: <a href="InletBuilder$.html#Aux[C&lt;:shapeless.Coproduct,Sub0&lt;:shapeless.Coproduct,HL&lt;:shapeless.HList]=com.mfglabs.stream.extensions.shapeless.InletBuilder[C]{typeSub=Sub0;typeOut=HL}" class="extmbr" name="com.mfglabs.stream.extensions.shapeless.InletBuilder.Aux">Aux</a>[<span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.C">C</span>, <span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.C">C</span>, <span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.HL">HL</span>]</span>, <span name="trav">trav: <span class="extype" name="shapeless.ops.hlist.ToTraversable.Aux">Aux</span>[<span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.HL">HL</span>, <span class="extype" name="scala.List">List</span>, <span class="extype" name="akka.stream.Inlet">Inlet</span>[<span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.C">C</span>]]</span>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@&lt;init&gt;()(implicitbuilder:com.mfglabs.stream.extensions.shapeless.InletBuilder.Aux[C,C,HL],implicittrav:shapeless.ops.hlist.ToTraversable.Aux[HL,List,akka.stream.Inlet[C]]):com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge[C,HL]" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
 
-        
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="akka.stream.scaladsl.FlexiMerge.PortT" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="PortT=S"></a>
+      <a id="PortT:PortT"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">PortT</span><span class="result"> = <a href="CoproductFanInShape.html" class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFanInShape">CoproductFanInShape</a>[<span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.C">C</span>, <span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.HL">HL</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@PortT=S" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>FlexiMerge</dd></dl></div>
+    </li><li name="akka.stream.Graph.Shape" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Shape=S@scala.annotation.unchecked.uncheckedVariance"></a>
+      <a id="Shape:Shape"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Shape</span><span class="result"> = <a href="CoproductFanInShape.html" class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFanInShape">CoproductFanInShape</a>[<span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.C">C</span>, <span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.HL">HL</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@Shape=S@scala.annotation.unchecked.uncheckedVariance" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Graph</dd></dl></div>
+    </li></ol>
+            </div>
 
         
 
@@ -109,7 +164,7 @@
         <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Any" class="extype" target="_top">Any</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.BulkPullerAsync$@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@!=(x$1:Any):Boolean" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
@@ -126,7 +181,7 @@
         <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.BulkPullerAsync$@##():Int" title="Permalink" target="_top">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@##():Int" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
@@ -143,7 +198,7 @@
         <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Any" class="extype" target="_top">Any</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.BulkPullerAsync$@==(x$1:Any):Boolean" title="Permalink" target="_top">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@==(x$1:Any):Boolean" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
@@ -160,7 +215,7 @@
         <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.BulkPullerAsync$@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@asInstanceOf[T0]:T0" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
@@ -177,7 +232,7 @@
         <span class="name">clone</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.BulkPullerAsync$@clone():Object" title="Permalink" target="_top">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@clone():Object" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
@@ -188,6 +243,23 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge#createMergeLogic" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="createMergeLogic(p:CoproductFlexiMerge.this.PortT):akka.stream.scaladsl.FlexiMerge.MergeLogic[C]{definitialState:this.State[C]}"></a>
+      <a id="createMergeLogic(PortT):MergeLogic[C]{definitialState:this.State[C]}"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">createMergeLogic</span><span class="params">(<span name="p">p: <a href="#PortT=S" class="extmbr" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.PortT">PortT</a></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.FlexiMerge.MergeLogic">MergeLogic</span>[<span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.C">C</span>] { def initialState: this.State[C] }</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@createMergeLogic(p:CoproductFlexiMerge.this.PortT):akka.stream.scaladsl.FlexiMerge.MergeLogic[C]{definitialState:this.State[C]}" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge">CoproductFlexiMerge</a> → FlexiMerge</dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a>
       <a id="eq(AnyRef):Boolean"></a>
@@ -200,7 +272,7 @@
         <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.BulkPullerAsync$@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
@@ -217,7 +289,7 @@
         <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Any" class="extype" target="_top">Any</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.BulkPullerAsync$@equals(x$1:Any):Boolean" title="Permalink" target="_top">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@equals(x$1:Any):Boolean" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
@@ -234,7 +306,7 @@
         <span class="name">finalize</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.BulkPullerAsync$@finalize():Unit" title="Permalink" target="_top">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@finalize():Unit" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
@@ -257,7 +329,7 @@
         <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.BulkPullerAsync$@getClass():Class[_]" title="Permalink" target="_top">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@getClass():Class[_]" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
@@ -274,7 +346,7 @@
         <span class="name">hashCode</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.BulkPullerAsync$@hashCode():Int" title="Permalink" target="_top">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@hashCode():Int" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
@@ -291,11 +363,28 @@
         <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.BulkPullerAsync$@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="akka.stream.scaladsl.FlexiMerge#named" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="named(name:String):akka.stream.Graph[S,Unit]"></a>
+      <a id="named(String):Graph[CoproductFanInShape[C,HL],Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">named</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="akka.stream.Graph">Graph</span>[<a href="CoproductFanInShape.html" class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFanInShape">CoproductFanInShape</a>[<span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.C">C</span>, <span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.HL">HL</span>], <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Unit" class="extype" target="_top">Unit</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@named(name:String):akka.stream.Graph[S,Unit]" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>FlexiMerge → Graph</dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a>
       <a id="ne(AnyRef):Boolean"></a>
@@ -308,7 +397,7 @@
         <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.BulkPullerAsync$@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
@@ -325,7 +414,7 @@
         <span class="name">notify</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.BulkPullerAsync$@notify():Unit" title="Permalink" target="_top">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@notify():Unit" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
@@ -342,28 +431,28 @@
         <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.BulkPullerAsync$@notifyAll():Unit" title="Permalink" target="_top">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@notifyAll():Unit" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="com.mfglabs.stream.internals.source.BulkPullerAsync#props" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="props[A](offset:Long)(f:(Long,Int)=&gt;scala.concurrent.Future[(Seq[A],Boolean)]):akka.actor.Props"></a>
-      <a id="props[A](Long)((Long,Int)⇒Future[(Seq[A],Boolean)]):Props"></a>
+    </li><li name="akka.stream.scaladsl.FlexiMerge#shape" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="shape:S"></a>
+      <a id="shape:CoproductFanInShape[C,HL]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">def</span>
+        <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">props</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="offset">offset: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Long" class="extype" target="_top">Long</a></span>)</span><span class="params">(<span name="f">f: (<a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Long" class="extype" target="_top">Long</a>, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a>) ⇒ <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.concurrent.Future" class="extype" target="_top">Future</a>[(<span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="com.mfglabs.stream.internals.source.BulkPullerAsync.props.A">A</span>], <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Boolean" class="extype" target="_top">Boolean</a>)]</span>)</span><span class="result">: <span class="extype" name="akka.actor.Props">Props</span></span>
+        <span class="name">shape</span><span class="result">: <a href="CoproductFanInShape.html" class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFanInShape">CoproductFanInShape</a>[<span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.C">C</span>, <span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.HL">HL</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.BulkPullerAsync$@props[A](offset:Long)(f:(Long,Int)=&gt;scala.concurrent.Future[(Seq[A],Boolean)]):akka.actor.Props" title="Permalink" target="_top">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@shape:S" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
-      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>FlexiMerge → Graph</dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>
@@ -376,12 +465,12 @@
         <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.BulkPullerAsync$@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="akka.stream.scaladsl.FlexiMerge#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <a id="toString():String"></a>
       <h4 class="signature">
@@ -393,11 +482,11 @@
         <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.BulkPullerAsync$@toString():String" title="Permalink" target="_top">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@toString():String" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>FlexiMerge → AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <a id="wait():Unit"></a>
@@ -410,7 +499,7 @@
         <span class="name">wait</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.BulkPullerAsync$@wait():Unit" title="Permalink" target="_top">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@wait():Unit" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
@@ -433,7 +522,7 @@
         <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Long" class="extype" target="_top">Long</a></span>, <span name="arg1">arg1: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.BulkPullerAsync$@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
@@ -456,7 +545,7 @@
         <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Long" class="extype" target="_top">Long</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.BulkPullerAsync$@wait(x$1:Long):Unit" title="Permalink" target="_top">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@wait(x$1:Long):Unit" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
@@ -467,6 +556,23 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="akka.stream.scaladsl.FlexiMerge#withAttributes" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="withAttributes(attr:akka.stream.OperationAttributes):akka.stream.Graph[S,Unit]"></a>
+      <a id="withAttributes(OperationAttributes):Graph[CoproductFanInShape[C,HL],Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">withAttributes</span><span class="params">(<span name="attr">attr: <span class="extype" name="akka.stream.OperationAttributes">OperationAttributes</span></span>)</span><span class="result">: <span class="extype" name="akka.stream.Graph">Graph</span>[<a href="CoproductFanInShape.html" class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFanInShape">CoproductFanInShape</a>[<span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.C">C</span>, <span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.HL">HL</span>], <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Unit" class="extype" target="_top">Unit</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge@withAttributes(attr:akka.stream.OperationAttributes):akka.stream.Graph[S,Unit]" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>FlexiMerge → Graph</dd></dl></div>
     </li></ol>
             </div>
 
@@ -476,7 +582,11 @@
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.AnyRef">
+        <div class="parent" name="akka.stream.scaladsl.FlexiMerge">
+              <h3>Inherited from <span class="extype" name="akka.stream.scaladsl.FlexiMerge">FlexiMerge</span>[<span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.C">C</span>, <a href="CoproductFanInShape.html" class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFanInShape">CoproductFanInShape</a>[<span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.C">C</span>, <span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.HL">HL</span>]]</h3>
+            </div><div class="parent" name="akka.stream.Graph">
+              <h3>Inherited from <span class="extype" name="akka.stream.Graph">Graph</span>[<a href="CoproductFanInShape.html" class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFanInShape">CoproductFanInShape</a>[<span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.C">C</span>, <span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.HL">HL</span>], <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Unit" class="extype" target="_top">Unit</a>]</h3>
+            </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Any" class="extype" target="_top">Any</a></h3>

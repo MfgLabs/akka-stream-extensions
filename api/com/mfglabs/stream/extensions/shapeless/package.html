@@ -1,0 +1,446 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>shapeless - com.mfglabs.stream.extensions.shapeless</title>
+          <meta name="description" content="shapeless - com.mfglabs.stream.extensions.shapeless" />
+          <meta name="keywords" content="shapeless com.mfglabs.stream.extensions.shapeless" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../../../index.html';
+            var hash = 'com.mfglabs.stream.extensions.shapeless.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img src="../../../../../lib/package_big.png" />
+        <p id="owner"><a href="../../../../package.html" class="extype" name="com">com</a>.<a href="../../../package.html" class="extype" name="com.mfglabs">mfglabs</a>.<a href="../../package.html" class="extype" name="com.mfglabs.stream">stream</a>.<a href="../package.html" class="extype" name="com.mfglabs.stream.extensions">extensions</a></p>
+        <h1>shapeless</h1><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.package" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">shapeless</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        
+        
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="com.mfglabs.stream.extensions.shapeless.CoproductFanInShape" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CoproductFanInShape[C&lt;:shapeless.Coproduct,HL&lt;:shapeless.HList]extendsFanInShape[C]"></a>
+      <a id="CoproductFanInShape[C&lt;:Coproduct,HL&lt;:HList]:CoproductFanInShape[C,HL]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="CoproductFanInShape.html"><span class="name">CoproductFanInShape</span></a><span class="tparams">[<span name="C">C &lt;: <span class="extype" name="shapeless.Coproduct">Coproduct</span></span>, <span name="HL">HL &lt;: <span class="extype" name="shapeless.HList">HList</span></span>]</span><span class="result"> extends <span class="extype" name="akka.stream.FanInShape">FanInShape</span>[<span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFanInShape.C">C</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.package@CoproductFanInShape[C&lt;:shapeless.Coproduct,HL&lt;:shapeless.HList]extendsFanInShape[C]" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The custom FanInShape used by CoproductFlexiMerge to build typed inlets from types in the Coproduct</p>
+    </li><li name="com.mfglabs.stream.extensions.shapeless.CoproductFanOutShape" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CoproductFanOutShape[C&lt;:shapeless.Coproduct,HL&lt;:shapeless.HList]extendsFanOutShape[C]"></a>
+      <a id="CoproductFanOutShape[C&lt;:Coproduct,HL&lt;:HList]:CoproductFanOutShape[C,HL]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="CoproductFanOutShape.html"><span class="name">CoproductFanOutShape</span></a><span class="tparams">[<span name="C">C &lt;: <span class="extype" name="shapeless.Coproduct">Coproduct</span></span>, <span name="HL">HL &lt;: <span class="extype" name="shapeless.HList">HList</span></span>]</span><span class="result"> extends <span class="extype" name="akka.stream.FanOutShape">FanOutShape</span>[<span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFanOutShape.C">C</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.package@CoproductFanOutShape[C&lt;:shapeless.Coproduct,HL&lt;:shapeless.HList]extendsFanOutShape[C]" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The custom FanOutShape used by CoproductFlexiRoute to build typed outlets from types in the Coproduct</p>
+    </li><li name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CoproductFlexiMerge[C&lt;:shapeless.Coproduct,HL&lt;:shapeless.HList]extendsFlexiMerge[C,com.mfglabs.stream.extensions.shapeless.CoproductFanInShape[C,HL]]"></a>
+      <a id="CoproductFlexiMerge[C&lt;:Coproduct,HL&lt;:HList]:CoproductFlexiMerge[C,HL]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="CoproductFlexiMerge.html"><span class="name">CoproductFlexiMerge</span></a><span class="tparams">[<span name="C">C &lt;: <span class="extype" name="shapeless.Coproduct">Coproduct</span></span>, <span name="HL">HL &lt;: <span class="extype" name="shapeless.HList">HList</span></span>]</span><span class="result"> extends <span class="extype" name="akka.stream.scaladsl.FlexiMerge">FlexiMerge</span>[<span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.C">C</span>, <a href="CoproductFanInShape.html" class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFanInShape">CoproductFanInShape</a>[<span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.C">C</span>, <span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiMerge.HL">HL</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.package@CoproductFlexiMerge[C&lt;:shapeless.Coproduct,HL&lt;:shapeless.HList]extendsFlexiMerge[C,com.mfglabs.stream.extensions.shapeless.CoproductFanInShape[C,HL]]" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The custom CoproductFlexiMerge that merges elements received on all inlets to output Coproduct using ReadAny condition</p>
+    </li><li name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiRoute" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CoproductFlexiRoute[C&lt;:shapeless.Coproduct,HL&lt;:shapeless.HList]extendsFlexiRoute[C,com.mfglabs.stream.extensions.shapeless.CoproductFanOutShape[C,HL]]"></a>
+      <a id="CoproductFlexiRoute[C&lt;:Coproduct,HL&lt;:HList]:CoproductFlexiRoute[C,HL]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="CoproductFlexiRoute.html"><span class="name">CoproductFlexiRoute</span></a><span class="tparams">[<span name="C">C &lt;: <span class="extype" name="shapeless.Coproduct">Coproduct</span></span>, <span name="HL">HL &lt;: <span class="extype" name="shapeless.HList">HList</span></span>]</span><span class="result"> extends <span class="extype" name="akka.stream.scaladsl.FlexiRoute">FlexiRoute</span>[<span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiRoute.C">C</span>, <a href="CoproductFanOutShape.html" class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFanOutShape">CoproductFanOutShape</a>[<span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiRoute.C">C</span>, <span class="extype" name="com.mfglabs.stream.extensions.shapeless.CoproductFlexiRoute.HL">HL</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.package@CoproductFlexiRoute[C&lt;:shapeless.Coproduct,HL&lt;:shapeless.HList]extendsFlexiRoute[C,com.mfglabs.stream.extensions.shapeless.CoproductFanOutShape[C,HL]]" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The custom CoproductFlexiRoute that dispatches instance of the Coproduct to the right route according to the type using a DemandFromAll condition</p>
+    </li><li name="com.mfglabs.stream.extensions.shapeless.FlowBuilder" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="FlowBuilder[CIn&lt;:shapeless.Coproduct,COut&lt;:shapeless.Coproduct]extendsAnyRef"></a>
+      <a id="FlowBuilder[CIn&lt;:Coproduct,COut&lt;:Coproduct]:FlowBuilder[CIn,COut]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="FlowBuilder.html"><span class="name">FlowBuilder</span></a><span class="tparams">[<span name="CIn">CIn &lt;: <span class="extype" name="shapeless.Coproduct">Coproduct</span></span>, <span name="COut">COut &lt;: <span class="extype" name="shapeless.Coproduct">Coproduct</span></span>]</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.package@FlowBuilder[CIn&lt;:shapeless.Coproduct,COut&lt;:shapeless.Coproduct]extendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Builds a Flow[CIn, Any] using provided FlowGraph.Builder</p>
+    </li><li name="com.mfglabs.stream.extensions.shapeless.FlowBuilderC" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="FlowBuilderC[CIn&lt;:shapeless.Coproduct,COut&lt;:shapeless.Coproduct]extendsAnyRef"></a>
+      <a id="FlowBuilderC[CIn&lt;:Coproduct,COut&lt;:Coproduct]:FlowBuilderC[CIn,COut]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="FlowBuilderC.html"><span class="name">FlowBuilderC</span></a><span class="tparams">[<span name="CIn">CIn &lt;: <span class="extype" name="shapeless.Coproduct">Coproduct</span></span>, <span name="COut">COut &lt;: <span class="extype" name="shapeless.Coproduct">Coproduct</span></span>]</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.package@FlowBuilderC[CIn&lt;:shapeless.Coproduct,COut&lt;:shapeless.Coproduct]extendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Builds a Flow[CIn, COut] using provided FlowGraph.Builder</p>
+    </li><li name="com.mfglabs.stream.extensions.shapeless.FlowTypes" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="FlowTypes[HL&lt;:shapeless.HList]extendsAnyRef"></a>
+      <a id="FlowTypes[HL&lt;:HList]:FlowTypes[HL]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="FlowTypes.html"><span class="name">FlowTypes</span></a><span class="tparams">[<span name="HL">HL &lt;: <span class="extype" name="shapeless.HList">HList</span></span>]</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.package@FlowTypes[HL&lt;:shapeless.HList]extendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Extracts from a HList of flows a Coproduct of Input types and a Coproduct of Output types</p>
+    </li><li name="com.mfglabs.stream.extensions.shapeless.InletBuilder" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="InletBuilder[C&lt;:shapeless.Coproduct]extendsAnyRef"></a>
+      <a id="InletBuilder[C&lt;:Coproduct]:InletBuilder[C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="InletBuilder.html"><span class="name">InletBuilder</span></a><span class="tparams">[<span name="C">C &lt;: <span class="extype" name="shapeless.Coproduct">Coproduct</span></span>]</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.package@InletBuilder[C&lt;:shapeless.Coproduct]extendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Typed inlet builder that builds a HList of Inlets from the types in a coproduct using a universal builder function</p>
+    </li><li name="com.mfglabs.stream.extensions.shapeless.InletFunction" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="InletFunctionextendsAnyRef"></a>
+      <a id="InletFunction:InletFunction"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="InletFunction.html"><span class="name">InletFunction</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.package@InletFunctionextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Universal Inlet builder function</p>
+    </li><li name="com.mfglabs.stream.extensions.shapeless.OutletBuilder" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="OutletBuilder[C&lt;:shapeless.Coproduct]extendsAnyRef"></a>
+      <a id="OutletBuilder[C&lt;:Coproduct]:OutletBuilder[C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="OutletBuilder.html"><span class="name">OutletBuilder</span></a><span class="tparams">[<span name="C">C &lt;: <span class="extype" name="shapeless.Coproduct">Coproduct</span></span>]</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.package@OutletBuilder[C&lt;:shapeless.Coproduct]extendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A typed outlet builder using a universal outlet builder function that builds a HList of outlets from the types in a coproduct</p>
+    </li><li name="com.mfglabs.stream.extensions.shapeless.OutletFunction" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="OutletFunctionextendsAnyRef"></a>
+      <a id="OutletFunction:OutletFunction"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="OutletFunction.html"><span class="name">OutletFunction</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.package@OutletFunctionextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A universal graph outlet builder function</p>
+    </li><li name="com.mfglabs.stream.extensions.shapeless.SelectOutletValue" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="SelectOutletValue[C&lt;:shapeless.Coproduct]extendsAnyRef"></a>
+      <a id="SelectOutletValue[C&lt;:Coproduct]:SelectOutletValue[C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="SelectOutletValue.html"><span class="name">SelectOutletValue</span></a><span class="tparams">[<span name="C">C &lt;: <span class="extype" name="shapeless.Coproduct">Coproduct</span></span>]</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.package@SelectOutletValue[C&lt;:shapeless.Coproduct]extendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Takes a coproduct instance and searches in a HList of outlets for corresponding typed outlet
+ and returns the outlet and the value
+</p>
+    </li><li name="com.mfglabs.stream.extensions.shapeless.ShapelessStream" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ShapelessStreamextendsAnyRef"></a>
+      <a id="ShapelessStream:ShapelessStream"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ShapelessStream.html"><span class="name">ShapelessStream</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.package@ShapelessStreamextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="com.mfglabs.stream.extensions.shapeless.FlowBuilder" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="FlowBuilder"></a>
+      <a id="FlowBuilder:FlowBuilder"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="FlowBuilder$.html"><span class="name">FlowBuilder</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.package@FlowBuilder" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="com.mfglabs.stream.extensions.shapeless.FlowBuilderC" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="FlowBuilderC"></a>
+      <a id="FlowBuilderC:FlowBuilderC"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="FlowBuilderC$.html"><span class="name">FlowBuilderC</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.package@FlowBuilderC" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="com.mfglabs.stream.extensions.shapeless.FlowTypes" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="FlowTypes"></a>
+      <a id="FlowTypes:FlowTypes"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="FlowTypes$.html"><span class="name">FlowTypes</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.package@FlowTypes" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="com.mfglabs.stream.extensions.shapeless.InletBuilder" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="InletBuilder"></a>
+      <a id="InletBuilder:InletBuilder"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="InletBuilder$.html"><span class="name">InletBuilder</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.package@InletBuilder" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="com.mfglabs.stream.extensions.shapeless.OutletBuilder" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="OutletBuilder"></a>
+      <a id="OutletBuilder:OutletBuilder"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="OutletBuilder$.html"><span class="name">OutletBuilder</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.package@OutletBuilder" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="com.mfglabs.stream.extensions.shapeless.SelectOutletValue" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SelectOutletValue"></a>
+      <a id="SelectOutletValue:SelectOutletValue"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="SelectOutletValue$.html"><span class="name">SelectOutletValue</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.package@SelectOutletValue" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="com.mfglabs.stream.extensions.shapeless.ShapelessStream" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ShapelessStream"></a>
+      <a id="ShapelessStream:ShapelessStream"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="ShapelessStream$.html"><span class="name">ShapelessStream</span></a><span class="result"> extends <a href="ShapelessStream.html" class="extype" name="com.mfglabs.stream.extensions.shapeless.ShapelessStream">ShapelessStream</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.extensions.shapeless.package@ShapelessStream" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

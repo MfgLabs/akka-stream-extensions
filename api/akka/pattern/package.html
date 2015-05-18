@@ -49,7 +49,7 @@
       
           <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><span class="extype" name="akka.pattern.FutureTimeoutSupport">FutureTimeoutSupport</span>, <span class="extype" name="akka.pattern.GracefulStopSupport">GracefulStopSupport</span>, <span class="extype" name="akka.pattern.AskSupport">AskSupport</span>, <span class="extype" name="akka.pattern.PipeToSupport">PipeToSupport</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="akka.pattern.FutureTimeoutSupport">FutureTimeoutSupport</span>, <span class="extype" name="akka.pattern.GracefulStopSupport">GracefulStopSupport</span>, <span class="extype" name="akka.pattern.AskSupport">AskSupport</span>, <span class="extype" name="akka.pattern.PipeToSupport">PipeToSupport</span>, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a>, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Any" class="extype" target="_top">Any</a></div>
         </div></div>
         
 
@@ -98,7 +98,7 @@
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">PipeableFuture</span><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+        <span class="name">PipeableFuture</span><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#akka.pattern.package@PipeableFuture[T]extendsAnyRef" title="Permalink" target="_top">
@@ -139,7 +139,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">ask</span><span class="params">(<span name="actorSelection">actorSelection: <span class="extype" name="akka.actor.ActorSelection">ActorSelection</span></span>, <span name="message">message: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="timeout">timeout: <span class="extype" name="akka.util.Timeout">Timeout</span></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.concurrent.Future" class="extype" target="_top">Future</a>[<span class="extype" name="scala.Any">Any</span>]</span>
+        <span class="name">ask</span><span class="params">(<span name="actorSelection">actorSelection: <span class="extype" name="akka.actor.ActorSelection">ActorSelection</span></span>, <span name="message">message: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Any" class="extype" target="_top">Any</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="timeout">timeout: <span class="extype" name="akka.util.Timeout">Timeout</span></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.concurrent.Future" class="extype" target="_top">Future</a>[<a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Any" class="extype" target="_top">Any</a>]</span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#akka.pattern.package@ask(actorSelection:akka.actor.ActorSelection,message:Any)(implicittimeout:akka.util.Timeout):scala.concurrent.Future[Any]" title="Permalink" target="_top">
@@ -173,7 +173,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">ask</span><span class="params">(<span name="actorRef">actorRef: <span class="extype" name="akka.actor.ActorRef">ActorRef</span></span>, <span name="message">message: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="timeout">timeout: <span class="extype" name="akka.util.Timeout">Timeout</span></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.concurrent.Future" class="extype" target="_top">Future</a>[<span class="extype" name="scala.Any">Any</span>]</span>
+        <span class="name">ask</span><span class="params">(<span name="actorRef">actorRef: <span class="extype" name="akka.actor.ActorRef">ActorRef</span></span>, <span name="message">message: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Any" class="extype" target="_top">Any</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="timeout">timeout: <span class="extype" name="akka.util.Timeout">Timeout</span></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.concurrent.Future" class="extype" target="_top">Future</a>[<a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Any" class="extype" target="_top">Any</a>]</span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#akka.pattern.package@ask(actorRef:akka.actor.ActorRef,message:Any)(implicittimeout:akka.util.Timeout):scala.concurrent.Future[Any]" title="Permalink" target="_top">
@@ -207,7 +207,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">gracefulStop</span><span class="params">(<span name="target">target: <span class="extype" name="akka.actor.ActorRef">ActorRef</span></span>, <span name="timeout">timeout: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.concurrent.duration.FiniteDuration" class="extype" target="_top">FiniteDuration</a></span>, <span name="stopMessage">stopMessage: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.concurrent.Future" class="extype" target="_top">Future</a>[<a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Boolean" class="extype" target="_top">Boolean</a>]</span>
+        <span class="name">gracefulStop</span><span class="params">(<span name="target">target: <span class="extype" name="akka.actor.ActorRef">ActorRef</span></span>, <span name="timeout">timeout: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.concurrent.duration.FiniteDuration" class="extype" target="_top">FiniteDuration</a></span>, <span name="stopMessage">stopMessage: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Any" class="extype" target="_top">Any</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.concurrent.Future" class="extype" target="_top">Future</a>[<a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Boolean" class="extype" target="_top">Boolean</a>]</span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#akka.pattern.package@gracefulStop(target:akka.actor.ActorRef,timeout:scala.concurrent.duration.FiniteDuration,stopMessage:Any):scala.concurrent.Future[Boolean]" title="Permalink" target="_top">
@@ -250,9 +250,9 @@
             </div><div class="parent" name="akka.pattern.PipeToSupport">
               <h3>Inherited from <span class="extype" name="akka.pattern.PipeToSupport">PipeToSupport</span></h3>
             </div><div class="parent" name="scala.AnyRef">
-              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+              <h3>Inherited from <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></h3>
             </div><div class="parent" name="scala.Any">
-              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+              <h3>Inherited from <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Any" class="extype" target="_top">Any</a></h3>
             </div>
         
         </div>
