@@ -10,7 +10,7 @@ class BulkPullerAsync[A](offset: Long)(f: (Long, Int) => Future[(Seq[A], Boolean
   import akka.stream.actor.ActorPublisherMessage._
   implicit val ec = context.dispatcher
 
-  def receive = waitingForDownstreamReq(offset, Seq.empty, stopAfterBuf = false)
+  def receive = waitingForDownstreamReq(offset, Vector.empty, stopAfterBuf = false)
 
   case object Pull
 
@@ -25,8 +25,8 @@ class BulkPullerAsync[A](offset: Long)(f: (Long, Int) => Future[(Seq[A], Boolean
   }
 
   private def nextElements(s: Long, n: Int, buf: Seq[A], stopAfterBuf: Boolean): Future[(Seq[A], Boolean)] =
-    if (buf.nonEmpty && buf.size >= n) Future.successful((Seq.empty, stopAfterBuf))
-    else f(s, n) map { r ⇒ (r._1, r._2) }
+    if (buf.nonEmpty && (buf.size >= n || stopAfterBuf)) Future.successful((Seq.empty, stopAfterBuf))
+    else f(s, n)
 
   def waitingForFut(s: Long, buf: Seq[A], beforeFutDemand: Long): Receive = {
     case (as: Seq[A], stop: Boolean) =>
