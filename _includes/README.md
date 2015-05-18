@@ -125,6 +125,68 @@ EsStream
   )
 ```
 
+## Shapeless extension
+
+This extension allows to build at compile-time a fully typed-controlled flow that transforms a HList of Flows to a Flow from the Coproduct of inputs to the Coproduct of outputs.
+
+For more details on the history of this extension, read [this article](http://mandubian.com/2015/05/05/shapelessstream/).
+
+### Dependencies
+
+```scala
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-shapeless" % "0.7.1"
+```
+
+### Sample
+
+```scala
+// 1 - Create a type alias for your coproduct
+type C = Int :+: String :+: Boolean :+: CNil
+
+// The sink to consume all output data
+val sink = Sink.fold[Seq[C], C](Seq())(_ :+ _)
+
+// 2 - a sample source wrapping incoming data in the Coproduct
+val f = FlowGraph.closed(sink) { implicit builder => sink =>
+  import FlowGraph.Implicits._
+  val s = Source(() => Seq(
+    Coproduct[C](1),
+    Coproduct[C]("foo"),
+    Coproduct[C](2),
+    Coproduct[C](false),
+    Coproduct[C]("bar"),
+    Coproduct[C](3),
+    Coproduct[C](true)
+  ).toIterator)
+
+// 3 - our typed flows
+  val flowInt = Flow[Int].map{i => println("i:"+i); i}
+  val flowString = Flow[String].map{s => println("s:"+s); s}
+  val flowBool = Flow[Boolean].map{s => println("s:"+s); s}
+  
+// >>>>>> THE IMPORTANT THING
+// 4 - build the coproductFlow in a 1-liner
+  val fr = builder.add(ShapelessStream.coproductFlow(flowInt :: flowString :: flowBool :: HNil))
+// <<<<<< THE IMPORTANT THING
+
+// 5 - plug everything together using akkastream DSL
+  s ~> fr.inlet
+       fr.outlet ~> sink
+}
+
+// 6 - run it
+f.run().futureValue.toSet should equal (Set(
+  Coproduct[C](1),
+  Coproduct[C]("foo"),
+  Coproduct[C](2),
+  Coproduct[C](false),
+  Coproduct[C]("bar"),
+  Coproduct[C](3),
+  Coproduct[C](true)
+))
+```
+
+
 ## AWS
 
 Check our project [MFG Labs/commons-aws](https://github.com/MfgLabs/commons-aws) also providing streaming extensions for Amazon S3 & SQS.
@@ -135,9 +197,9 @@ To test postgres-extensions, you need to have Docker installed and running on yo
 
 ## Tributes
 
-We thank [MFG Labs](http://mfglabs.com) for sponsoring the development and the opensourcing of this library.
+[MFG Labs](http://mfglabs.com) sponsored the development and the opensourcing of this library.
 
-We believed it could be very useful & interesting to many people and we are sure some will help us debug & build more useful structures.
+We hope this library will be useful & interesting to a few ones and that some of you will help us debug & build more useful structures.
 
 <div class="push">
   <p>So don't hesitate to contribute</p>
