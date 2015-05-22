@@ -27,7 +27,8 @@ resolvers in ThisBuild ++= Seq(
 
 lazy val commonSettings = Seq(
   scmInfo := Some(ScmInfo(url("https://github.com/MfgLabs/akka-stream-extensions"),
-    "git@github.com:MfgLabs/akka-stream-extensions.git"))
+    "git@github.com:MfgLabs/akka-stream-extensions.git")),
+  libraryDependencies += "org.scalatest" %% "scalatest" % "2.1.6" % "test"
 )
 
 lazy val publishSettings = Seq(
@@ -89,8 +90,7 @@ lazy val commons = project.in(file("commons"))
   .settings(
     name := "akka-stream-extensions",
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-stream-experimental" % "1.0-RC2",
-      "org.scalatest" %% "scalatest" % "2.1.6"
+      "com.typesafe.akka" %% "akka-stream-experimental" % "1.0-RC2"
     ),
     commonSettings,
     publishSettings
