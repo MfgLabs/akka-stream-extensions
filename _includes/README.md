@@ -1,6 +1,6 @@
 ## Akka Stream Extensions
 
-We are proud to opensource `Akka-Stream-Extensions` extending the very promising [Typesafe Akka-Stream](http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0-RC2/scala.html).
+We are proud to opensource `Akka-Stream-Extensions` extending the very promising [Typesafe Akka-Stream](http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0-RC3/scala.html).
 
 The main purpose of this project is to:
 
@@ -25,10 +25,10 @@ resolvers += Resolver.bintrayRepo("mfglabs", "maven")
 
 ### Add dependencies to your `build.sbt`
 
-Currently depends on `akka-stream-1.0-RC2`
+Currently depends on `akka-stream-1.0-RC3`
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.7.2"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.7.3"
 ```
 
 ### Sample
