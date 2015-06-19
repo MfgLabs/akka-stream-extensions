@@ -47,7 +47,7 @@ val pagesStream: Source[Page, ActorRef] = SourceExt
   }
 
 someBinaryStream
-  .via(FlowExt.rechunkByteStringBySeparator(ByteString("\n"), maxChunkSize = 5 * 1024))
+  .via(FlowExt.rechunkByteStringBySeparator(ByteString("\n"), maximumChunkBytes = 5 * 1024))
   .map(_.utf8String)
   .via(
     FlowExt.customStatefulProcessor(Vector.empty[String])( // grouping by 100 except when we encounter a "flush" line
@@ -69,7 +69,7 @@ This extension provides tools to stream data from/to Postgres.
 ### Dependencies
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.7.1"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.7.3"
 ```
 
 ### Sample
@@ -86,7 +86,7 @@ PgStream
     "select a, b, c from table", 
     options = Map("FORMAT" -> "CSV")
   )
-  .via(FlowExt.rechunkByteStringBySeparator(ByteString("\n"), maxChunkSize = 5 * 1024))
+  .via(FlowExt.rechunkByteStringBySeparator(ByteString("\n"), maximumChunkBytes = 5 * 1024))
 
 someLineStream
   .via(PgStream.insertStreamToTable(
@@ -101,7 +101,7 @@ someLineStream
 ### Dependencies
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-elasticsearch" % "0.7.1"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-elasticsearch" % "0.7.3"
 ```
 
 ### Sample
@@ -134,7 +134,7 @@ For more details on the history of this extension, read [this article](http://ma
 ### Dependencies
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-shapeless" % "0.7.1"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-shapeless" % "0.7.3"
 ```
 
 ### Sample
