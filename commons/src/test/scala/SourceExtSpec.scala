@@ -109,7 +109,7 @@ class SourceExtSpec extends FlatSpec with Matchers with ScalaFutures {
 
 */
   
-
+/*
   "bulkAsyncPullerWithMaxRetries" should "manage max retry failure" in {
     var i = 0
 
@@ -157,6 +157,30 @@ class SourceExtSpec extends FlatSpec with Matchers with ScalaFutures {
       case (_, n) => 
         println(s"max retries reached $n")
         false
+    }
+
+    intercept[RuntimeException] { b.runWith(SinkExt.collect).futureValue }
+    i should be (15)
+  }
+*/
+  "bulkPullerAsyncWithErrorExpBackoff" should "manage failure with exp backoff" in {
+    import scala.concurrent.duration._
+    var i = 0
+
+    val b = bulkPullerAsyncWithErrorExpBackoff(0L, 10.seconds, 1000.milliseconds) { (counter, nbElemToPush) =>
+      // if(i < 3) {
+      //   i+=1
+      //   println(s"i:$i")
+      //   Future.successful(Seq(i) -> false)
+      // } else if(i == 3 || i > 10) {
+        i+=1
+        println(s"i:$i")
+        Future.failed(new RuntimeException("BOOom"))
+      // } else {
+      //   i+=1
+      //   println(s"i:$i")
+      //   Future.successful(Seq(i) -> false)
+      // }
     }
 
     intercept[RuntimeException] { b.runWith(SinkExt.collect).futureValue }
