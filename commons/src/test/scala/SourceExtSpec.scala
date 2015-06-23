@@ -6,6 +6,7 @@ import akka.actor.ActorSystem
 import akka.stream.{ActorFlowMaterializerSettings, ActorFlowMaterializer}
 import akka.stream.scaladsl._
 import akka.util.ByteString
+import akka.stream.ActorOperationAttributes
 import org.scalatest._
 import org.scalatest.concurrent
 import concurrent.ScalaFutures
@@ -28,7 +29,7 @@ class SourceExtSpec extends FlatSpec with Matchers with ScalaFutures {
   implicit val ecBlocking = ExecutionContextForBlockingOps(scala.concurrent.ExecutionContext.Implicits.global)
 
   val elements = for (i <- 1 to 500) yield i
-
+/*
   "bulkAsyncPuller" should "end the stream when nothing to pull" in {
     whenReady(
       bulkPullerAsync(0L)((_, _) => Future.successful((Seq.empty[Int], true)))
@@ -106,6 +107,62 @@ class SourceExtSpec extends FlatSpec with Matchers with ScalaFutures {
     }
   }
 
+*/
+  
+
+  "bulkAsyncPullerWithMaxRetries" should "manage max retry failure" in {
+    var i = 0
+
+    val b = bulkPullerAsyncWithMaxRetries(0L, 3) { (counter, nbElemToPush) =>
+      if(i < 3) {
+        i+=1
+        println(s"i:$i")
+        Future.successful(Seq(i) -> false)
+      } else if(i == 3 || i > 10) {
+        i+=1
+        println(s"i:$i")
+        Future.failed(new RuntimeException("BOOom"))
+      } else {
+        i+=1
+        println(s"i:$i")
+        Future.successful(Seq(i) -> false)
+      }
+    }
+
+    intercept[RuntimeException] { b.runWith(SinkExt.collect).futureValue }
+    i should be (15)
+  }
+
+  "bulkPullerAsyncWithErrorMgt" should "manage manage failure" in {
+    var i = 0
+
+    val b = bulkPullerAsyncWithErrorMgt(0L) { (counter, nbElemToPush) =>
+      if(i < 3) {
+        i+=1
+        println(s"i:$i")
+        Future.successful(Seq(i) -> false)
+      } else if(i == 3 || i > 10) {
+        i+=1
+        println(s"i:$i")
+        Future.failed(new RuntimeException("BOOom"))
+      } else {
+        i+=1
+        println(s"i:$i")
+        Future.successful(Seq(i) -> false)
+      }
+    }{
+      case (e: RuntimeException, n) if n < 3 =>
+        println(s"$n < 3 -> Retrying...")
+        true
+      case (_, n) => 
+        println(s"max retries reached $n")
+        false
+    }
+
+    intercept[RuntimeException] { b.runWith(SinkExt.collect).futureValue }
+    i should be (15)
+  }
+/*
   "fromStream" should "read from an input stream" in {
     val filePath = getClass.getResource("/big.txt").getPath
     val futFile = SourceExt
@@ -225,4 +282,7 @@ class SourceExtSpec extends FlatSpec with Matchers with ScalaFutures {
 
     whenReady(source.runWith(SinkExt.collect)) { _ should equal (Vector.fill(1000)(a + 10)) }
   }
+*/
+
+
 }
