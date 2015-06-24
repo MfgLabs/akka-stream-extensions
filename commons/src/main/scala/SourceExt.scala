@@ -7,9 +7,10 @@ import akka.stream._
 import akka.stream.scaladsl._
 import akka.util.ByteString
 import akka.actor.ActorRef
-import com.mfglabs.stream.internals.source.{UnfoldPullerAsync, BulkPullerAsync}
+import com.mfglabs.stream.internals.source.{UnfoldPullerAsync, BulkPullerAsync, BulkPullerAsyncWithErrorMgt, BulkPullerAsyncWithErrorExpBackoff}
 
 import scala.concurrent._
+import scala.concurrent.duration.FiniteDuration
 
 trait SourceExt {
   val defaultChunkSize = 8 * 1024
@@ -88,6 +89,54 @@ trait SourceExt {
    */
   def bulkPullerAsync[A](offset: Long)(f: (Long, Int) => Future[(Seq[A], Boolean)]): Source[A, ActorRef] =
     Source.actorPublisher(BulkPullerAsync.props(offset)(f))
+
+  /**
+   * Create a source that calls the f function each time that downstream requests more elements
+   * and retries a max number of times in case of errors.
+   *
+   * @param offset initial offset
+   * @param maxRetries maximum number of retries in case of error
+   * @param f pulling function that takes as first argument (offset + nb of already pushed elements into downstream) and
+   *          as second argument the maximum number of elements that can be currently pushed downstream.
+   *          Returns a sequence of elements to push, and a stop boolean (true means that this is the end of the stream)
+   * @tparam A
+   * @return
+   */
+  def bulkPullerAsyncWithMaxRetries[A](offset: Long, maxRetries: Int)(f: (Long, Int) => Future[(Seq[A], Boolean)]): Source[A, ActorRef] =
+    bulkPullerAsyncWithErrorMgt(offset)(f){
+      case (e: Exception, n) if n < maxRetries => true
+      case _ => false
+    }
+
+  /**
+   * Create a source that calls the f function each time that downstream requests more elements
+   * and in case of error in the Future, it calls your continuation error function (true to continue, false to stop).
+   *
+   * @param offset initial offset
+   * @param f pulling function that takes as first argument (offset + nb of already pushed elements into downstream) and
+   *          as second argument the maximum number of elements that can be currently pushed downstream.
+   *          Returns a sequence of elements to push, and a stop boolean (true means that this is the end of the stream)
+   * @param contErrFn continuation error function called in case of error (return true to continue & false to stop)
+   * @tparam A
+   * @return
+   */
+  def bulkPullerAsyncWithErrorMgt[A](offset: Long)(f: (Long, Int) => Future[(Seq[A], Boolean)])(contErrFn: (Throwable, Int) => Boolean): Source[A, ActorRef] =
+    Source.actorPublisher(BulkPullerAsyncWithErrorMgt.props(offset)(f)(contErrFn))
+
+  /**
+   * Create a source that calls the f function each time that downstream requests more elements
+   * and in case of error in the Future, it calls your continuation error function (true to continue, false to stop).
+   *
+   * @param offset initial offset
+   * @param f pulling function that takes as first argument (offset + nb of already pushed elements into downstream) and
+   *          as second argument the maximum number of elements that can be currently pushed downstream.
+   *          Returns a sequence of elements to push, and a stop boolean (true means that this is the end of the stream)
+   * @param contErrFn continuation error function called in case of error (return true to continue & false to stop)
+   * @tparam A
+   * @return
+   */
+  def bulkPullerAsyncWithErrorExpBackoff[A](offset: Long, maxRetryDuration: FiniteDuration, retryMinInterval: FiniteDuration)(f: (Long, Int) => Future[(Seq[A], Boolean)]): Source[A, ActorRef] =
+    Source.actorPublisher(BulkPullerAsyncWithErrorExpBackoff.props(offset, maxRetryDuration, retryMinInterval)(f))
 
   /**
    * Create a source that calls the f function each time that downstream requests more elements.

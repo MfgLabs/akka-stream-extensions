@@ -6,6 +6,7 @@ import akka.actor.ActorSystem
 import akka.stream.{ActorFlowMaterializerSettings, ActorFlowMaterializer}
 import akka.stream.scaladsl._
 import akka.util.ByteString
+import akka.stream.ActorOperationAttributes
 import org.scalatest._
 import org.scalatest.concurrent
 import concurrent.ScalaFutures
@@ -104,6 +105,76 @@ class SourceExtSpec extends FlatSpec with Matchers with ScalaFutures {
     whenReady(futR) { result =>
       result shouldEqual (for (i <- (0 to 100).filterNot(_ % 2 == 0)) yield i * 10).toSeq
     }
+  }
+
+  "bulkAsyncPullerWithMaxRetries" should "manage max retry failure" in {
+    var i = 0
+
+    val b = bulkPullerAsyncWithMaxRetries(0L, 3) { (counter, nbElemToPush) =>
+      if(i < 3) {
+        i+=1
+        println(s"i:$i")
+        Future.successful(Seq(i) -> false)
+      } else if(i == 3 || i > 10) {
+        i+=1
+        println(s"i:$i")
+        Future.failed(new RuntimeException("BOOom"))
+      } else {
+        i+=1
+        println(s"i:$i")
+        Future.successful(Seq(i) -> false)
+      }
+    }
+
+    intercept[RuntimeException] { b.runWith(SinkExt.collect).futureValue }
+    i should be (15)
+  }
+
+  "bulkPullerAsyncWithErrorMgt" should "manage manage failure" in {
+    var i = 0
+
+    val b = bulkPullerAsyncWithErrorMgt(0L) { (counter, nbElemToPush) =>
+      if(i < 3) {
+        i+=1
+        println(s"i:$i")
+        Future.successful(Seq(i) -> false)
+      } else if(i == 3 || i > 10) {
+        i+=1
+        println(s"i:$i")
+        Future.failed(new RuntimeException("BOOom"))
+      } else {
+        i+=1
+        println(s"i:$i")
+        Future.successful(Seq(i) -> false)
+      }
+    }{
+      case (e: RuntimeException, n) if n < 3 =>
+        println(s"$n < 3 -> Retrying...")
+        true
+      case (_, n) => 
+        println(s"max retries reached $n")
+        false
+    }
+
+    intercept[RuntimeException] { b.runWith(SinkExt.collect).futureValue }
+    i should be (15)
+  }
+
+  "bulkPullerAsyncWithErrorExpBackoff" should "manage failure with exp backoff" in {
+    import scala.concurrent.duration._
+    var i = 0
+
+    val time0 = System.currentTimeMillis()
+    val b = bulkPullerAsyncWithErrorExpBackoff(0L, 10.seconds, 1000.milliseconds) { (counter, nbElemToPush) =>
+        i+=1
+        println(s"i:$i")
+        Future.failed(new RuntimeException("BOOom"))
+    }
+
+    intercept[RuntimeException] { b.runWith(SinkExt.collect).futureValue }
+    val time1 = System.currentTimeMillis()
+    i should be (4)
+    (time1 - time0) should be > 7000L
   }
 
   "fromStream" should "read from an input stream" in {
@@ -225,4 +296,5 @@ class SourceExtSpec extends FlatSpec with Matchers with ScalaFutures {
 
     whenReady(source.runWith(SinkExt.collect)) { _ should equal (Vector.fill(1000)(a + 10)) }
   }
+
 }
