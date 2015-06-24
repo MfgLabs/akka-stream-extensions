@@ -29,7 +29,7 @@ class SourceExtSpec extends FlatSpec with Matchers with ScalaFutures {
   implicit val ecBlocking = ExecutionContextForBlockingOps(scala.concurrent.ExecutionContext.Implicits.global)
 
   val elements = for (i <- 1 to 500) yield i
-/*
+
   "bulkAsyncPuller" should "end the stream when nothing to pull" in {
     whenReady(
       bulkPullerAsync(0L)((_, _) => Future.successful((Seq.empty[Int], true)))
@@ -107,9 +107,6 @@ class SourceExtSpec extends FlatSpec with Matchers with ScalaFutures {
     }
   }
 
-*/
-  
-/*
   "bulkAsyncPullerWithMaxRetries" should "manage max retry failure" in {
     var i = 0
 
@@ -162,31 +159,24 @@ class SourceExtSpec extends FlatSpec with Matchers with ScalaFutures {
     intercept[RuntimeException] { b.runWith(SinkExt.collect).futureValue }
     i should be (15)
   }
-*/
+
   "bulkPullerAsyncWithErrorExpBackoff" should "manage failure with exp backoff" in {
     import scala.concurrent.duration._
     var i = 0
 
+    val time0 = System.currentTimeMillis()
     val b = bulkPullerAsyncWithErrorExpBackoff(0L, 10.seconds, 1000.milliseconds) { (counter, nbElemToPush) =>
-      // if(i < 3) {
-      //   i+=1
-      //   println(s"i:$i")
-      //   Future.successful(Seq(i) -> false)
-      // } else if(i == 3 || i > 10) {
         i+=1
         println(s"i:$i")
         Future.failed(new RuntimeException("BOOom"))
-      // } else {
-      //   i+=1
-      //   println(s"i:$i")
-      //   Future.successful(Seq(i) -> false)
-      // }
     }
 
     intercept[RuntimeException] { b.runWith(SinkExt.collect).futureValue }
-    i should be (15)
+    val time1 = System.currentTimeMillis()
+    i should be (4)
+    (time1 - time0) should be > 7000L
   }
-/*
+
   "fromStream" should "read from an input stream" in {
     val filePath = getClass.getResource("/big.txt").getPath
     val futFile = SourceExt
@@ -306,7 +296,5 @@ class SourceExtSpec extends FlatSpec with Matchers with ScalaFutures {
 
     whenReady(source.runWith(SinkExt.collect)) { _ should equal (Vector.fill(1000)(a + 10)) }
   }
-*/
-
 
 }
