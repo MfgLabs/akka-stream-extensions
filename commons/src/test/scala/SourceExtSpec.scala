@@ -3,10 +3,10 @@ package com.mfglabs.stream
 import java.io.{FileInputStream, File}
 
 import akka.actor.ActorSystem
-import akka.stream.{ActorFlowMaterializerSettings, ActorFlowMaterializer}
+import akka.stream.{ActorMaterializerSettings, ActorMaterializer}
 import akka.stream.scaladsl._
 import akka.util.ByteString
-import akka.stream.ActorOperationAttributes
+import akka.stream.ActorAttributes
 import org.scalatest._
 import org.scalatest.concurrent
 import concurrent.ScalaFutures
@@ -22,7 +22,7 @@ class SourceExtSpec extends FlatSpec with Matchers with ScalaFutures {
   import SourceExt._
   
   implicit val system = ActorSystem()
-  implicit val mat = ActorFlowMaterializer(ActorFlowMaterializerSettings(system).withInputBuffer(16, 16))
+  implicit val mat = ActorMaterializer(ActorMaterializerSettings(system).withInputBuffer(16, 16))
   implicit override val patienceConfig =
     PatienceConfig(timeout = Span(2, Minutes), interval = Span(20, Millis))
 
