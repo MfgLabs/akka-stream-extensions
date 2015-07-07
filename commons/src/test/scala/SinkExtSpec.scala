@@ -3,7 +3,6 @@ package com.mfglabs.stream
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorFlowMaterializerSettings, ActorFlowMaterializer}
-import com.mfglabs.stream.ExecutionContextForBlockingOps
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Minutes, Span}
 import org.scalatest.{Matchers, FlatSpec}

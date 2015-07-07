@@ -52,11 +52,11 @@ html {
   font-size: 16px;
   line-height: 1.5;
 }
-@media (min-width: 38em) {
+/*@media (min-width: 38em) {
   html {
     font-size: 20px;
   }
-}
+}*/
 
 body {
   color: #515151;
@@ -153,10 +153,10 @@ pre {
   font-family: Menlo, Monaco, "Courier New", monospace;
 }
 code {
-  padding: .25em .5em;
+  padding: 7px 10px;
   font-size: 85%;
-  color: #bf616a;
-  background-color: #f9f9f9;
+  color: inherit;
+  background-color: #F2F2F2;
   border-radius: 3px;
 }
 pre {
@@ -170,18 +170,17 @@ pre {
   white-space: pre-wrap;
   word-break: break-all;
   word-wrap: break-word;
-  background-color: #f9f9f9;
+  background-color: #F2F2F2;
+  border-radius: 2px;
 }
 pre code {
   padding: 0;
-  font-size: 100%;
   color: inherit;
   background-color: transparent;
 }
 
 /* Pygments via Jekyll */
 .highlight {
-  margin-bottom: 1rem;
   border-radius: 4px;
 }
 .highlight pre {
@@ -220,12 +219,12 @@ blockquote {
 blockquote p:last-child {
   margin-bottom: 0;
 }
-@media (min-width: 30em) {
+/*@media (min-width: 30em) {
   blockquote {
     padding-right: 5rem;
     padding-left: 1.25rem;
   }
-}
+}*/
 
 img {
   display: block;
@@ -300,11 +299,7 @@ tbody tr:nth-child(odd) th {
  * Super small header above the content for site name and short description.
  */
 
-.masthead {
-  padding-top:    1rem;
-  padding-bottom: 1rem;
-  margin-bottom: 3rem;
-}
+
 .masthead-title {
   margin-top: 0;
   margin-bottom: 0;
@@ -409,7 +404,7 @@ a.pagination-item:hover {
   background-color: #f5f5f5;
 }
 
-@media (min-width: 30em) {
+/*@media (min-width: 30em) {
   .pagination {
     margin: 3rem 0;
   }
@@ -427,4 +422,4 @@ a.pagination-item:hover {
     border-top-right-radius:    4px;
     border-bottom-right-radius: 4px;
   }
-}
+}*/

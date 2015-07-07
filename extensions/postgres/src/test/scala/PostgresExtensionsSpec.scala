@@ -2,31 +2,28 @@ package com.mfglabs.stream
 package extensions.postgres
 
 import java.io.File
-import java.sql.{Connection, DriverManager}
 import java.util.concurrent.atomic.AtomicLong
 
 import akka.actor.ActorSystem
 import akka.stream._
 import akka.stream.scaladsl._
 import akka.util.ByteString
-import org.scalatest.time._
+import commons.DockerTempPostgres
 import org.scalatest._
-import concurrent.ScalaFutures
-import scala.concurrent.Future
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.time._
+
 import scala.util.Try
 
-class PostgresExtensionsSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll with DockerTmpDB {
+  class PostgresExtensionsSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll with DockerTempPostgres {
   implicit val as = ActorSystem()
   implicit val fm = ActorFlowMaterializer()
   implicit override val patienceConfig =
     PatienceConfig(timeout = Span(5, Minutes), interval = Span(5, Millis))
 
-  Class.forName("org.postgresql.Driver")
-
   "PgStream" should "stream a file to a Postgres table and stream a sql query from a Postgres table" in {
     val stmt = conn.createStatement()
     implicit val pgConn = PgStream.sqlConnAsPgConnUnsafe(conn)
-    import scala.concurrent.ExecutionContext.Implicits.global
     implicit val blockingEc = ExecutionContextForBlockingOps(scala.concurrent.ExecutionContext.Implicits.global)
 
     stmt.execute(

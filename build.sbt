@@ -17,7 +17,7 @@ scalaVersion in ThisBuild := "2.11.6"
 
 publishMavenStyle in ThisBuild := true
 
-scalacOptions in ThisBuild ++= Seq("-feature", "-deprecation", "-unchecked", "-language:postfixOps")
+scalacOptions in ThisBuild ++= Seq("-feature", "-unchecked", "-language:postfixOps")
 
 resolvers in ThisBuild ++= Seq(
   "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
@@ -49,7 +49,7 @@ lazy val noPublishSettings = Seq(
 
 lazy val docSettings = Seq(
   autoAPIMappings := true,
-  unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(commons),
+  unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(commons, postgres, elasticsearch, shapeless),
   site.addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), "api"),
   ghpagesNoJekyll := false,
   siteMappings ++= Seq(
@@ -61,16 +61,16 @@ lazy val docSettings = Seq(
     "-sourcepath", baseDirectory.in(LocalRootProject).value.getAbsolutePath
   ),
   git.remoteRepo := "git@github.com:MfgLabs/akka-stream-extensions.git",
-  includeFilter in makeSite := "*.html" || "*.css" || "*.png" || "*.jpg" || "*.gif" || "*.js" || "*.swf" || "*.yml" || "*.md"
+  includeFilter in makeSite := "*.html" || "*.css" || "*.png" || "*.jpg" || "*.gif" || "*.js" || "*.swf" || "*.yml" || "*.md" || "*.svg" || "*.eot" || "*.ttf" || "*.woff" || "*.woff2"
 )
 
 lazy val all = project.in(file("."))
-  .aggregate(commons, postgres, shapeless, elasticsearch, docs)
+  .aggregate(commons, shapeless, postgres, elasticsearch, docs)
   .settings(
     name := "commons-all",
     noPublishSettings
   )
-  .dependsOn(commons, postgres, shapeless, elasticsearch, docs)
+  .dependsOn(commons, shapeless, postgres, elasticsearch, docs)
 
 lazy val docs = project
   .settings(moduleName := "akka-stream-ext-docs")
@@ -89,7 +89,7 @@ lazy val commons = project.in(file("commons"))
   .settings(
     name := "akka-stream-extensions",
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-stream-experimental" % "1.0-M5",
+      "com.typesafe.akka" %% "akka-stream-experimental" % "1.0-RC2",
       "org.scalatest" %% "scalatest" % "2.1.6"
     ),
     commonSettings,
@@ -100,8 +100,11 @@ lazy val postgres = project.in(file("extensions/postgres"))
   .dependsOn(commons)
   .settings(
     name := "akka-stream-extensions-postgres",
+    resolvers += Resolver.bintrayRepo("softprops", "maven"),
     libraryDependencies ++= Seq(
-      "org.postgresql" % "postgresql"  % "9.3-1102-jdbc4"
+      "com.typesafe.akka" %% "akka-stream-experimental" % "1.0-RC2",
+      "org.postgresql" % "postgresql"  % "9.3-1102-jdbc4",
+      "me.lessis" %% "tugboat" % "0.2.1" % "test"
     ),
     commonSettings,
     publishSettings
@@ -112,6 +115,7 @@ lazy val elasticsearch = project.in(file("extensions/elasticsearch"))
   .settings(
     name := "akka-stream-extensions-elasticsearch",
     libraryDependencies ++= Seq(
+      "com.typesafe.akka" %% "akka-stream-experimental" % "1.0-RC2",
       "org.elasticsearch" % "elasticsearch" % "1.3.2"
     ),
     commonSettings,
@@ -119,12 +123,13 @@ lazy val elasticsearch = project.in(file("extensions/elasticsearch"))
   )
 
 lazy val shapeless = project.in(file("extensions/shapeless"))
-  .dependsOn(commons)
-  .settings(
-    name := "akka-stream-extensions-shapeless",
-    libraryDependencies ++= Seq(
-      "com.chuusai"       %% "shapeless"   % "2.2.0-RC4"
-    ),
-    commonSettings,
-    publishSettings
-  )
+ .dependsOn(commons)
+ .settings(
+   name := "akka-stream-extensions-shapeless",
+   libraryDependencies ++= Seq(
+     "com.typesafe.akka" %% "akka-stream-experimental" % "1.0-RC2",
+     "com.chuusai"       %% "shapeless"                % "2.2.0-RC5"
+   ),
+   commonSettings,
+   publishSettings
+ )

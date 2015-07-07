@@ -73,11 +73,11 @@ trait PgStream {
     Flow[ByteString]
       .map(_.utf8String)
       .grouped(nbLinesPerInsertionBatch)
-      .via(FlowExt.mapAsyncUnorderedWithBoundedConcurrency(chunkInsertionConcurrency) { chunk =>
+      .mapAsyncUnordered(chunkInsertionConcurrency) { chunk =>
       Future {
         copyManager.copyIn(copyQuery, new StringReader(chunk.mkString("\n")))
       }(ec.value)
-    })
+    }
   }
 
   private def optionsToStrV8(options: Map[String, String]) = {

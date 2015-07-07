@@ -1,0 +1,65 @@
+package commons
+
+import dispatch.url
+import org.scalatest.{BeforeAndAfterEach, Suite}
+import tugboat.{Docker, ContainerConfig, HostConfig}
+
+import scala.concurrent.Await
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+import scala.util.Random
+
+
+trait DockerContainer extends BeforeAndAfterEach {
+  self: Suite =>
+
+  def timeout = 30.seconds
+
+  def containerName = Random.alphanumeric.take(8).mkString("")
+
+  def containerConfig: ContainerConfig
+
+  def hostConfig: HostConfig
+
+    val docker = tugboat.Docker() //hostStr="http://localhost:4243") //tcp://127.0.0.1:4243") //"tcp://127.0.0.1:4243")//unix:///var/run/docker.sock")
+
+
+
+  var container: Option[String] = None
+
+  def dockerIp = {
+
+    if (docker.hostStr.startsWith("https")){
+      val reg = """https://(.*):.*""".r
+      val reg(ip) = docker.hostStr
+      ip
+    } else {
+      "localhost" //tcp://127.0.0.1:4243"//"unix:///var/run/docker.sock"
+
+    }
+  }
+
+  override protected def beforeEach(): Unit = {
+    println("HOST " + docker + " & " + docker.hostStr + " & " + docker.host)
+    //println(  url("http://localhost:4243").toRequest.getRawUrl)
+
+    println(docker.containers.Create(containerConfig, Some(containerName)).body)
+    println(docker.containers.Create(containerConfig, Some(containerName)))
+    val C = docker.containers.Create(containerConfig, Some(containerName)).apply()
+    val f = for {
+      c <- docker.containers.Create(containerConfig, Some(containerName))()
+      _ <- docker.containers.get(c.id).Start(hostConfig)()
+    } yield c.id
+    container = Some(Await.result(f, timeout))
+
+    println(s"Container ${container.get} started")
+  }
+
+  override protected def afterEach(): Unit = {
+    container.foreach { id =>
+      println(s"Stopping container $id...")
+      Await.result(docker.containers.get(id).stop()(), timeout)
+      println(s"Container $id stopped")
+    }
+  }
+}
