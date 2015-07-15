@@ -1,87 +1,80 @@
 package commons
 
 import java.sql.{DriverManager, Connection}
-import java.util.{Timer, TimerTask}
 
-import org.scalatest.Suite
-import tugboat._
+import org.scalatest.{Suite, BeforeAndAfter}
+import scala.sys.process._
+import scala.util.{Failure, Success, Try}
 
-import scala.concurrent.duration._
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Await, ExecutionContext, Future, Promise}
-import scala.util.Try
+/**
+ * for each test, creates a PostgresSQL docker container and provides a connection to its database
+ */
+trait DockerTempPostgres extends BeforeAndAfter { self: Suite =>
 
-trait DockerTempPostgres extends DockerContainer {
-  self: Suite =>
+  var dockerIdOpt: Option[String] = None
 
   Class.forName("org.postgresql.Driver")
   implicit var conn : Connection = _
 
-  def dbPort =  sys.props.getOrElse("postgres_port", "5432").toInt
-  def pgUser = "postgres"
-  def pgPassword = "postgres"
-
-  var containerStarted = false
-
-  val containerConfig = ContainerConfig(
-    image = "postgres:9.3",
-    env = Map("POSTGRES_USER" -> pgUser, "POSTGRES_PASSWORD" -> pgPassword)
-  )
-
-  val hostConfig = HostConfig(
-    ports = Map(Port.Tcp(5432) -> List(PortBinding.local(dbPort)))
-  )
-
-  val dbUrl = s"postgres://$pgUser:$pgPassword@$dockerIp:$dbPort/postgres"
-  val jdbcDbUrl = s"jdbc:postgresql://$dockerIp:$dbPort/postgres"
-
-  def delay[T](timeout: Duration)(block: => T)(implicit executor: ExecutionContext): Future[T] = {
-    val promise = Promise[T]()
-    val t = new Timer
-    t.schedule(new TimerTask {
-      override def run(): Unit = {
-        promise.complete(Try(block))
-      }
-    }, timeout.toMillis)
-    promise.future
-  }
-
-  def waitForDBStarted(): Future[Unit] = {
-    print(".")
-    delay(500.milliseconds)({}).flatMap { _ =>
-      if(!containerStarted)
-        waitForDBStarted()
-      else {
-        Future.successful(println("OK"))
-      }
+  val version = "9.3"
+  def newPGDB(): Int = {
+    val port: Int = 5432 + (math.random * (10000 - 5432)).toInt
+    Try {
+      dockerIdOpt = Some(s"docker run -p $port:5432 -e POSTGRES_PASSWORD=pwd -d postgres:$version".!!.trim)
+      println("Docker Id: " + dockerIdOpt)
+      port
+    } match {
+      case Success(port) => port
+      case Failure(err) => // if the port is already allocated
+        println(s"Error while trying to run docker container: $err")
+        println("Retrying...")
+        Thread.sleep(1000)
+        newPGDB()
     }
   }
 
-  def createConnection(): Connection =
-    DriverManager.getConnection(jdbcDbUrl, pgUser, pgPassword)
+  def getDockerIp: String = Try("boot2docker ip".!!.trim).getOrElse("127.0.0.1") // platform dependent
 
-  override protected def beforeEach(): Unit = {
-    super.beforeEach()
-    container.foreach { id =>
-      val (stopper, completeFuture) = docker.containers.get(id)
-        .logs
-        .follow(true)
-        .stdout(true)
-        .stderr(true)
-        .stream { l =>
-          if(!containerStarted)
-            containerStarted = l.contains("database system is ready to accept connections")
-        }
-
-      println("Waiting for db")
-
-      Await.result(waitForDBStarted(), 10.seconds)
-      conn = createConnection()
+  //ugly solution to wait for the connection to be ready
+  def waitsForConnection(port : Int) : Connection = {
+    try {
+      DriverManager.getConnection(
+        s"jdbc:postgresql://$getDockerIp:$port/postgres", "postgres", "pwd")
+    } catch {
+      case err: Exception =>
+        println(s"Error while trying to connect to db: $err")
+        println("Retrying...")
+        Thread.sleep(1000)
+        waitsForConnection(port)
     }
   }
 
-  override protected def afterEach(): Unit = {
+  before {
+    val port = newPGDB()
+    println(s"new database at port $port")
+    Thread.sleep(2000)
+    conn = waitsForConnection(port)
+  }
+
+  after {
     conn.close()
-    super.afterEach()
+    println(s"stop and rm docker container $dockerIdOpt")
+    dockerIdOpt.foreach { dockerId =>
+      val stopOUT = s"docker stop $dockerId".!!
+      println(s"Docker stop: $stopOUT")
+      val rmOUT = s"docker rm $dockerId".!!
+      println(s"docker rm : $rmOUT")
+    }
   }
+}
+
+trait DockerTempPostgres8 extends DockerTempPostgres {
+  self: Suite =>
+
+  override val version = "8.4"
+
+  /*override val containerConfig = ContainerConfig(
+    image = "postgres:8.4",
+    env = Map("POSTGRES_USER" -> pgUser, "POSTGRES_PASSWORD" -> pgPassword)
+  )*/
 }
