@@ -21,7 +21,6 @@ trait DockerContainer extends BeforeAndAfterEach {
   def hostConfig: HostConfig
 
   val docker = tugboat.Docker()
-
   var container: Option[String] = None
 
   def dockerIp = {
@@ -30,9 +29,9 @@ trait DockerContainer extends BeforeAndAfterEach {
       val reg(ip) = docker.hostStr
       ip
     } else {
-      //"localhost" //tcp://127.0.0.1:4243"//
       "unix:///var/run/docker.sock"
     }
+
   }
 
   override protected def beforeEach(): Unit = {
