@@ -16,7 +16,7 @@ trait PgStream {
   /**
    * Execute a SQL query and get its result as a stream.
    * @param sqlQuery sql query
-   * @param options options of the Postgres COPY command. For example, Map("FORMAT" -> "CSV", "DELIMITER" -> "','")
+   * @param options options of the Postgres COPY command. For example, Map("DELIMITER" -> "','")
    * @param outputStreamTransformer optional output stream transformer
    * @param v8Compatible whether the underlying postgreSQL database version is 8.x (else it is 9.x)
    * @param conn Postgres connection

@@ -1,8 +1,7 @@
 package commons
 
-import dispatch.url
 import org.scalatest.{BeforeAndAfterEach, Suite}
-import tugboat.{Docker, ContainerConfig, HostConfig}
+import tugboat.{ContainerConfig, HostConfig}
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -21,33 +20,33 @@ trait DockerContainer extends BeforeAndAfterEach {
 
   def hostConfig: HostConfig
 
-    val docker = tugboat.Docker() //hostStr="http://localhost:4243") //tcp://127.0.0.1:4243") //"tcp://127.0.0.1:4243")//unix:///var/run/docker.sock")
-
-
+  val docker = tugboat.Docker()
 
   var container: Option[String] = None
 
   def dockerIp = {
-
+    println("//////////////////////////////////////////////")
+    println(docker.hostStr)
+    println(docker.host)
+    println((docker.host / "TOTO").toRequestBuilder.build().getURI)
     if (docker.hostStr.startsWith("https")){
-      val reg = """https://(.*):.*""".r
+      val reg = """http[s]*://(.*):.*""".r
       val reg(ip) = docker.hostStr
+      println("IP : "+ ip)
       ip
     } else {
-      "localhost" //tcp://127.0.0.1:4243"//"unix:///var/run/docker.sock"
-
+      //"localhost" //tcp://127.0.0.1:4243"//
+      "unix:///var/run/docker.sock"
     }
   }
 
   override protected def beforeEach(): Unit = {
-    println("HOST " + docker + " & " + docker.hostStr + " & " + docker.host)
-    //println(  url("http://localhost:4243").toRequest.getRawUrl)
-
-    println(docker.containers.Create(containerConfig, Some(containerName)).body)
-    println(docker.containers.Create(containerConfig, Some(containerName)))
-    val C = docker.containers.Create(containerConfig, Some(containerName)).apply()
     val f = for {
       c <- docker.containers.Create(containerConfig, Some(containerName))()
+      _ = println("//////////////////////////////////////////////")
+      _ = println(docker.hostStr)
+      _ = println(docker.host)
+      _ = println(docker.host / "TOTO")
       _ <- docker.containers.get(c.id).Start(hostConfig)()
     } yield c.id
     container = Some(Await.result(f, timeout))
