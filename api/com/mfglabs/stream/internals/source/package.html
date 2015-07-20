@@ -67,7 +67,7 @@
         <div id="types" class="types members">
               <h3>Type Members</h3>
               <ol><li name="com.mfglabs.stream.internals.source.BulkPullerAsync" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="BulkPullerAsync[A]extendsActorPublisher[A]withActorLogging"></a>
+      <a id="BulkPullerAsync[A]extendsGenericBulkPullerAsync[A,Unit]"></a>
       <a id="BulkPullerAsync[A]:BulkPullerAsync[A]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -75,10 +75,44 @@
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a href="BulkPullerAsync.html"><span class="name">BulkPullerAsync</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="result"> extends <span class="extype" name="akka.stream.actor.ActorPublisher">ActorPublisher</span>[<span class="extype" name="com.mfglabs.stream.internals.source.BulkPullerAsync.A">A</span>] with <span class="extype" name="akka.actor.ActorLogging">ActorLogging</span></span>
+        <a href="BulkPullerAsync.html"><span class="name">BulkPullerAsync</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="result"> extends <span class="extype" name="com.mfglabs.stream.internals.source.GenericBulkPullerAsync">GenericBulkPullerAsync</span>[<span class="extype" name="com.mfglabs.stream.internals.source.BulkPullerAsync.A">A</span>, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Unit" class="extype" target="_top">Unit</a>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.package@BulkPullerAsync[A]extendsActorPublisher[A]withActorLogging" title="Permalink" target="_top">
+      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.package@BulkPullerAsync[A]extendsGenericBulkPullerAsync[A,Unit]" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="com.mfglabs.stream.internals.source.BulkPullerAsyncWithErrorExpBackoff" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="BulkPullerAsyncWithErrorExpBackoff[A]extendsGenericBulkPullerAsync[A,(Int,scala.concurrent.duration.FiniteDuration)]"></a>
+      <a id="BulkPullerAsyncWithErrorExpBackoff[A]:BulkPullerAsyncWithErrorExpBackoff[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="BulkPullerAsyncWithErrorExpBackoff.html"><span class="name">BulkPullerAsyncWithErrorExpBackoff</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="result"> extends <span class="extype" name="com.mfglabs.stream.internals.source.GenericBulkPullerAsync">GenericBulkPullerAsync</span>[<span class="extype" name="com.mfglabs.stream.internals.source.BulkPullerAsyncWithErrorExpBackoff.A">A</span>, (<a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a>, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.concurrent.duration.FiniteDuration" class="extype" target="_top">FiniteDuration</a>)]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.package@BulkPullerAsyncWithErrorExpBackoff[A]extendsGenericBulkPullerAsync[A,(Int,scala.concurrent.duration.FiniteDuration)]" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="com.mfglabs.stream.internals.source.BulkPullerAsyncWithErrorMgt" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="BulkPullerAsyncWithErrorMgt[A]extendsGenericBulkPullerAsync[A,Int]"></a>
+      <a id="BulkPullerAsyncWithErrorMgt[A]:BulkPullerAsyncWithErrorMgt[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="BulkPullerAsyncWithErrorMgt.html"><span class="name">BulkPullerAsyncWithErrorMgt</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="result"> extends <span class="extype" name="com.mfglabs.stream.internals.source.GenericBulkPullerAsync">GenericBulkPullerAsync</span>[<span class="extype" name="com.mfglabs.stream.internals.source.BulkPullerAsyncWithErrorMgt.A">A</span>, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.package@BulkPullerAsyncWithErrorMgt[A]extendsGenericBulkPullerAsync[A,Int]" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
@@ -120,6 +154,40 @@
       </span>
       </h4><span class="permalink">
       <a href="../../../../../index.html#com.mfglabs.stream.internals.source.package@BulkPullerAsync" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="com.mfglabs.stream.internals.source.BulkPullerAsyncWithErrorExpBackoff" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="BulkPullerAsyncWithErrorExpBackoff"></a>
+      <a id="BulkPullerAsyncWithErrorExpBackoff:BulkPullerAsyncWithErrorExpBackoff"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="BulkPullerAsyncWithErrorExpBackoff$.html"><span class="name">BulkPullerAsyncWithErrorExpBackoff</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.package@BulkPullerAsyncWithErrorExpBackoff" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="com.mfglabs.stream.internals.source.BulkPullerAsyncWithErrorMgt" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="BulkPullerAsyncWithErrorMgt"></a>
+      <a id="BulkPullerAsyncWithErrorMgt:BulkPullerAsyncWithErrorMgt"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="BulkPullerAsyncWithErrorMgt$.html"><span class="name">BulkPullerAsyncWithErrorMgt</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.mfglabs.stream.internals.source.package@BulkPullerAsyncWithErrorMgt" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>

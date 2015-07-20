@@ -188,6 +188,76 @@
          as second argument the maximum number of elements that can be currently pushed downstream.
          Returns a sequence of elements to push, and a stop boolean (true means that this is the end of the stream)</p></dd><dt>returns</dt><dd class="cmt"><p>
 </p></dd></dl></div>
+    </li><li name="com.mfglabs.stream.SourceExt#bulkPullerAsyncWithErrorExpBackoff" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="bulkPullerAsyncWithErrorExpBackoff[A](offset:Long,maxRetryDuration:scala.concurrent.duration.FiniteDuration,retryMinInterval:scala.concurrent.duration.FiniteDuration)(f:(Long,Int)=&gt;scala.concurrent.Future[(Seq[A],Boolean)]):akka.stream.scaladsl.Source[A,akka.actor.ActorRef]"></a>
+      <a id="bulkPullerAsyncWithErrorExpBackoff[A](Long,FiniteDuration,FiniteDuration)((Long,Int)⇒Future[(Seq[A],Boolean)]):Source[A,ActorRef]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">bulkPullerAsyncWithErrorExpBackoff</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="offset">offset: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Long" class="extype" target="_top">Long</a></span>, <span name="maxRetryDuration">maxRetryDuration: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.concurrent.duration.FiniteDuration" class="extype" target="_top">FiniteDuration</a></span>, <span name="retryMinInterval">retryMinInterval: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.concurrent.duration.FiniteDuration" class="extype" target="_top">FiniteDuration</a></span>)</span><span class="params">(<span name="f">f: (<a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Long" class="extype" target="_top">Long</a>, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a>) ⇒ <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.concurrent.Future" class="extype" target="_top">Future</a>[(<span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="com.mfglabs.stream.SourceExt.bulkPullerAsyncWithErrorExpBackoff.A">A</span>], <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Boolean" class="extype" target="_top">Boolean</a>)]</span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<span class="extype" name="com.mfglabs.stream.SourceExt.bulkPullerAsyncWithErrorExpBackoff.A">A</span>, <span class="extype" name="akka.actor.ActorRef">ActorRef</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.mfglabs.stream.SourceExt@bulkPullerAsyncWithErrorExpBackoff[A](offset:Long,maxRetryDuration:scala.concurrent.duration.FiniteDuration,retryMinInterval:scala.concurrent.duration.FiniteDuration)(f:(Long,Int)=&gt;scala.concurrent.Future[(Seq[A],Boolean)]):akka.stream.scaladsl.Source[A,akka.actor.ActorRef]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Create a source that calls the f function each time that downstream requests more elements
+and in case of error in the Future, it calls your continuation error function (true to continue, false to stop).</p><div class="fullcomment"><div class="comment cmt"><p>Create a source that calls the f function each time that downstream requests more elements
+and in case of error in the Future, it calls your continuation error function (true to continue, false to stop).
+</p></div><dl class="paramcmts block"><dt class="tparam">A</dt><dd class="cmt"></dd><dt class="param">offset</dt><dd class="cmt"><p>initial offset</p></dd><dt class="param">f</dt><dd class="cmt"><p>pulling function that takes as first argument (offset + nb of already pushed elements into downstream) and
+         as second argument the maximum number of elements that can be currently pushed downstream.
+         Returns a sequence of elements to push, and a stop boolean (true means that this is the end of the stream)</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
+    </li><li name="com.mfglabs.stream.SourceExt#bulkPullerAsyncWithErrorMgt" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="bulkPullerAsyncWithErrorMgt[A](offset:Long)(f:(Long,Int)=&gt;scala.concurrent.Future[(Seq[A],Boolean)],stopOnErr:(Throwable,Int)=&gt;Boolean):akka.stream.scaladsl.Source[A,akka.actor.ActorRef]"></a>
+      <a id="bulkPullerAsyncWithErrorMgt[A](Long)((Long,Int)⇒Future[(Seq[A],Boolean)],(Throwable,Int)⇒Boolean):Source[A,ActorRef]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">bulkPullerAsyncWithErrorMgt</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="offset">offset: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Long" class="extype" target="_top">Long</a></span>)</span><span class="params">(<span name="f">f: (<a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Long" class="extype" target="_top">Long</a>, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a>) ⇒ <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.concurrent.Future" class="extype" target="_top">Future</a>[(<span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="com.mfglabs.stream.SourceExt.bulkPullerAsyncWithErrorMgt.A">A</span>], <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Boolean" class="extype" target="_top">Boolean</a>)]</span>, <span name="stopOnErr">stopOnErr: (<span class="extype" name="scala.Throwable">Throwable</span>, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a>) ⇒ <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<span class="extype" name="com.mfglabs.stream.SourceExt.bulkPullerAsyncWithErrorMgt.A">A</span>, <span class="extype" name="akka.actor.ActorRef">ActorRef</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.mfglabs.stream.SourceExt@bulkPullerAsyncWithErrorMgt[A](offset:Long)(f:(Long,Int)=&gt;scala.concurrent.Future[(Seq[A],Boolean)],stopOnErr:(Throwable,Int)=&gt;Boolean):akka.stream.scaladsl.Source[A,akka.actor.ActorRef]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Create a source that calls the f function each time that downstream requests more elements
+and in case of error in the Future, it calls your continuation error function (true to continue, false to stop).</p><div class="fullcomment"><div class="comment cmt"><p>Create a source that calls the f function each time that downstream requests more elements
+and in case of error in the Future, it calls your continuation error function (true to continue, false to stop).
+</p></div><dl class="paramcmts block"><dt class="tparam">A</dt><dd class="cmt"></dd><dt class="param">offset</dt><dd class="cmt"><p>initial offset</p></dd><dt class="param">f</dt><dd class="cmt"><p>pulling function that takes as first argument (offset + nb of already pushed elements into downstream) and
+         as second argument the maximum number of elements that can be currently pushed downstream.
+         Returns a sequence of elements to push, and a stop boolean (true means that this is the end of the stream)</p></dd><dt class="param">stopOnErr</dt><dd class="cmt"><p>stop on error function called in case of error in the future returned by the pulling function f
+                 (return true to stop the stream in failure &amp; false to ignore the error and continue)</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
+    </li><li name="com.mfglabs.stream.SourceExt#bulkPullerAsyncWithMaxRetries" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="bulkPullerAsyncWithMaxRetries[A](offset:Long,maxRetries:Int)(f:(Long,Int)=&gt;scala.concurrent.Future[(Seq[A],Boolean)]):akka.stream.scaladsl.Source[A,akka.actor.ActorRef]"></a>
+      <a id="bulkPullerAsyncWithMaxRetries[A](Long,Int)((Long,Int)⇒Future[(Seq[A],Boolean)]):Source[A,ActorRef]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">bulkPullerAsyncWithMaxRetries</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="offset">offset: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Long" class="extype" target="_top">Long</a></span>, <span name="maxRetries">maxRetries: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="params">(<span name="f">f: (<a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Long" class="extype" target="_top">Long</a>, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a>) ⇒ <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.concurrent.Future" class="extype" target="_top">Future</a>[(<span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="com.mfglabs.stream.SourceExt.bulkPullerAsyncWithMaxRetries.A">A</span>], <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Boolean" class="extype" target="_top">Boolean</a>)]</span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<span class="extype" name="com.mfglabs.stream.SourceExt.bulkPullerAsyncWithMaxRetries.A">A</span>, <span class="extype" name="akka.actor.ActorRef">ActorRef</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.mfglabs.stream.SourceExt@bulkPullerAsyncWithMaxRetries[A](offset:Long,maxRetries:Int)(f:(Long,Int)=&gt;scala.concurrent.Future[(Seq[A],Boolean)]):akka.stream.scaladsl.Source[A,akka.actor.ActorRef]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Create a source that calls the f function each time that downstream requests more elements
+and retries a max number of times in case of errors.</p><div class="fullcomment"><div class="comment cmt"><p>Create a source that calls the f function each time that downstream requests more elements
+and retries a max number of times in case of errors.
+</p></div><dl class="paramcmts block"><dt class="tparam">A</dt><dd class="cmt"></dd><dt class="param">offset</dt><dd class="cmt"><p>initial offset</p></dd><dt class="param">maxRetries</dt><dd class="cmt"><p>maximum number of retries in case of error in the future returned by the pulling function f</p></dd><dt class="param">f</dt><dd class="cmt"><p>pulling function that takes as first argument (offset + nb of already pushed elements into downstream) and
+         as second argument the maximum number of elements that can be currently pushed downstream.
+         Returns a sequence of elements to push, and a stop boolean (true means that this is the end of the stream)</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
     </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a>
       <a id="clone():AnyRef"></a>
