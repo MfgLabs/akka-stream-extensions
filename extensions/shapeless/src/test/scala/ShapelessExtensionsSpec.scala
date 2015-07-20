@@ -25,7 +25,7 @@ class ShapelessExtensionsSpec extends FlatSpec with Matchers with ScalaFutures w
   import extensions.shapeless._
 
   implicit val as = ActorSystem()
-  implicit val fm = ActorFlowMaterializer()
+  implicit val fm = ActorMaterializer()
   implicit override val patienceConfig =
     PatienceConfig(timeout = Span(5, Minutes), interval = Span(5, Millis))
 

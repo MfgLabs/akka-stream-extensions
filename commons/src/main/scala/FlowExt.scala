@@ -135,7 +135,7 @@ trait FlowExt {
     }
 
     // We need to limit input buffer to 1 to guarantee the rate limiting feature
-    flow.withAttributes(OperationAttributes.inputBuffer(initial = 1, max = 1))
+    flow.withAttributes(Attributes.inputBuffer(initial = 1, max = 1))
   }
 
   /**

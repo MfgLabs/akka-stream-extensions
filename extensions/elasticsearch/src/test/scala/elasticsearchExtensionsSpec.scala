@@ -2,7 +2,7 @@ package com.mfglabs.stream
 package extensions.elasticsearch
 
 import akka.actor.ActorSystem
-import akka.stream.ActorFlowMaterializer
+import akka.stream._
 import org.elasticsearch.index.query.QueryBuilders
 import org.elasticsearch.node.NodeBuilder
 import org.scalatest.concurrent.ScalaFutures
@@ -15,7 +15,7 @@ import scala.util.Try
 
 class PostgresExtensionsSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll {
   implicit val as = ActorSystem()
-  implicit val fm = ActorFlowMaterializer()
+  implicit val fm = ActorMaterializer()
   implicit override val patienceConfig =
     PatienceConfig(timeout = Span(1, Minutes), interval = Span(100, Millis))
   implicit val blockingEc = ExecutionContextForBlockingOps(scala.concurrent.ExecutionContext.Implicits.global)

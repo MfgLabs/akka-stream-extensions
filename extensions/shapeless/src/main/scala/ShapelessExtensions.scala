@@ -6,7 +6,7 @@ import shapeless.ops.hlist._
 import shapeless.ops.nat._
 import shapeless.ops.coproduct.Inject
 
-import akka.stream.{FlowMaterializer, ActorFlowMaterializer, FanInShape, FanOutShape, Graph, UniformFanInShape, Outlet, Inlet, OperationAttributes}
+import akka.stream._
 import akka.stream.scaladsl._
 import akka.stream.stage._
 import akka.event.Logging
@@ -206,7 +206,7 @@ class CoproductFlexiRoute[C <: Coproduct, HL <: HList](implicit
   trav: ToTraversable.Aux[HL, List, Outlet[_]],
   sel: SelectOutletValue.Aux[C, HL]
 ) extends FlexiRoute[C, CoproductFanOutShape[C, HL]](
-  new CoproductFanOutShape(builder), OperationAttributes.name("CoproductFanOutShape")
+  new CoproductFanOutShape(builder), Attributes.name("CoproductFanOutShape")
 ) {
   import FlexiRoute._
 
@@ -277,7 +277,7 @@ class CoproductFlexiMerge[C <: Coproduct, HL <: HList](implicit
   builder: InletBuilder.Aux[C, C, HL],
   trav: ToTraversable.Aux[HL, List, Inlet[C]]
 ) extends FlexiMerge[C, CoproductFanInShape[C, HL]](
-  new CoproductFanInShape(builder), OperationAttributes.name("CoproductFanInShape")
+  new CoproductFanInShape(builder), Attributes.name("CoproductFanInShape")
 ) {
   import FlexiMerge._
 
