@@ -108,70 +108,61 @@ class SourceExtSpec extends FlatSpec with Matchers with ScalaFutures {
   }
 
   "bulkAsyncPullerWithMaxRetries" should "manage max retry failure" in {
-    var i = 0
+    @volatile var i = 0
 
-    val b = bulkPullerAsyncWithMaxRetries(0L, 3) { (counter, nbElemToPush) =>
-      if(i < 3) {
-        i+=1
-        println(s"i:$i")
-        Future.successful(Seq(i) -> false)
-      } else if(i == 3 || i > 10) {
-        i+=1
-        println(s"i:$i")
-        Future.failed(new RuntimeException("BOOom"))
+    val b = bulkPullerAsyncWithMaxRetries(0L, 2) { (counter, nbElemToPush) =>
+      i += 1
+      if (i != 0 && i % 3 == 0) {
+        Future.failed(new RuntimeException(""))
       } else {
-        i+=1
-        println(s"i:$i")
         Future.successful(Seq(i) -> false)
       }
     }
 
-    intercept[RuntimeException] { b.runWith(SinkExt.collect).futureValue }
-    i should be (15)
+    intercept[RuntimeException] {
+      b.runWith(SinkExt.collect).futureValue
+    }
+    i should be (9)
   }
 
   "bulkPullerAsyncWithErrorMgt" should "manage manage failure" in {
-    var i = 0
+    @volatile var i = 0
 
-    val b = bulkPullerAsyncWithErrorMgt(0L) { (counter, nbElemToPush) =>
-      if(i < 3) {
-        i+=1
-        println(s"i:$i")
-        Future.successful(Seq(i) -> false)
-      } else if(i == 3 || i > 10) {
-        i+=1
-        println(s"i:$i")
-        Future.failed(new RuntimeException("BOOom"))
-      } else {
-        i+=1
-        println(s"i:$i")
-        Future.successful(Seq(i) -> false)
+    val b = bulkPullerAsyncWithErrorMgt(0L)(
+      (counter, nbElemToPush) => {
+        i += 1
+        if (i != 0 && i % 3 == 0) {
+          Future.failed(new RuntimeException(""))
+        } else {
+          Future.successful(Seq(i) -> false)
+        }
+      },
+      {
+        case (e: RuntimeException, n) if n == 3 => true
+        case _ => false
       }
-    }{
-      case (e: RuntimeException, n) if n < 3 =>
-        println(s"$n < 3 -> Retrying...")
-        true
-      case (_, n) => 
-        println(s"max retries reached $n")
-        false
-    }
+    )
 
-    intercept[RuntimeException] { b.runWith(SinkExt.collect).futureValue }
-    i should be (15)
+    intercept[RuntimeException] {
+      b.runWith(SinkExt.collect).futureValue
+    }
+    i should be (9)
   }
 
   "bulkPullerAsyncWithErrorExpBackoff" should "manage failure with exp backoff" in {
     import scala.concurrent.duration._
-    var i = 0
+    @volatile var i = 0
 
     val time0 = System.currentTimeMillis()
     val b = bulkPullerAsyncWithErrorExpBackoff(0L, 10.seconds, 1000.milliseconds) { (counter, nbElemToPush) =>
-        i+=1
-        println(s"i:$i")
-        Future.failed(new RuntimeException("BOOom"))
+      i += 1
+      Future.failed(new RuntimeException(""))
     }
 
-    intercept[RuntimeException] { b.runWith(SinkExt.collect).futureValue }
+    intercept[RuntimeException] {
+      b.runWith(SinkExt.collect).futureValue
+    }
+
     val time1 = System.currentTimeMillis()
     i should be (4)
     (time1 - time0) should be > 7000L

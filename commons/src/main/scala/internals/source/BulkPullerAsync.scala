@@ -1,56 +1,66 @@
 package com.mfglabs.stream.internals.source
 
 import akka.pattern.pipe
-import akka.actor.{Props, Status, ActorLogging}
+import akka.actor._
 import akka.stream.actor.ActorPublisher
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
-
-class BulkPullerAsync[A](offset: Long)(f: (Long, Int) => Future[(Seq[A], Boolean)]) extends ActorPublisher[A] with ActorLogging {
+private[stream] abstract class GenericBulkPullerAsync[A, S](offset: Long)(f: (Long, Int) => Future[(Seq[A], Boolean)])
+                                           extends ActorPublisher[A] with ActorLogging {
   import akka.stream.actor.ActorPublisherMessage._
   implicit val ec = context.dispatcher
 
-  def receive = waitingForDownstreamReq(offset, Vector.empty, stopAfterBuf = false)
-
   case object Pull
 
-  def waitingForDownstreamReq(s: Long, buf: Seq[A], stopAfterBuf: Boolean): Receive = {
+  var s: S
+  def onFutureFailure(err: Throwable, currentPosition: Long, downstreamDemandBeforeFut: Int, buffer: Seq[A]): Unit
+
+  def receive = waitingForDownstreamReq(offset, Vector.empty, stopAfterBuf = false)
+
+  def waitingForDownstreamReq(currentPosition: Long, buffer: Seq[A], stopAfterBuf: Boolean): Receive = {
     case Request(_) | Pull =>
       if (totalDemand > 0 && isActive) {
-        nextElements(s, totalDemand.toInt, buf, stopAfterBuf).pipeTo(self)
-        context.become(waitingForFut(s, buf, totalDemand))
+        nextElements(currentPosition, totalDemand.toInt, buffer, stopAfterBuf).pipeTo(self)
+        context.become(waitingForFut(currentPosition, buffer, totalDemand.toInt))
       }
 
     case Cancel => context.stop(self)
   }
 
-  private def nextElements(s: Long, n: Int, buf: Seq[A], stopAfterBuf: Boolean): Future[(Seq[A], Boolean)] =
-    if (buf.nonEmpty && (buf.size >= n || stopAfterBuf)) Future.successful((Seq.empty, stopAfterBuf))
-    else f(s, n)
-
-  def waitingForFut(s: Long, buf: Seq[A], beforeFutDemand: Long): Receive = {
+  def waitingForFut(currentPosition: Long, buffer: Seq[A], downstreamDemandBeforeFut: Int): Receive = {
     case (as: Seq[A], stop: Boolean) =>
-      val (requestedAs, keep) = (buf ++ as).splitAt(beforeFutDemand.toInt)
+      val (requestedAs, keep) = (buffer ++ as).splitAt(downstreamDemandBeforeFut.toInt)
       requestedAs.foreach(onNext)
       if (keep.isEmpty && stop) {
         onComplete()
       } else {
         if (totalDemand > 0) self ! Pull
-        context.become(waitingForDownstreamReq(s + as.length, keep, stop))
+        context.become(waitingForDownstreamReq(currentPosition + as.length, keep, stop))
       }
 
     case Request(_) | Pull => // ignoring until we receive the future response
 
-    case Status.Failure(err) =>
-      context.become(waitingForDownstreamReq(s, Seq.empty, stopAfterBuf = false))
-      if (totalDemand > 0) self ! Pull
-      onError(err)
+    case Status.Failure(err) => onFutureFailure(err, currentPosition, downstreamDemandBeforeFut, buffer)
 
     case Cancel => context.stop(self)
   }
 
+  def nextElements(currentPosition: Long, n: Int, buffer: Seq[A], stopAfterBuf: Boolean): Future[(Seq[A], Boolean)] =
+    if (buffer.nonEmpty && (buffer.size >= n || stopAfterBuf)) Future.successful((Seq.empty, stopAfterBuf))
+    else f(currentPosition, n)
+}
+
+
+class BulkPullerAsync[A](offset: Long)(f: (Long, Int) => Future[(Seq[A], Boolean)]) extends GenericBulkPullerAsync[A, Unit](offset)(f) {
+  override var s = ()
+
+  override def onFutureFailure(err: Throwable, currentPosition: Long, downstreamDemandBeforeFut: Int, buffer: Seq[A]): Unit = {
+    context.become(waitingForDownstreamReq(currentPosition, Seq.empty, stopAfterBuf = false))
+    if (totalDemand > 0) self ! Pull
+    onError(err)
+  }
 }
 
 object BulkPullerAsync {
@@ -58,141 +68,57 @@ object BulkPullerAsync {
 }
 
 
+class BulkPullerAsyncWithErrorMgt[A](offset: Long)(f: (Long, Int) => Future[(Seq[A], Boolean)])
+                                    (stopOnError: (Throwable, Int) => Boolean) extends GenericBulkPullerAsync[A, Int](offset)(f) {
+  override var s = 0
 
-class BulkPullerAsyncWithErrorMgt[A]
-  (offset: Long)(f: (Long, Int) => Future[(Seq[A], Boolean)])
-                (contErrFn: (Throwable, Int) => Boolean)
-  extends ActorPublisher[A]
-  with ActorLogging {
-  
-  import akka.stream.actor.ActorPublisherMessage._
-  implicit val ec = context.dispatcher
-
-  def receive = waitingForDownstreamReq(offset, Vector.empty, stopAfterBuf = false, 0)
-
-  case object Pull
-
-  def waitingForDownstreamReq(s: Long, buf: Seq[A], stopAfterBuf: Boolean, retryNb: Int): Receive = {
-    case Request(_) | Pull =>
-      if (totalDemand > 0 && isActive) {
-        nextElements(s, totalDemand.toInt, buf, stopAfterBuf).pipeTo(self)
-        context.become(waitingForFut(s, buf, totalDemand, retryNb))
-      }
-
-    case Cancel => context.stop(self)
+  override def onFutureFailure(err: Throwable, currentPosition: Long, downstreamDemandBeforeFut: Int, buffer: Seq[A]): Unit = {
+    s = s + 1
+    if (stopOnError(err, s)) {
+      onError(err)
+    }
+    else {
+      if (totalDemand > 0) self ! Pull
+      context.become(waitingForDownstreamReq(s, Seq.empty, stopAfterBuf = false))
+    }
   }
-
-  private def nextElements(s: Long, n: Int, buf: Seq[A], stopAfterBuf: Boolean): Future[(Seq[A], Boolean)] =
-    if (buf.nonEmpty && (buf.size >= n || stopAfterBuf)) Future.successful((Seq.empty, stopAfterBuf))
-    else f(s, n)
-
-  def waitingForFut(s: Long, buf: Seq[A], beforeFutDemand: Long, retryNb: Int): Receive = {
-    case (as: Seq[A], stop: Boolean) =>
-      val (requestedAs, keep) = (buf ++ as).splitAt(beforeFutDemand.toInt)
-      requestedAs.foreach(onNext)
-      if (keep.isEmpty && stop) {
-        onComplete()
-      } else {
-        if (totalDemand > 0) self ! Pull
-        // we have received data so it means, the retry succeeded so reset retryNb to 0
-        context.become(waitingForDownstreamReq(s + as.length, keep, stop, 0))
-      }
-
-    case Request(_) | Pull => // ignoring until we receive the future response
-
-    case Status.Failure(err) =>
-      // context.become(waitingForDownstreamReq(s, Seq.empty, stopAfterBuf = false))
-      if (!contErrFn(err, retryNb)) {
-        onError(err)
-      }
-      else {
-        if (totalDemand > 0) self ! Pull
-        context.become(waitingForDownstreamReq(s, Seq.empty, stopAfterBuf = false, retryNb + 1))
-      }
-
-    case Cancel => context.stop(self)
-  }
-
-
-
 }
-
-
 
 object BulkPullerAsyncWithErrorMgt {
-  def props[A](offset: Long)(f: (Long, Int) => Future[(Seq[A], Boolean)])(contFn: (Throwable, Int) => Boolean) = Props(new BulkPullerAsyncWithErrorMgt[A](offset)(f)(contFn))
+  def props[A](offset: Long)(f: (Long, Int) => Future[(Seq[A], Boolean)])(contFn: (Throwable, Int) => Boolean) =
+    Props(new BulkPullerAsyncWithErrorMgt[A](offset)(f)(contFn))
 }
 
 
+class BulkPullerAsyncWithErrorExpBackoff[A](offset: Long, maxRetryDuration: FiniteDuration, retryMinInterval: FiniteDuration)
+                                           (f: (Long, Int) => Future[(Seq[A], Boolean)])
+                                           extends GenericBulkPullerAsync[A, (Int, FiniteDuration)](offset)(f) {
+  override var s = (0, Duration.Zero)
 
-class BulkPullerAsyncWithErrorExpBackoff[A]
-  (offset: Long, maxRetryDuration: FiniteDuration, retryMinInterval: FiniteDuration)
-  (f: (Long, Int) => Future[(Seq[A], Boolean)])
-  extends ActorPublisher[A]
-  with ActorLogging {
-  
-  import akka.stream.actor.ActorPublisherMessage._
-  implicit val ec = context.dispatcher
+  override def onFutureFailure(err: Throwable, currentPosition: Long, downstreamDemandBeforeFut: Int, buffer: Seq[A]): Unit = {
+    val (retryIdx, retryDuration) = s
+    val expBackoff = nextExpBackoff(retryIdx)
+    val total = retryDuration + expBackoff
 
-  def receive = waitingForDownstreamReq(offset, Vector.empty, stopAfterBuf = false, 0, Duration.Zero)
+    log.debug(s"RetryDuration: $retryDuration ExpBackoff: $expBackoff")
 
-  case object Pull
-
-  def waitingForDownstreamReq(s: Long, buf: Seq[A], stopAfterBuf: Boolean, retryIdx: Int, retryDuration: FiniteDuration): Receive = {
-    case Request(_) | Pull =>
-      if (totalDemand > 0 && isActive) {
-        nextElements(s, totalDemand.toInt, buf, stopAfterBuf).pipeTo(self)
-        context.become(waitingForFut(s, buf, totalDemand, retryIdx, retryDuration))
-      }
-
-    case Cancel => context.stop(self)
+    if (total > maxRetryDuration) {
+      log.debug(s"Reached max duration $total > $maxRetryDuration")
+      onError(err)
+    }
+    else {
+      log.debug(s"Scheduling retry in $expBackoff")
+      s = (retryIdx + 1, total)
+      context.become(waitingForDownstreamReq(currentPosition, Seq.empty, stopAfterBuf = false))
+      context.system.scheduler.scheduleOnce(expBackoff, self, Pull)
+    }
   }
 
-  def waitingForFut(s: Long, buf: Seq[A], beforeFutDemand: Long, retryIdx: Int, retryDuration: FiniteDuration): Receive = {
-    case (as: Seq[A], stop: Boolean) =>
-      val (requestedAs, keep) = (buf ++ as).splitAt(beforeFutDemand.toInt)
-      requestedAs.foreach(onNext)
-      if (keep.isEmpty && stop) {
-        onComplete()
-      } else {
-        if (totalDemand > 0) self ! Pull
-        // we have received data so it means, the retry succeeded so reset retryNb to 0
-        context.become(waitingForDownstreamReq(s + as.length, keep, stop, 0, Duration.Zero))
-      }
-
-    case Request(_) | Pull => // ignoring until we receive the future response
-
-    case Status.Failure(err) =>
-      // context.become(waitingForDownstreamReq(s, Seq.empty, stopAfterBuf = false))
-      val d = expBackoff(retryIdx)
-      val total = retryDuration + d
-      println(s"retryDuration:$retryDuration d:$d")
-      if(total > maxRetryDuration) {
-        println(s"reached max duration $total > $maxRetryDuration")
-        onError(err)
-      }
-      else {
-        println(s"scheduling retry in $d")
-        context.become(waitingForDownstreamReq(s, Seq.empty, stopAfterBuf = false, retryIdx + 1, total))
-        context.system.scheduler.scheduleOnce(d, self, Pull)    
-      }
-
-    case Cancel => context.stop(self)
-  }
-
-
-  // ugly conversion :(
-  def expBackoff(i: Int): FiniteDuration = (Math.pow(2, i) * retryMinInterval).asInstanceOf[FiniteDuration]
-
-  private def nextElements(s: Long, n: Int, buf: Seq[A], stopAfterBuf: Boolean): Future[(Seq[A], Boolean)] =
-    if (buf.nonEmpty && (buf.size >= n || stopAfterBuf)) Future.successful((Seq.empty, stopAfterBuf))
-    else f(s, n)
-
-
+  def nextExpBackoff(i: Int): FiniteDuration = (Math.pow(2, i) * retryMinInterval).asInstanceOf[FiniteDuration]
 }
-
 
 object BulkPullerAsyncWithErrorExpBackoff {
-  def props[A](offset: Long, maxRetryDuration: FiniteDuration, retryMinInterval: FiniteDuration)(f: (Long, Int) => Future[(Seq[A], Boolean)]) =
+  def props[A](offset: Long, maxRetryDuration: FiniteDuration, retryMinInterval: FiniteDuration)
+              (f: (Long, Int) => Future[(Seq[A], Boolean)]) =
     Props(new BulkPullerAsyncWithErrorExpBackoff[A](offset, maxRetryDuration, retryMinInterval)(f))
 }
