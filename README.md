@@ -1,6 +1,6 @@
 ## Akka Stream Extensions
 
-We are proud to opensource `Akka-Stream-Extensions` extending the very promising [Typesafe Akka-Stream](http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0-RC3/scala.html).
+We are proud to opensource `Akka-Stream-Extensions` extending the very promising [Typesafe Akka-Stream](http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0/scala.html).
 
 The main purpose of this project is to:
 
@@ -25,10 +25,10 @@ resolvers += Resolver.bintrayRepo("mfglabs", "maven")
 
 ### Add dependencies to your `build.sbt`
 
-Currently depends on `akka-stream-1.0-RC3`
+Currently depends on `akka-stream-1.0`
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.7.3"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.8.0"
 ```
 
 ### Sample
@@ -69,7 +69,7 @@ This extension provides tools to stream data from/to Postgres.
 ### Dependencies
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.7.3"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.8.0"
 ```
 
 ### Sample
@@ -101,7 +101,7 @@ someLineStream
 ### Dependencies
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-elasticsearch" % "0.7.3"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-elasticsearch" % "0.8.0"
 ```
 
 ### Sample
@@ -134,7 +134,7 @@ For more details on the history of this extension, read [this article](http://ma
 ### Dependencies
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-shapeless" % "0.7.3"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-shapeless" % "0.8.0"
 ```
 
 ### Sample

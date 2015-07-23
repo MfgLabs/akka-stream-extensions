@@ -3,7 +3,7 @@ package com.mfglabs.stream
 import java.io.File
 
 import akka.actor.ActorSystem
-import akka.stream.{OverflowStrategy, ActorFlowMaterializerSettings, ActorFlowMaterializer}
+import akka.stream._
 import akka.stream.scaladsl._
 import akka.util.ByteString
 import org.scalatest._
@@ -17,7 +17,7 @@ import scala.concurrent.duration._
 
 class FlowExtSpec extends FlatSpec with Matchers with ScalaFutures {
   implicit val system = ActorSystem()
-  implicit val mat = ActorFlowMaterializer(ActorFlowMaterializerSettings(system).withInputBuffer(16, 16))
+  implicit val mat = ActorMaterializer(ActorMaterializerSettings(system).withInputBuffer(16, 16))
   implicit override val patienceConfig =
     PatienceConfig(timeout = Span(3, Minutes), interval = Span(20, Millis))
 
