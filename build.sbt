@@ -107,7 +107,9 @@ lazy val postgres = project.in(file("extensions/postgres"))
       "me.lessis" %% "tugboat" % "0.2.0" % "test"
     ),
     commonSettings,
-    publishSettings
+    publishSettings,
+    fork := true,
+    parallelExecution in Test := false
   )
 
 lazy val elasticsearch = project.in(file("extensions/elasticsearch"))
