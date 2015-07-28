@@ -40,7 +40,6 @@ trait PgStream {
     val errorStream = Source(p.future) // hack to fail the stream if error in copyOut
     val optsStr = optionsToStr(pgVersion, options)
     val copyOutQuery = s"COPY ($sqlQuery) TO STDOUT $optsStr"
-    println(copyOutQuery)
     Future {
       Try(copyManager.copyOut(copyOutQuery, tos)) match {
         case Success(_) =>
@@ -76,7 +75,6 @@ trait PgStream {
     val optsStr = optionsToStr(pgVersion, options)
     val copyQuery = s"COPY ${schema}.${table} FROM STDIN $optsStr"
     val copyManager = conn.getCopyAPI()
-    println(copyQuery)
     Flow[ByteString]
       .map(_.utf8String)
       .grouped(nbLinesPerInsertionBatch)
