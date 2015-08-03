@@ -24,8 +24,6 @@ trait DockerTempPostgres extends DockerContainer {
 
   implicit var conn : Connection = _
 
-  def version = "9.3"
-
   def dbPort =  sys.props.getOrElse("postgres_port", "5432").toInt
   def pgUser = "postgres"
   def pgPassword = "postgres"
