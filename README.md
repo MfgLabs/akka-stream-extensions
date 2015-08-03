@@ -72,6 +72,14 @@ This extension provides tools to stream data from/to Postgres.
 libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.8.0"
 ```
 
+### Prerequisites
+#### Test only
+Pull all docker images launched by the tests
+``` bash
+docker pull postgres:8.4
+docker pull postgres:9.3
+```
+
 ### Sample
 
 ```scala

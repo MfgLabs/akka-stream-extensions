@@ -3,6 +3,8 @@ package commons
 import java.sql.{DriverManager, Connection}
 import java.util.{Timer, TimerTask}
 
+
+import com.mfglabs.stream.extensions.postgres.PostgresVersion
 import org.scalatest.Suite
 import tugboat._
 
@@ -14,8 +16,15 @@ import scala.util.Try
 trait DockerTempPostgres extends DockerContainer {
   self: Suite =>
 
+  val versionLabels : Map[PostgresVersion, String] = Map(PostgresVersion.Nine -> "9.3", PostgresVersion.Eight -> "8.4")
+
+  def version: PostgresVersion = PostgresVersion.Nine
+
   Class.forName("org.postgresql.Driver")
+
   implicit var conn : Connection = _
+
+  def version = "9.3"
 
   def dbPort =  sys.props.getOrElse("postgres_port", "5432").toInt
   def pgUser = "postgres"
@@ -24,7 +33,7 @@ trait DockerTempPostgres extends DockerContainer {
   var containerStarted = false
 
   val containerConfig = ContainerConfig(
-    image = "postgres:9.3",
+    image = s"postgres:${versionLabels.get(version).get}",
     env = Map("POSTGRES_USER" -> pgUser, "POSTGRES_PASSWORD" -> pgPassword)
   )
 
@@ -69,9 +78,9 @@ trait DockerTempPostgres extends DockerContainer {
         .stdout(true)
         .stderr(true)
         .stream { l =>
-          if(!containerStarted)
-            containerStarted = l.contains("database system is ready to accept connections")
-        }
+        if(!containerStarted)
+          containerStarted = l.contains("database system is ready to accept connections")
+      }
 
       println("Waiting for db")
 
@@ -84,4 +93,14 @@ trait DockerTempPostgres extends DockerContainer {
     conn.close()
     super.afterEach()
   }
+}
+
+trait DockerTempPostgresV9 extends DockerTempPostgres {
+  self: Suite =>
+  override def version = PostgresVersion.Nine
+}
+
+trait DockerTempPostgresV8 extends DockerTempPostgres {
+  self: Suite =>
+  override def version = PostgresVersion.Eight
 }

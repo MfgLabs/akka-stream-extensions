@@ -24,9 +24,14 @@ trait DockerContainer extends BeforeAndAfterEach {
   var container: Option[String] = None
 
   def dockerIp = {
-    val reg = """https://(.*):.*""".r
-    val reg(ip) = docker.hostStr
-    ip
+    if (docker.hostStr.startsWith("https")){
+      val reg = """http[s]*://(.*):.*""".r
+      val reg(ip) = docker.hostStr
+      ip
+    } else {
+      "unix:///var/run/docker.sock"
+    }
+
   }
 
   override protected def beforeEach(): Unit = {
@@ -35,7 +40,6 @@ trait DockerContainer extends BeforeAndAfterEach {
       _ <- docker.containers.get(c.id).Start(hostConfig)()
     } yield c.id
     container = Some(Await.result(f, timeout))
-
     println(s"Container ${container.get} started")
   }
 
