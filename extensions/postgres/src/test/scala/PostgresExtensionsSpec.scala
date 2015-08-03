@@ -5,19 +5,18 @@ import java.io.File
 import java.util.concurrent.atomic.AtomicLong
 
 import akka.actor.ActorSystem
-import akka.stream._
 import akka.stream.scaladsl._
 import akka.util.ByteString
-import commons.{DockerTempPostgresV8, DockerTempPostgres}
+import commons.{DockerTempPostgres, DockerTempPostgresV8, DockerTempPostgresV9}
 import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time._
-
+import akka.stream._
 import scala.util.Try
 
 trait PostgresExtensionsSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll {
   self: DockerTempPostgres =>
-  val v8Compatible: Boolean
+
   implicit val as = ActorSystem()
   implicit val fm = ActorMaterializer()
   implicit override val patienceConfig =
@@ -57,11 +56,11 @@ trait PostgresExtensionsSpec extends FlatSpec with Matchers with ScalaFutures wi
     val futLines = SourceExt
       .fromFile(new File(getClass.getResource("/report.csv0000_part_00").getPath), maxChunkSize = 5 * 1024 * 1024)
       .via(FlowExt.rechunkByteStringBySeparator(ByteString("\n"), maximumChunkBytes = 1 * 1024 * 1024))
-      .via(PgStream.insertStreamToTable("public", insertTable, Map("DELIMITER" -> "','"), v8Compatible = v8Compatible, chunkInsertionConcurrency = 2))
+      .via(PgStream.insertStreamToTable("public", insertTable, Map("DELIMITER" -> "','"), pgVersion = self.version, chunkInsertionConcurrency = 2))
       .via(FlowExt.fold(0L)(_ + _))
       .map { total =>
       nbLinesInserted.set(total)
-      PgStream.getQueryResultAsStream("select * from public.test_postgres", Map("DELIMITER" -> "','"),v8Compatible = v8Compatible)
+      PgStream.getQueryResultAsStream("select * from public.test_postgres", Map("DELIMITER" -> "','"),pgVersion = self.version)
     }
       .flatten(FlattenStrategy.concat)
       .via(FlowExt.rechunkByteStringBySize(5 * 1024 * 1024))
@@ -92,12 +91,7 @@ trait PostgresExtensionsSpec extends FlatSpec with Matchers with ScalaFutures wi
   }
 }
 
-class PostgresExtensionsForV9Spec extends PostgresExtensionsSpec with DockerTempPostgres {
-  override val v8Compatible: Boolean = false
-}
-class PostgresExtensionsForV8Spec extends PostgresExtensionsSpec with DockerTempPostgresV8 {
-  override val v8Compatible: Boolean = true
-}
-
+class PostgresExtensionsForV9Spec extends PostgresExtensionsSpec with DockerTempPostgresV9
+class PostgresExtensionsForV8Spec extends PostgresExtensionsSpec with DockerTempPostgresV8
 
 

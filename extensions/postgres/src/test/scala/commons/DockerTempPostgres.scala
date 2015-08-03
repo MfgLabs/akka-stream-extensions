@@ -4,6 +4,7 @@ import java.sql.{DriverManager, Connection}
 import java.util.{Timer, TimerTask}
 
 
+import com.mfglabs.stream.extensions.postgres.PostgresVersion
 import org.scalatest.Suite
 import tugboat._
 
@@ -15,7 +16,12 @@ import scala.util.Try
 trait DockerTempPostgres extends DockerContainer {
   self: Suite =>
 
+  val versionLabels : Map[PostgresVersion, String] = Map(PostgresVersion.Nine -> "9.3", PostgresVersion.Eight -> "8.4")
+
+  def version: PostgresVersion = PostgresVersion.Nine
+
   Class.forName("org.postgresql.Driver")
+
   implicit var conn : Connection = _
 
   def version = "9.3"
@@ -27,7 +33,7 @@ trait DockerTempPostgres extends DockerContainer {
   var containerStarted = false
 
   val containerConfig = ContainerConfig(
-    image = s"postgres:$version",
+    image = s"postgres:${versionLabels.get(version).get}",
     env = Map("POSTGRES_USER" -> pgUser, "POSTGRES_PASSWORD" -> pgPassword)
   )
 
@@ -89,7 +95,12 @@ trait DockerTempPostgres extends DockerContainer {
   }
 }
 
+trait DockerTempPostgresV9 extends DockerTempPostgres {
+  self: Suite =>
+  override def version = PostgresVersion.Nine
+}
+
 trait DockerTempPostgresV8 extends DockerTempPostgres {
   self: Suite =>
-  override def version = "8.4"
+  override def version = PostgresVersion.Eight
 }

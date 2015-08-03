@@ -6,11 +6,18 @@ import java.io._
 import akka.stream._
 import akka.stream.scaladsl._
 import akka.util.ByteString
+import com.mfglabs.stream.extensions.postgres.PostgresVersion.{Eight, Nine}
 import org.postgresql.PGConnection
 import scala.concurrent._
 import java.sql.Connection
 
 import scala.util.{Failure, Try, Success}
+
+sealed trait PostgresVersion
+object PostgresVersion {
+  case object Nine extends PostgresVersion
+  case object Eight extends PostgresVersion
+}
 
 trait PgStream {
   /**
@@ -18,12 +25,12 @@ trait PgStream {
    * @param sqlQuery sql query
    * @param options options of the Postgres COPY command. For example, Map("DELIMITER" -> "','")
    * @param outputStreamTransformer optional output stream transformer
-   * @param v8Compatible whether the underlying postgreSQL database version is 8.x (else it is 9.x)
+   * @param pgVersion PostgreSQL version (8.x or 9.x)
    * @param conn Postgres connection
    * @param ec ec that will be used for Postgres' blocking operations
    * @return
    */
-  def getQueryResultAsStream(sqlQuery: String, options: Map[String, String], v8Compatible : Boolean = false, outputStreamTransformer : OutputStream => OutputStream = identity)
+  def getQueryResultAsStream(sqlQuery: String, options: Map[String, String], pgVersion : PostgresVersion = PostgresVersion.Nine, outputStreamTransformer : OutputStream => OutputStream = identity)
                       (implicit conn: PGConnection, ec: ExecutionContextForBlockingOps): Source[ByteString, (akka.actor.ActorRef, Unit)] = {
     val copyManager = conn.getCopyAPI()
     val os = new PipedOutputStream()
@@ -31,7 +38,7 @@ trait PgStream {
     val tos = outputStreamTransformer(os)
     val p = Promise[ByteString]
     val errorStream = Source(p.future) // hack to fail the stream if error in copyOut
-    val optsStr = if (v8Compatible) optionsToStrV8(options) else optionsToStrV9(options)
+    val optsStr = optionsToStr(pgVersion, options)
     val copyOutQuery = s"COPY ($sqlQuery) TO STDOUT $optsStr"
     Future {
       Try(copyManager.copyOut(copyOutQuery, tos)) match {
@@ -57,25 +64,42 @@ trait PgStream {
    * @param table can be table_name or table_name(column1, column2) to insert data in specific columns
    * @param nbLinesPerInsertionBatch
    * @param chunkInsertionConcurrency
-   * @param v8Compatible whether the underlying postgreSQL database version is 8.x (else it is 9.x)
+   * @param pgVersion PostgreSQL version (8.x or 9.x)
    * @param conn
    * @param ec
    * @return
    */
-  def insertStreamToTable(schema: String, table: String, options: Map[String, String], v8Compatible : Boolean = false, nbLinesPerInsertionBatch: Int = 20000,
+  def insertStreamToTable(schema: String, table: String, options: Map[String, String], pgVersion : PostgresVersion = PostgresVersion.Nine, nbLinesPerInsertionBatch: Int = 20000,
                           chunkInsertionConcurrency: Int = 1)
                          (implicit conn: PGConnection, ec: ExecutionContextForBlockingOps): Flow[ByteString, Long, Unit] = {
-    val optsStr = if (v8Compatible) optionsToStrV8(options) else optionsToStrV9(options)
+    val optsStr = optionsToStr(pgVersion, options)
     val copyQuery = s"COPY ${schema}.${table} FROM STDIN $optsStr"
     val copyManager = conn.getCopyAPI()
     Flow[ByteString]
       .map(_.utf8String)
       .grouped(nbLinesPerInsertionBatch)
       .mapAsyncUnordered(chunkInsertionConcurrency) { chunk =>
-        Future {
-          copyManager.copyIn(copyQuery, new StringReader(chunk.mkString("\n")))
-        }(ec.value)
-      }
+      Future {
+        copyManager.copyIn(copyQuery, new StringReader(chunk.mkString("\n")))
+      }(ec.value)
+    }
+  }
+
+  private def optionsToStr(pgVersion : PostgresVersion, options: Map[String, String]) = {
+    pgVersion match {
+      case Nine =>
+        if (options.isEmpty) ""
+        else
+          " (" + options
+            .map { case (k, v) => s"$k $v" }
+            .mkString(",") + ")"
+      case Eight =>
+        def optToStr(st: Map[String, String]) = st.map { case (k, v) => s"$k $v" }.mkString(" ")
+        val csvOptionKeys = Set("header", "quote", "escape", "force quote")
+        val (csvOptions, commonOptions) = options.partition { case (k, v) => csvOptionKeys.contains(k.toLowerCase()) }
+        val csvOptsStr = if (csvOptions.isEmpty) "" else " CSV " + optToStr(csvOptions)
+        s"${optToStr(commonOptions)} $csvOptsStr"
+    }
   }
 
   private def optionsToStrV8(options: Map[String, String]) = {
