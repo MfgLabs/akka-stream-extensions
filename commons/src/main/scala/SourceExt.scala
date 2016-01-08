@@ -158,7 +158,7 @@ trait SourceExt {
    * @return
    */
   def seededLazyAsync[A, B, M](futB: => Future[B])(f: B => Source[A, M]): Source[A, Unit] =
-    singleLazyAsync(futB).map(f).flatten(FlattenStrategy.concat)
+    singleLazyAsync(futB).map(f).flatMapConcat(identity)
 
   /**
    * Create a source from a Lazy Async value that will be evaluated only when the stream is materialized.
@@ -194,7 +194,7 @@ trait SourceExt {
    * @tparam A
    * @return
    */
-  def constantLazy[A](a: => A): Source[A, ActorRef] = 
+  def constantLazy[A](a: => A): Source[A, ActorRef] =
     unfoldPullerAsync(a)(evaluatedA => Future.successful(Some(evaluatedA), Some(evaluatedA)))
 }
 

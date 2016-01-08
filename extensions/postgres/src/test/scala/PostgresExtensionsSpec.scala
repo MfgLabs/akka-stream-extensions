@@ -62,7 +62,7 @@ trait PostgresExtensionsSpec extends FlatSpec with Matchers with ScalaFutures wi
       nbLinesInserted.set(total)
       PgStream.getQueryResultAsStream("select * from public.test_postgres", Map("DELIMITER" -> "','"),pgVersion = self.version)
     }
-      .flatten(FlattenStrategy.concat)
+      .flatMapConcat(identity)
       .via(FlowExt.rechunkByteStringBySize(5 * 1024 * 1024))
       .via(FlowExt.rechunkByteStringBySeparator(ByteString("\n"), maximumChunkBytes = 1 * 1024 * 1024))
       .map(_.utf8String)

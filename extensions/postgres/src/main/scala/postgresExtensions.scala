@@ -30,14 +30,18 @@ trait PgStream {
    * @param ec ec that will be used for Postgres' blocking operations
    * @return
    */
-  def getQueryResultAsStream(sqlQuery: String, options: Map[String, String], pgVersion : PostgresVersion = PostgresVersion.Nine, outputStreamTransformer : OutputStream => OutputStream = identity)
-                      (implicit conn: PGConnection, ec: ExecutionContextForBlockingOps): Source[ByteString, (akka.actor.ActorRef, Unit)] = {
+  def getQueryResultAsStream(
+    sqlQuery: String,
+    options: Map[String, String],
+    pgVersion : PostgresVersion = PostgresVersion.Nine,
+    outputStreamTransformer : OutputStream => OutputStream = identity
+  )(implicit conn: PGConnection, ec: ExecutionContextForBlockingOps): Source[ByteString, akka.actor.ActorRef] = {
     val copyManager = conn.getCopyAPI()
     val os = new PipedOutputStream()
     val is = new PipedInputStream(os)
     val tos = outputStreamTransformer(os)
     val p = Promise[ByteString]
-    val errorStream = Source(p.future) // hack to fail the stream if error in copyOut
+    val errorStream = Source.fromFuture(p.future) // hack to fail the stream if error in copyOut
     val optsStr = optionsToStr(pgVersion, options)
     val copyOutQuery = s"COPY ($sqlQuery) TO STDOUT $optsStr"
     Future {
@@ -52,7 +56,7 @@ trait PgStream {
           os.close()
       }
     }(ec.value)
-    Source.concat(SourceExt.fromStream(is), errorStream)
+    SourceExt.fromStream(is).concat(errorStream)
   }
 
   /**
