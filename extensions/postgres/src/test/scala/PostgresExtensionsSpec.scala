@@ -7,16 +7,13 @@ import java.util.concurrent.atomic.AtomicLong
 import akka.actor.ActorSystem
 import akka.stream.scaladsl._
 import akka.util.ByteString
-import commons.{DockerTempPostgres, DockerTempPostgresV8, DockerTempPostgresV9}
-import org.scalatest._
-import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time._
+import org.scalatest._
+import concurrent.ScalaFutures
 import akka.stream._
 import scala.util.Try
 
-trait PostgresExtensionsSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll {
-  self: DockerTempPostgres =>
-
+class PostgresExtensionsSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll with DockerTmpDB { self:DockerTmpDB =>
   implicit val as = ActorSystem()
   implicit val fm = ActorMaterializer()
   implicit override val patienceConfig =
@@ -88,10 +85,9 @@ trait PostgresExtensionsSpec extends FlatSpec with Matchers with ScalaFutures wi
 
       stmt.close()
     }
+
+
   }
 }
-
-class PostgresExtensionsForV9Spec extends PostgresExtensionsSpec with DockerTempPostgresV9
-class PostgresExtensionsForV8Spec extends PostgresExtensionsSpec with DockerTempPostgresV8
 
 

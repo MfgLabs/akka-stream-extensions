@@ -13,10 +13,16 @@ import java.sql.Connection
 
 import scala.util.{Failure, Try, Success}
 
-sealed trait PostgresVersion
+abstract class PostgresVersion(val value:String)
 object PostgresVersion {
-  case object Nine extends PostgresVersion
-  case object Eight extends PostgresVersion
+  case object Nine extends PostgresVersion("9.3")
+  case object Eight extends PostgresVersion("8.4")
+
+  private val seq = Seq(Nine, Eight)
+
+  def apply(v:String) =
+    seq.find(_.value == v)
+      .getOrElse(throw new IllegalArgumentException(s"Unsupported postgres version ($v), must be one of ${seq.map(_.value).mkString(", ")}"))
 }
 
 trait PgStream {
