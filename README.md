@@ -25,7 +25,7 @@ resolvers += Resolver.bintrayRepo("mfglabs", "maven")
 
 ### Add dependencies to your `build.sbt`
 
-Currently depends on `akka-stream-1.0`
+Currently depends on `akka-stream-2.0.1`
 
 ```scala
 libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.8.0"
@@ -91,15 +91,15 @@ implicit val blockingEc = ExecutionContextForBlockingOps(someEc)
 
 PgStream
   .getQueryResultAsStream(
-    "select a, b, c from table", 
+    "select a, b, c from table",
     options = Map("FORMAT" -> "CSV")
   )
   .via(FlowExt.rechunkByteStringBySeparator(ByteString("\n"), maximumChunkBytes = 5 * 1024))
 
 someLineStream
   .via(PgStream.insertStreamToTable(
-    "schema", 
-    "table", 
+    "schema",
+    "table",
     options = Map("FORMAT" -> "CSV")
   ))
 ```
@@ -171,7 +171,7 @@ val f = FlowGraph.closed(sink) { implicit builder => sink =>
   val flowInt = Flow[Int].map{i => println("i:"+i); i}
   val flowString = Flow[String].map{s => println("s:"+s); s}
   val flowBool = Flow[Boolean].map{s => println("s:"+s); s}
-  
+
 // >>>>>> THE IMPORTANT THING
 // 4 - build the coproductFlow in a 1-liner
   val fr = builder.add(ShapelessStream.coproductFlow(flowInt :: flowString :: flowBool :: HNil))
@@ -203,12 +203,6 @@ Check our project [MFG Labs/commons-aws](https://github.com/MfgLabs/commons-aws)
 
 To test postgres-extensions, you need to have Docker installed and running on your computer (the tests will automatically launch a docker container with a Postgres db).
 
-If the default postgres port is not available, you can specify another one by passing `postgres_port` as property to sbt.
-
-```
-sbt -Dpostgres_port=5433 test
-```
-
 ## Tributes
 
 [MFG Labs](http://mfglabs.com) sponsored the development and the opensourcing of this library.
@@ -217,7 +211,7 @@ We hope this library will be useful & interesting to a few ones and that some of
 
 <div class="push">
   <p>So don't hesitate to contribute</p>
-  
+
   <a href="{{ site.baseurl }}/contributing/" alt="go one contribute page" class="btn-round grey">
     <span class="ico arrow_g"></span>
   </a>
@@ -225,17 +219,17 @@ We hope this library will be useful & interesting to a few ones and that some of
 
 <div class="license">
   <h2>License</h2>
-  
+
   <p>This software is licensed under the Apache 2 license, quoted below.</p>
-  
+
   <p>
-    Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance 
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance
     with the License. You may obtain a copy of the License <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank" alt="go to apache.org">here</a>.
   </p>
-  
+
   <p>
-    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
-    on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
+    on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for
     the specific language governing permissions and limitations under the License.
   </p>
 </div>

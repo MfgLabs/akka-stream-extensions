@@ -36,9 +36,9 @@ class ShapelessExtensionsSpec extends FlatSpec with Matchers with ScalaFutures w
     // WARNING Don't forget to change the access_token with a valid one
     val sink = Sink.fold[Seq[Any], Any](Seq())(_ :+ _)
 
-    val f = FlowGraph.closed(sink) { implicit builder => sink =>
-      import FlowGraph.Implicits._
-      val s = Source(() => Seq(
+    val f = GraphDSL.create(sink) { implicit builder => sink =>
+      import GraphDSL.Implicits._
+      val s = Source.fromIterator(() => Seq(
         Coproduct[C](1),
         Coproduct[C]("foo"),
         Coproduct[C](2),
@@ -55,11 +55,13 @@ class ShapelessExtensionsSpec extends FlatSpec with Matchers with ScalaFutures w
       
       val fr = builder.add(ShapelessStream.coproductFlowAny(flowInt :: flowString :: flowBool :: HNil))
 
-      s ~> fr.inlet
-           fr.outlet ~> sink
+      s ~> fr.in
+           fr.out ~> sink
+
+      ClosedShape
     }
 
-    f.run().futureValue.toSet should equal (Set[Any](
+    RunnableGraph.fromGraph(f).run().futureValue.toSet should equal (Set[Any](
       1,
       "foo",
       2,
@@ -76,9 +78,9 @@ class ShapelessExtensionsSpec extends FlatSpec with Matchers with ScalaFutures w
     // WARNING Don't forget to change the access_token with a valid one
     val sink = Sink.fold[Seq[C], C](Seq())(_ :+ _)
 
-    val f = FlowGraph.closed(sink) { implicit builder => sink =>
-      import FlowGraph.Implicits._
-      val s = Source(() => Seq(
+    val f = GraphDSL.create(sink) { implicit builder => sink =>
+      import GraphDSL.Implicits._
+      val s = Source.fromIterator(() => Seq(
         Coproduct[C](1),
         Coproduct[C]("foo"),
         Coproduct[C](2),
@@ -91,14 +93,16 @@ class ShapelessExtensionsSpec extends FlatSpec with Matchers with ScalaFutures w
       val flowInt = Flow[Int].map{i => println("i:"+i); i}
       val flowString = Flow[String].map{s => println("s:"+s); s}
       val flowBool = Flow[Boolean].map{s => println("s:"+s); s}
-      
+
       val fr = builder.add(ShapelessStream.coproductFlow(flowInt :: flowString :: flowBool :: HNil))
 
-      s ~> fr.inlet
-           fr.outlet ~> sink
+      s ~> fr.in
+           fr.out ~> sink
+
+      ClosedShape
     }
 
-    f.run().futureValue.toSet should equal (Set(
+    RunnableGraph.fromGraph(f).run().futureValue.toSet should equal (Set(
       Coproduct[C](1),
       Coproduct[C]("foo"),
       Coproduct[C](2),

@@ -53,16 +53,16 @@ trait ShapelessStream {
       itrav: ToTraversable.Aux[COutInlets, List, Inlet[COut]],
       selOutletValue: SelectOutletValue.Aux[CIn, CInOutlets],
       flowBuilder: FlowBuilderC.Aux[CIn, COut, CInOutlets, HL, COutInlets]
-  ): Flow[CIn, COut, Unit] =
-    Flow() { implicit builder =>
+  ): Graph[FlowShape[CIn, COut], Unit] =
+    GraphDSL.create() { implicit builder =>
     
-      import FlowGraph.Implicits._
+      import GraphDSL.Implicits._
 
       val router = builder.add(new CoproductFlexiRoute[CIn, CInOutlets]())
       val merger = builder.add(new CoproductFlexiMerge[COut, COutInlets]())
 
       flowBuilder.build(router.outs, flows, merger.ins)
-      router.in -> merger.out
+      FlowShape(router.in, merger.out)
     }
 
   /**
@@ -80,7 +80,7 @@ trait ShapelessStream {
    *                                             |                               |
    *                                             |                               |
    *                                             +-------- Flow[An, Bn] ---------+
-   * 
+   *
    *
    * The flows is built with a custom FlexiRoute with `DemandFromAll` condition & Merge using `ReadAny` condition.
    *
@@ -100,16 +100,16 @@ trait ShapelessStream {
       length: shapeless.ops.coproduct.Length.Aux[CIn, Size],
       toIntN: ToInt[Size],
       flowBuilder: FlowBuilder.Aux[CIn, COut, CInOutlets, HL, N]
-  ): Flow[CIn, Any, Unit] =
-    Flow() { implicit builder =>
-    
-      import FlowGraph.Implicits._
+  ): Graph[FlowShape[CIn, Any], Unit] =
+    GraphDSL.create() { implicit builder =>
+
+      import GraphDSL.Implicits._
 
       val router = builder.add(new CoproductFlexiRoute[CIn, CInOutlets]())
       val merge = builder.add(Merge[Any](toIntN()))
 
       flowBuilder.build(router.outs, flows, merge)
-      router.in -> merge.out
+      FlowShape(router.in, merge.out)
     }
 
 }
@@ -131,12 +131,12 @@ trait OutletBuilder[C <: Coproduct] {
 
 object OutletBuilder {
   type Aux[C <: Coproduct, HL <: HList] = OutletBuilder[C] { type Out = HL }
-  
+
   implicit val last: Aux[CNil, HNil] = new OutletBuilder[CNil] {
     type Out = HNil
     def apply(f: OutletFunction): HNil = HNil
   }
-  
+
   implicit def head[H, T <: Coproduct, HT <: HList](
     implicit tl: OutletBuilder.Aux[T, HT]
   ): OutletBuilder.Aux[H :+: T, Outlet[H] :: HT] = new OutletBuilder[H :+: T] {
@@ -176,7 +176,7 @@ object SelectOutletValue{
       selO: Selector[HL, Outlet[H]]
   ): SelectOutletValue.Aux[H :+: T, HL] = new SelectOutletValue[H :+: T] {
     type Outlets = HL
-    def apply(c: H :+: T, outlets: HL): (Outlet[_], Any) = 
+    def apply(c: H :+: T, outlets: HL): (Outlet[_], Any) =
       c match {
         case Inl(h) => outlets.select[Outlet[H]] -> h
         case Inr(t) => sel.apply(t, outlets)
@@ -194,7 +194,7 @@ class CoproductFanOutShape[C <: Coproduct, HL <: HList](
   self =>
   val rnd = new scala.util.Random
   val outs = builder.apply(new OutletFunction{
-    def apply[H] = self.newOutlet[H](rnd.nextString(5))
+    def apply[H] = self.newOutlet[H](rnd.alphanumeric.take(5).mkString)
   })
 
   protected override def construct(i: FanOutShape.Init[C]) = new CoproductFanOutShape(builder, i)
@@ -205,21 +205,33 @@ class CoproductFlexiRoute[C <: Coproduct, HL <: HList](implicit
   builder: OutletBuilder.Aux[C, HL],
   trav: ToTraversable.Aux[HL, List, Outlet[_]],
   sel: SelectOutletValue.Aux[C, HL]
-) extends FlexiRoute[C, CoproductFanOutShape[C, HL]](
-  new CoproductFanOutShape(builder), Attributes.name("CoproductFanOutShape")
-) {
-  import FlexiRoute._
+) extends GraphStage[CoproductFanOutShape[C, HL]] {
 
-  override def createRouteLogic(p: PortT) = new RouteLogic[C] {
+  override val shape: CoproductFanOutShape[C, HL] = new CoproductFanOutShape(builder)
+  val in:Inlet[C] = shape.in
+  val out:HL = shape.outs
 
-    override def initialState = State[Any](DemandFromAll(p.outs.toList[Outlet[_]](trav))) {
-      (ctx, _, element) =>
-        val (outlet, h) = sel.apply(element, p.outs)
-        ctx.emit(outlet)(h)
-        SameState
+  override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = new GraphStageLogic(shape) {
+    import scala.language.existentials
+
+    setHandler(in, new InHandler {
+      override def onPush(): Unit = {
+        val elm = grab(in)
+        val (outlet, h) = sel.apply(elm, out)
+        push(outlet.as[Any], h)
+      }
+    })
+
+    out.toList[Outlet[_]](trav).foreach{ o =>
+      setHandler(o, new OutHandler {
+        override def onPull(): Unit = {
+            if(isAvailable(in)){
+              val (outlet, h) = sel.apply(grab(in), out)
+              push(outlet.as[Any], h)
+            } else if(!hasBeenPulled(in)) pull(in)
+        }
+      })
     }
- 
-    override def initialCompletionHandling = eagerClose
   }
 }
 
@@ -259,7 +271,7 @@ object InletBuilder {
 /** The custom FanInShape used by CoproductFlexiMerge to build typed inlets from types in the Coproduct */
 class CoproductFanInShape[C <: Coproduct, HL <: HList](
   val builder: InletBuilder.Aux[C, C, HL],
-  _init: FanInShape.Init[C] = FanInShape.Name("CoproductFanInShape")
+  _init: FanInShape.Init[C] = FanInShape.Name[C]("CoproductFanInShape")
 ) extends FanInShape[C](_init) {
   self =>
 
@@ -276,29 +288,29 @@ class CoproductFanInShape[C <: Coproduct, HL <: HList](
 class CoproductFlexiMerge[C <: Coproduct, HL <: HList](implicit
   builder: InletBuilder.Aux[C, C, HL],
   trav: ToTraversable.Aux[HL, List, Inlet[C]]
-) extends FlexiMerge[C, CoproductFanInShape[C, HL]](
-  new CoproductFanInShape(builder), Attributes.name("CoproductFanInShape")
-) {
-  import FlexiMerge._
+) extends GraphStage[CoproductFanInShape[C, HL]]{
 
-  override def createMergeLogic(p: PortT) = new MergeLogic[C] {
-    var inletsOpened = p.ins.toList[Inlet[C]](trav).size
+  override val shape: CoproductFanInShape[C, HL] = new CoproductFanInShape[C, HL](builder)
+  val in = shape.ins
+  val out = shape.out
 
-    override def initialState = State[C](ReadAny(p.ins.toList[Inlet[C]](trav))) {
-      (ctx, _, element) =>
-        ctx.emit(element)
-        SameState
+  override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = new GraphStageLogic(shape) {
+    in.toList[Inlet[C]](trav).foreach { i =>
+      setHandler(i, new InHandler {
+        override def onPush(): Unit = {
+          push(out, grab(i))
+        }
+      })
     }
- 
-    override def initialCompletionHandling = CompletionHandling(
-      onUpstreamFinish = (ctx, _) => {
-        if(inletsOpened == 1) ctx.finish()
-        else inletsOpened -= 1
-        SameState
-      },
-      onUpstreamFailure = (ctx, _, cause) => { ctx.fail(cause); SameState }
-    )
-    
+
+    setHandler(out, new OutHandler {
+      override def onPull(): Unit = {
+        in.toList[Inlet[C]](trav).foreach { i =>
+          if (!hasBeenPulled(i)) pull(i)
+          else if(isAvailable(i)) push(out, grab(i))
+        }
+      }
+    })
   }
 }
 
@@ -334,7 +346,7 @@ trait FlowBuilder[CIn <: Coproduct, COut <: Coproduct] {
   type N <: Nat
 
   def build(outlets: HLO, flows: HLF, merge: UniformFanInShape[Any, Any])
-           (implicit builder: FlowGraph.Builder[Unit]): Unit
+           (implicit builder: GraphDSL.Builder[Unit]): Unit
 }
 
 object FlowBuilder{
@@ -352,8 +364,8 @@ object FlowBuilder{
       type HLF = HLF0
       type N = Nat._1
 
-      def build(outlets: HLO0, flows: HLF0, merge: UniformFanInShape[Any, Any])(implicit builder: FlowGraph.Builder[Unit]): Unit = {
-        import FlowGraph.Implicits._
+      def build(outlets: HLO0, flows: HLF0, merge: UniformFanInShape[Any, Any])(implicit builder: GraphDSL.Builder[Unit]): Unit = {
+        import GraphDSL.Implicits._
         val outlet = outlets.select[Outlet[HI]]
         val flow = flows.select[Flow[HI, HO, Unit]]
         outlet ~> flow ~> merge.in(merge.inlets.size - 1)
@@ -372,8 +384,8 @@ object FlowBuilder{
       type HLF = HLF0
       type N = Succ[N0]
 
-      def build(outlets: HLO0, flows: HLF0, merge: UniformFanInShape[Any, Any])(implicit builder: FlowGraph.Builder[Unit]): Unit = {
-        import FlowGraph.Implicits._
+      def build(outlets: HLO0, flows: HLF0, merge: UniformFanInShape[Any, Any])(implicit builder: GraphDSL.Builder[Unit]): Unit = {
+        import GraphDSL.Implicits._
         
         val outlet = outlets.select[Outlet[HI]]
         val flow = flows.select[Flow[HI, HO, Unit]]
@@ -392,7 +404,7 @@ trait FlowBuilderC[CIn <: Coproduct, COut <: Coproduct] {
   type HLI <: HList
 
   def build(outlets: HLO, flows: HLF, inlets: HLI)
-           (implicit builder: FlowGraph.Builder[Unit]): Unit
+           (implicit builder: GraphDSL.Builder[Unit]): Unit
 }
 
 object FlowBuilderC{
@@ -409,8 +421,8 @@ object FlowBuilderC{
       type HLF = Flow[HI, HO, Unit] :: HNil
       type HLI = Inlet[C] :: HNil
 
-      def build(outlets: Outlet[HI] :: HNil, flows: Flow[HI, HO, Unit] :: HNil, inlets: Inlet[C] :: HNil)(implicit builder: FlowGraph.Builder[Unit]): Unit = {
-        import FlowGraph.Implicits._
+      def build(outlets: Outlet[HI] :: HNil, flows: Flow[HI, HO, Unit] :: HNil, inlets: Inlet[C] :: HNil)(implicit builder: GraphDSL.Builder[Unit]): Unit = {
+        import GraphDSL.Implicits._
         val outlet = outlets.head
         val inlet = inlets.head
         val flow = flows.head
@@ -429,8 +441,8 @@ object FlowBuilderC{
       type HLF = Flow[HI, HO, Unit] :: HLF0
       type HLI = Inlet[C] :: HLI0
 
-      def build(outlets: Outlet[HI] :: HLO0, flows: Flow[HI, HO, Unit] :: HLF0, inlets: Inlet[C] :: HLI0)(implicit builder: FlowGraph.Builder[Unit]): Unit = {
-        import FlowGraph.Implicits._
+      def build(outlets: Outlet[HI] :: HLO0, flows: Flow[HI, HO, Unit] :: HLF0, inlets: Inlet[C] :: HLI0)(implicit builder: GraphDSL.Builder[Unit]): Unit = {
+        import GraphDSL.Implicits._
         
         val outlet = outlets.head
         val flow = flows.head

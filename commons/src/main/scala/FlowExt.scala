@@ -27,10 +27,10 @@ trait FlowExt {
       .map {
         case (Seq(), _) => Source.empty
         case (head +: _, tailStream) =>
-          if (includeHeadInUpStream) Source.concat(Source.single(head), tailStream).via(f(head))
+          if (includeHeadInUpStream) Source.combine(Source.single(head), tailStream)(Concat(_)).via(f(head))
           else tailStream.via(f(head))
       }
-      .flatten(FlattenStrategy.concat)
+      .flatMapConcat(identity)
   }
 
   /**
@@ -122,17 +122,17 @@ trait FlowExt {
   def rateLimiter[A](interval: FiniteDuration): Flow[A, A, Unit] = {
     case object Tick
 
-    val flow = Flow() { implicit builder =>
-      import FlowGraph.Implicits._
+    val flow = Flow.fromGraph( GraphDSL.create() { implicit builder =>
+      import GraphDSL.Implicits._
 
-      val rateLimiter = Source.apply(0 second, interval, Tick)
+      val rateLimiter = Source.tick(0 second, interval, Tick)
 
       val zip = builder.add(Zip[A, Tick.type]())
 
       rateLimiter ~> zip.in1
 
-      (zip.in0, zip.out.map(_._1).outlet)
-    }
+      FlowShape(zip.in0, zip.out)
+    }).map(_._1)
 
     // We need to limit input buffer to 1 to guarantee the rate limiting feature
     flow.withAttributes(Attributes.inputBuffer(initial = 1, max = 1))
@@ -310,15 +310,15 @@ trait FlowExt {
    * @return
    */
   def zipWithConstantLazyAsync[A, B](futB: => Future[B])(implicit ec: ExecutionContext): Flow[A, (A, B), Unit] = {
-    Flow() { implicit builder =>
-      import FlowGraph.Implicits._
+    Flow.fromGraph( GraphDSL.create() { implicit builder =>
+      import GraphDSL.Implicits._
 
       val zip = builder.add(Zip[A, B]())
 
       SourceExt.constantLazyAsync(futB) ~> zip.in1
 
-      (zip.in0, zip.out)
-    }
+      FlowShape(zip.in0, zip.out)
+    })
   }
 
   /**
