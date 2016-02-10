@@ -7,7 +7,6 @@ import sbtrelease.ReleaseStateTransformations._
 import sbtrelease.Utilities._
 import sbtunidoc.Plugin.UnidocKeys._
 
-import bintray.Plugin._
 
 organization in ThisBuild := "com.mfglabs"
 
@@ -16,6 +15,8 @@ name in ThisBuild := "akka-stream-extensions"
 scalaVersion in ThisBuild := "2.11.6"
 
 publishMavenStyle in ThisBuild := true
+
+bintrayReleaseOnPublish in ThisBuild := false
 
 scalacOptions in ThisBuild ++= Seq("-feature", "-unchecked", "-language:postfixOps")
 
@@ -40,7 +41,7 @@ lazy val publishSettings = Seq(
   publishArtifact in packageDoc := false,
   publishArtifact in Test := false,
   pomIncludeRepository := { _ => false }
-) ++ bintrayPublishSettings
+)
 
 lazy val noPublishSettings = Seq(
   publish := (),
