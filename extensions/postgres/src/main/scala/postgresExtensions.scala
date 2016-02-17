@@ -3,6 +3,7 @@ package extensions.postgres
 
 import java.io._
 
+import akka.NotUsed
 import akka.stream._
 import akka.stream.scaladsl._
 import akka.util.ByteString
@@ -81,7 +82,7 @@ trait PgStream {
    */
   def insertStreamToTable(schema: String, table: String, options: Map[String, String], pgVersion : PostgresVersion = PostgresVersion.Nine, nbLinesPerInsertionBatch: Int = 20000,
                           chunkInsertionConcurrency: Int = 1)
-                         (implicit conn: PGConnection, ec: ExecutionContextForBlockingOps): Flow[ByteString, Long, Unit] = {
+                         (implicit conn: PGConnection, ec: ExecutionContextForBlockingOps): Flow[ByteString, Long, NotUsed] = {
     val optsStr = optionsToStr(pgVersion, options)
     val copyQuery = s"COPY ${schema}.${table} FROM STDIN $optsStr"
     val copyManager = conn.getCopyAPI()

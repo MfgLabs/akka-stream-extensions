@@ -103,7 +103,7 @@ lazy val postgres = project.in(file("extensions/postgres"))
     name := "akka-stream-extensions-postgres",
     resolvers += Resolver.bintrayRepo("softprops", "maven"),
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-stream-experimental" % "2.0.1",
+      "com.typesafe.akka" %% "akka-stream" % "2.4.2",
       "org.postgresql" % "postgresql"  % "9.3-1102-jdbc4"
     ),
     commonSettings,
@@ -117,7 +117,7 @@ lazy val elasticsearch = project.in(file("extensions/elasticsearch"))
   .settings(
     name := "akka-stream-extensions-elasticsearch",
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-stream-experimental" % "2.0.1",
+      "com.typesafe.akka" %% "akka-stream" % "2.4.2",
       "org.elasticsearch" % "elasticsearch" % "1.3.2"
     ),
     commonSettings,

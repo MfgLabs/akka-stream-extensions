@@ -1,6 +1,7 @@
 package com.mfglabs.stream
 package extensions.elasticsearch
 
+import akka.NotUsed
 import akka.stream.scaladsl._
 import com.mfglabs.stream.{ExecutionContextForBlockingOps, SourceExt}
 import org.elasticsearch.action.search.SearchType
@@ -25,7 +26,7 @@ trait EsStream {
    * @return
    */
   def queryAsStream(query: QueryBuilder, index: String, `type`: String, scrollKeepAlive: FiniteDuration, scrollSize: Int)
-                   (implicit es: EsClient, ec: ExecutionContextForBlockingOps): Source[String, Unit] = {
+                   (implicit es: EsClient, ec: ExecutionContextForBlockingOps): Source[String, NotUsed] = {
     implicit val ecValue = ec.value
 
     lazy val futInitSearchResp = Future {
