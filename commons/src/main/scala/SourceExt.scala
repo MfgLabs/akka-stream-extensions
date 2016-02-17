@@ -3,6 +3,7 @@ package com.mfglabs.stream
 import java.io.{BufferedInputStream, FileInputStream, InputStream, File}
 import java.util.zip.GZIPInputStream
 
+import akka.NotUsed
 import akka.stream._
 import akka.stream.scaladsl._
 import akka.util.ByteString
@@ -157,7 +158,7 @@ trait SourceExt {
    * @tparam B
    * @return
    */
-  def seededLazyAsync[A, B, M](futB: => Future[B])(f: B => Source[A, M]): Source[A, Unit] =
+  def seededLazyAsync[A, B, M](futB: => Future[B])(f: B => Source[A, M]): Source[A, NotUsed] =
     singleLazyAsync(futB).map(f).flatMapConcat(identity)
 
   /**
@@ -167,7 +168,7 @@ trait SourceExt {
    * @tparam A
    * @return
    */
-  def singleLazyAsync[A](fut: => Future[A]): Source[A, Unit] = singleLazy(fut).mapAsync(1)(identity)
+  def singleLazyAsync[A](fut: => Future[A]): Source[A, NotUsed] = singleLazy(fut).mapAsync(1)(identity)
 
   /**
    * Create a source from a Lazy Value that will be evaluated only when the stream is materialized.
@@ -176,7 +177,7 @@ trait SourceExt {
    * @tparam A
    * @return
    */
-  def singleLazy[A](a: => A): Source[A, Unit] = Source.single(() => a).map(_())
+  def singleLazy[A](a: => A): Source[A, NotUsed] = Source.single(() => a).map(_())
 
   /**
    * Create an infinite source of the same Async Lazy value evaluated only when the stream is materialized.
