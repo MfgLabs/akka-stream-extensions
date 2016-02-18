@@ -113,22 +113,6 @@ trait PgStream {
     }
   }
 
-  private def optionsToStrV8(options: Map[String, String]) = {
-    def optToStr(st : Map[String,String]) = st.map { case (k, v) => s"$k $v"}.mkString(" ")
-    val csvOptionKeys = Set("header", "quote", "escape", "force quote")
-    val (csvOptions, commonOptions) = options.partition{ case (k,v) => csvOptionKeys.contains(k.toLowerCase())}
-    val csvOptsStr = if (csvOptions.isEmpty) "" else " CSV " + optToStr(csvOptions)
-    s"${optToStr(commonOptions)} $csvOptsStr"
-  }
-
-  private def optionsToStrV9(options : Map[String, String]) = {
-      if (options.isEmpty) ""
-      else
-        " (" + options
-          .map { case (k, v) => s"$k $v" }
-          .mkString(",") + ")"
-  }
-
   def sqlConnAsPgConnUnsafe(conn: Connection) = conn.asInstanceOf[PGConnection]
 }
 

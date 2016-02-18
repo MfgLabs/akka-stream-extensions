@@ -38,7 +38,10 @@ trait DockerTmpDB extends BeforeAndAfter { self: Suite =>
 
   lazy val dockerIp: String =
     Try("docker-machine ip default".!!.trim).toOption
-      .orElse(Option(ConfigFactory.load().getString("docker.ip")))
+      .orElse {
+        val conf = ConfigFactory.load()
+        if (conf.hasPath("docker.ip")) Some(conf.getString("docker.ip")) else None
+      }
       .getOrElse("127.0.0.1") // platform dependent
 
   //ugly solution to wait for the connection to be ready

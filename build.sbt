@@ -12,7 +12,7 @@ organization in ThisBuild := "com.mfglabs"
 
 name in ThisBuild := "akka-stream-extensions"
 
-scalaVersion in ThisBuild := "2.11.6"
+scalaVersion in ThisBuild := "2.11.7"
 
 publishMavenStyle in ThisBuild := true
 
@@ -130,7 +130,7 @@ lazy val shapeless = project.in(file("extensions/shapeless"))
    name := "akka-stream-extensions-shapeless",
    libraryDependencies ++= Seq(
      "com.typesafe.akka" %% "akka-stream" % "2.4.2",
-     "com.chuusai"       %% "shapeless"                % "2.2.0-RC6"
+     "com.chuusai"       %% "shapeless"   % "2.2.0-RC6"
    ),
    commonSettings,
    publishSettings
