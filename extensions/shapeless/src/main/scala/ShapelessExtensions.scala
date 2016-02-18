@@ -1,6 +1,7 @@
 package com.mfglabs.stream
 package extensions.shapeless
 
+import akka.NotUsed
 import shapeless._
 import shapeless.ops.hlist._
 import shapeless.ops.nat._
@@ -53,7 +54,7 @@ trait ShapelessStream {
       itrav: ToTraversable.Aux[COutInlets, List, Inlet[COut]],
       selOutletValue: SelectOutletValue.Aux[CIn, CInOutlets],
       flowBuilder: FlowBuilderC.Aux[CIn, COut, CInOutlets, HL, COutInlets]
-  ): Graph[FlowShape[CIn, COut], Unit] =
+  ): Graph[FlowShape[CIn, COut], NotUsed] =
     GraphDSL.create() { implicit builder =>
     
       import GraphDSL.Implicits._
@@ -100,7 +101,7 @@ trait ShapelessStream {
       length: shapeless.ops.coproduct.Length.Aux[CIn, Size],
       toIntN: ToInt[Size],
       flowBuilder: FlowBuilder.Aux[CIn, COut, CInOutlets, HL, N]
-  ): Graph[FlowShape[CIn, Any], Unit] =
+  ): Graph[FlowShape[CIn, Any], NotUsed] =
     GraphDSL.create() { implicit builder =>
 
       import GraphDSL.Implicits._
@@ -331,8 +332,8 @@ object FlowTypes {
 
   implicit def hl[A, B, HT <: HList, CInT <: Coproduct, COutT <: Coproduct](
     implicit tl: FlowTypes.Aux[HT, CInT, COutT]
-  ): FlowTypes.Aux[Flow[A, B, Unit] :: HT, A :+: CInT, B :+: COutT] =
-    new FlowTypes[Flow[A, B, Unit] :: HT] {
+  ): FlowTypes.Aux[Flow[A, B, NotUsed] :: HT, A :+: CInT, B :+: COutT] =
+    new FlowTypes[Flow[A, B, NotUsed] :: HT] {
       type CIn = A :+: CInT
       type COut = B :+: COutT
     }
@@ -346,7 +347,7 @@ trait FlowBuilder[CIn <: Coproduct, COut <: Coproduct] {
   type N <: Nat
 
   def build(outlets: HLO, flows: HLF, merge: UniformFanInShape[Any, Any])
-           (implicit builder: GraphDSL.Builder[Unit]): Unit
+           (implicit builder: GraphDSL.Builder[NotUsed]): Unit
 }
 
 object FlowBuilder{
@@ -356,7 +357,7 @@ object FlowBuilder{
   implicit def last[HI, HO, HLO0 <: HList, HLF0 <: HList](
     implicit
       selO: Selector[HLO0, Outlet[HI]],
-      selF: Selector[HLF0, Flow[HI, HO, Unit]],
+      selF: Selector[HLF0, Flow[HI, HO, NotUsed]],
       toInt: ToInt[Nat._1]
   ): FlowBuilder.Aux[HI :+: CNil, HO :+: CNil, HLO0, HLF0, Nat._1] =
     new FlowBuilder[HI :+: CNil, HO :+: CNil] {
@@ -364,10 +365,10 @@ object FlowBuilder{
       type HLF = HLF0
       type N = Nat._1
 
-      def build(outlets: HLO0, flows: HLF0, merge: UniformFanInShape[Any, Any])(implicit builder: GraphDSL.Builder[Unit]): Unit = {
+      def build(outlets: HLO0, flows: HLF0, merge: UniformFanInShape[Any, Any])(implicit builder: GraphDSL.Builder[NotUsed]): Unit = {
         import GraphDSL.Implicits._
         val outlet = outlets.select[Outlet[HI]]
-        val flow = flows.select[Flow[HI, HO, Unit]]
+        val flow = flows.select[Flow[HI, HO, NotUsed]]
         outlet ~> flow ~> merge.in(merge.inlets.size - 1)
       }
     }
@@ -375,7 +376,7 @@ object FlowBuilder{
   implicit def head[HI, TI <: Coproduct, HO, TO <: Coproduct, HLO0 <: HList, HLF0 <: HList, N0 <: Nat](
     implicit
       selO: Selector[HLO0, Outlet[HI]],
-      selF: Selector[HLF0, Flow[HI, HO, Unit]],
+      selF: Selector[HLF0, Flow[HI, HO, NotUsed]],
       flowBuilder: FlowBuilder.Aux[TI, TO, HLO0, HLF0, N0],
       toInt: ToInt[Succ[N0]]
   ): FlowBuilder.Aux[HI :+: TI, HO :+: TO, HLO0, HLF0, Succ[N0]] =
@@ -384,11 +385,11 @@ object FlowBuilder{
       type HLF = HLF0
       type N = Succ[N0]
 
-      def build(outlets: HLO0, flows: HLF0, merge: UniformFanInShape[Any, Any])(implicit builder: GraphDSL.Builder[Unit]): Unit = {
+      def build(outlets: HLO0, flows: HLF0, merge: UniformFanInShape[Any, Any])(implicit builder: GraphDSL.Builder[NotUsed]): Unit = {
         import GraphDSL.Implicits._
         
         val outlet = outlets.select[Outlet[HI]]
-        val flow = flows.select[Flow[HI, HO, Unit]]
+        val flow = flows.select[Flow[HI, HO, NotUsed]]
         outlet ~> flow ~> merge.in(merge.inlets.size - toInt())
 
         flowBuilder.build(outlets, flows, merge)
@@ -404,7 +405,7 @@ trait FlowBuilderC[CIn <: Coproduct, COut <: Coproduct] {
   type HLI <: HList
 
   def build(outlets: HLO, flows: HLF, inlets: HLI)
-           (implicit builder: GraphDSL.Builder[Unit]): Unit
+           (implicit builder: GraphDSL.Builder[NotUsed]): Unit
 }
 
 object FlowBuilderC{
@@ -414,14 +415,14 @@ object FlowBuilderC{
   implicit def last[HI, HO, C <: Coproduct](
     implicit inj: Inject[C, HO]
   ): FlowBuilderC.Aux[
-    HI :+: CNil, HO :+: CNil, Outlet[HI] :: HNil, Flow[HI, HO, Unit] :: HNil, Inlet[C] :: HNil
+    HI :+: CNil, HO :+: CNil, Outlet[HI] :: HNil, Flow[HI, HO, NotUsed] :: HNil, Inlet[C] :: HNil
   ] =
     new FlowBuilderC[HI :+: CNil, HO :+: CNil] {
       type HLO = Outlet[HI] :: HNil
-      type HLF = Flow[HI, HO, Unit] :: HNil
+      type HLF = Flow[HI, HO, NotUsed] :: HNil
       type HLI = Inlet[C] :: HNil
 
-      def build(outlets: Outlet[HI] :: HNil, flows: Flow[HI, HO, Unit] :: HNil, inlets: Inlet[C] :: HNil)(implicit builder: GraphDSL.Builder[Unit]): Unit = {
+      def build(outlets: Outlet[HI] :: HNil, flows: Flow[HI, HO, NotUsed] :: HNil, inlets: Inlet[C] :: HNil)(implicit builder: GraphDSL.Builder[NotUsed]): Unit = {
         import GraphDSL.Implicits._
         val outlet = outlets.head
         val inlet = inlets.head
@@ -435,13 +436,13 @@ object FlowBuilderC{
       flowBuilder: FlowBuilderC.Aux[TI, TO, HLO0, HLF0, HLI0],
       inj: Inject[C, HO]
   ): FlowBuilderC.Aux[
-    HI :+: TI, HO :+: TO, Outlet[HI] :: HLO0, Flow[HI, HO, Unit] :: HLF0, Inlet[C] :: HLI0
+    HI :+: TI, HO :+: TO, Outlet[HI] :: HLO0, Flow[HI, HO, NotUsed] :: HLF0, Inlet[C] :: HLI0
   ] = new FlowBuilderC[HI :+: TI, HO :+: TO] {
       type HLO = Outlet[HI] :: HLO0
-      type HLF = Flow[HI, HO, Unit] :: HLF0
+      type HLF = Flow[HI, HO, NotUsed] :: HLF0
       type HLI = Inlet[C] :: HLI0
 
-      def build(outlets: Outlet[HI] :: HLO0, flows: Flow[HI, HO, Unit] :: HLF0, inlets: Inlet[C] :: HLI0)(implicit builder: GraphDSL.Builder[Unit]): Unit = {
+      def build(outlets: Outlet[HI] :: HLO0, flows: Flow[HI, HO, NotUsed] :: HLF0, inlets: Inlet[C] :: HLI0)(implicit builder: GraphDSL.Builder[NotUsed]): Unit = {
         import GraphDSL.Implicits._
         
         val outlet = outlets.head

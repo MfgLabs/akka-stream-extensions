@@ -1,5 +1,6 @@
 package com.mfglabs.stream
 
+import akka.NotUsed
 import akka.stream._
 import akka.stream.scaladsl._
 import akka.stream.stage._
@@ -21,7 +22,7 @@ trait FlowExt {
    * @tparam M
    * @return the flow returned by f
    */
-  def withHead[A, B, M](includeHeadInUpStream: Boolean)(f: A => Flow[A, B, M]): Flow[A, B, Unit] = {
+  def withHead[A, B, M](includeHeadInUpStream: Boolean)(f: A => Flow[A, B, M]): Flow[A, B, NotUsed] = {
     Flow[A]
       .prefixAndTail(1)
       .map {
@@ -37,7 +38,7 @@ trait FlowExt {
    * Zip a stream with the indices of its elements.
    * @return
    */
-  def zipWithIndex[A]: Flow[A, (A, Long), Unit] = {
+  def zipWithIndex[A]: Flow[A, (A, Long), NotUsed] = {
     withHead(includeHeadInUpStream = false) { head =>
       Flow[A].scan((head, 0L)) { case ((_, n), el) => (el, n + 1) }
     }
@@ -50,7 +51,7 @@ trait FlowExt {
    *                          before reaching this limit, the stream fails.
    * @return
    */
-  def rechunkByteStringBySeparator(separator: ByteString, maximumChunkBytes: Int): Flow[ByteString, ByteString, Unit] = {
+  def rechunkByteStringBySeparator(separator: ByteString, maximumChunkBytes: Int): Flow[ByteString, ByteString, NotUsed] = {
     def stage = new PushPullStage[ByteString, ByteString] {
       private val separatorBytes = separator
       private val firstSeparatorByte = separatorBytes.head
@@ -119,7 +120,7 @@ trait FlowExt {
    * @tparam A
    * @return
    */
-  def rateLimiter[A](interval: FiniteDuration): Flow[A, A, Unit] = {
+  def rateLimiter[A](interval: FiniteDuration): Flow[A, A, NotUsed] = {
     case object Tick
 
     val flow = Flow.fromGraph( GraphDSL.create() { implicit builder =>
@@ -143,7 +144,7 @@ trait FlowExt {
    * @param chunkSize the new chunk size
    * @return
    */
-  def rechunkByteStringBySize(chunkSize: Int): Flow[ByteString, ByteString, Unit] = {
+  def rechunkByteStringBySize(chunkSize: Int): Flow[ByteString, ByteString, NotUsed] = {
     def stage = new PushPullStage[ByteString, ByteString] {
       private var buffer = ByteString.empty
 
@@ -194,7 +195,7 @@ trait FlowExt {
    */
   def customStatefulProcessor[A, B, C](zero: => B)
                              (f: (B, A) => (Option[B], IndexedSeq[C]),
-                              lastPushIfUpstreamEnds: B => IndexedSeq[C] = {_: B => IndexedSeq.empty}): Flow[A, C, Unit] = {
+                              lastPushIfUpstreamEnds: B => IndexedSeq[C] = {_: B => IndexedSeq.empty}): Flow[A, C, NotUsed] = {
     def stage = new PushPullStage[A, C] {
       private var state: B = _
       private var buffer = Vector.empty[C]
@@ -265,7 +266,7 @@ trait FlowExt {
    * @tparam B
    * @return
    */
-  def customStatelessProcessor[A, B](f: A => (IndexedSeq[B], Boolean)): Flow[A, B, Unit] = {
+  def customStatelessProcessor[A, B](f: A => (IndexedSeq[B], Boolean)): Flow[A, B, NotUsed] = {
     customStatefulProcessor[A, Unit, B](())(
       (_, a) => {
         val (bs, stop) = f(a)
@@ -282,7 +283,7 @@ trait FlowExt {
    * @tparam B
    * @return
    */
-  def fold[A, B](zero: => B)(f: (B, A) => B): Flow[A, B, Unit] = {
+  def fold[A, B](zero: => B)(f: (B, A) => B): Flow[A, B, NotUsed] = {
     customStatefulProcessor[A, B, B](zero)(
       (b, a) => (Some(f(b, a)), Vector.empty),
       b => Vector(b)
@@ -295,7 +296,7 @@ trait FlowExt {
    * @tparam A
    * @return
    */
-  def takeWhile[A](f: A => Boolean): Flow[A, A, Unit] = {
+  def takeWhile[A](f: A => Boolean): Flow[A, A, NotUsed] = {
     customStatelessProcessor { a =>
       if (!f(a)) (Vector.empty, true)
       else (Vector(a), false)
@@ -309,7 +310,7 @@ trait FlowExt {
    * @tparam B
    * @return
    */
-  def zipWithConstantLazyAsync[A, B](futB: => Future[B])(implicit ec: ExecutionContext): Flow[A, (A, B), Unit] = {
+  def zipWithConstantLazyAsync[A, B](futB: => Future[B])(implicit ec: ExecutionContext): Flow[A, (A, B), NotUsed] = {
     Flow.fromGraph( GraphDSL.create() { implicit builder =>
       import GraphDSL.Implicits._
 
@@ -327,7 +328,7 @@ trait FlowExt {
    * @tparam A
    * @return
    */
-  def repeatEach[A](nb: Int): Flow[A, A, Unit] = Flow[A].mapConcat(a => Vector.fill(nb)(a))
+  def repeatEach[A](nb: Int): Flow[A, A, NotUsed] = Flow[A].mapConcat(a => Vector.fill(nb)(a))
 
 }
 
