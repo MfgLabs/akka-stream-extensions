@@ -13,6 +13,9 @@ import scala.concurrent._
 import scala.concurrent.duration._
 import scala.util.Try
 
+import org.elasticsearch.common.settings.Settings
+import org.elasticsearch.node.NodeBuilder.nodeBuilder
+
 class ElasticExtensionsSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll {
   implicit val as = ActorSystem()
   implicit val fm = ActorMaterializer()
@@ -20,8 +23,17 @@ class ElasticExtensionsSpec extends FlatSpec with Matchers with ScalaFutures wit
     PatienceConfig(timeout = Span(1, Minutes), interval = Span(100, Millis))
   implicit val blockingEc = ExecutionContextForBlockingOps(scala.concurrent.ExecutionContext.Implicits.global)
 
+  private val DEFAULT_DATA_DIRECTORY = "target/elasticsearch-data"
+
   "EsStream" should "execute a query a get the result as a stream" in {
-    val node = new NodeBuilder().build().start()
+    val node = nodeBuilder()
+      .settings(Settings.settingsBuilder()
+          .put("http.enabled", false)
+          .put("path.data", DEFAULT_DATA_DIRECTORY)
+          .put("path.home", "/")
+       )
+      .local(true)
+      .node()
     implicit val client = node.client()
 
     val index = "test"
