@@ -13,7 +13,7 @@ import scala.concurrent._
 import scala.concurrent.duration._
 import scala.util.Try
 
-class PostgresExtensionsSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll {
+class ElasticExtensionsSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll {
   implicit val as = ActorSystem()
   implicit val fm = ActorMaterializer()
   implicit override val patienceConfig =
