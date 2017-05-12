@@ -12,7 +12,9 @@ organization in ThisBuild := "com.mfglabs"
 
 name in ThisBuild := "akka-stream-extensions"
 
-scalaVersion in ThisBuild := "2.11.7"
+scalaVersion in ThisBuild := "2.12.2"
+
+crossScalaVersions in ThisBuild := Seq("2.11.11", "2.12.2")
 
 publishMavenStyle in ThisBuild := true
 
@@ -29,7 +31,7 @@ resolvers in ThisBuild ++= Seq(
 lazy val commonSettings = Seq(
   scmInfo := Some(ScmInfo(url("https://github.com/MfgLabs/akka-stream-extensions"),
     "git@github.com:MfgLabs/akka-stream-extensions.git")),
-  libraryDependencies += "org.scalatest" %% "scalatest" % "2.1.6" % "test"
+  libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.3" % Test
 )
 
 lazy val publishSettings = Seq(
@@ -81,9 +83,9 @@ lazy val docs = project
   .settings(unidocSettings)
   .settings(site.settings)
   .settings(ghpages.settings)
-  .settings(tutSettings)
   .settings(docSettings)
   .dependsOn(commons, postgres, shapeless, elasticsearch)
+  .enablePlugins(TutPlugin)
 
 site.jekyllSupport()
 
@@ -91,7 +93,7 @@ lazy val commons = project.in(file("commons"))
   .settings(
     name := "akka-stream-extensions",
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-stream" % "2.4.2"
+      "com.typesafe.akka" %% "akka-stream" % "2.4.18"
     ),
     commonSettings,
     publishSettings
@@ -103,7 +105,7 @@ lazy val postgres = project.in(file("extensions/postgres"))
     name := "akka-stream-extensions-postgres",
     resolvers += Resolver.bintrayRepo("softprops", "maven"),
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-stream" % "2.4.2",
+      "com.typesafe.akka" %% "akka-stream" % "2.4.18",
       "org.postgresql" % "postgresql"  % "9.3-1102-jdbc4"
     ),
     commonSettings,
@@ -117,7 +119,7 @@ lazy val elasticsearch = project.in(file("extensions/elasticsearch"))
   .settings(
     name := "akka-stream-extensions-elasticsearch",
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-stream" % "2.4.2",
+      "com.typesafe.akka" %% "akka-stream" % "2.4.18",
       "org.elasticsearch" % "elasticsearch" % "1.3.2"
     ),
     commonSettings,
@@ -129,8 +131,8 @@ lazy val shapeless = project.in(file("extensions/shapeless"))
  .settings(
    name := "akka-stream-extensions-shapeless",
    libraryDependencies ++= Seq(
-     "com.typesafe.akka" %% "akka-stream" % "2.4.2",
-     "com.chuusai"       %% "shapeless"   % "2.2.5"
+     "com.typesafe.akka" %% "akka-stream" % "2.4.18",
+     "com.chuusai"       %% "shapeless"   % "2.3.2"
    ),
    commonSettings,
    publishSettings
