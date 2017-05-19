@@ -2,13 +2,15 @@ package com.mfglabs.stream
 package extensions.elasticsearch
 
 import scala.Stream
-import scala.collection.immutable.Stream.consWrapper
+import scala.collection.immutable.Seq
 import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.Future
 
-import org.elasticsearch.action.search.SearchResponse
+import org.elasticsearch.action.search.{SearchResponse, SearchRequestBuilder}
 import org.elasticsearch.client.{ Client => EsClient }
 import org.elasticsearch.common.unit.TimeValue
 import org.elasticsearch.index.query.QueryBuilder
+import org.elasticsearch.search.SearchHit
 
 import com.mfglabs.stream.ExecutionContextForBlockingOps
 
@@ -16,83 +18,73 @@ import akka.NotUsed
 import akka.stream.scaladsl.Source
 
 trait EsStream {
+  import EsHelper._
 
   /**
    * Get the result of a search query as a stream.
    * Internally, the scan/scroll ES API is used to improve performance when fetching large chunks of data.
    * @param query search query
    * @param index ES index
-   * @param `type` ES type
+   * @param types ES type
    * @param scrollKeepAlive ES scroll keep alive
    * @param scrollSize ES scroll size
-   * @param es
-   * @param ec
-   * @return
    */
-  def queryAsStream(query: QueryBuilder, index: String, `type`: String, scrollKeepAlive: FiniteDuration, scrollSize: Int)
-                   (implicit es: EsClient, ec: ExecutionContextForBlockingOps): Source[String, NotUsed] = {
-    queryAsStream(query, index, `type`, scrollKeepAlive, scrollSize, Array.empty, Array.empty, List())
+  def queryAsStream(
+    query           : QueryBuilder,
+    index           : String,
+    `type`          : String,
+    scrollKeepAlive : FiniteDuration,
+    scrollSize      : Int,
+    build           : SearchRequestBuilder => SearchRequestBuilder = identity
+  )(implicit es: EsClient, ec: ExecutionContextForBlockingOps): Source[String, NotUsed] = {
+    searchStream(index, scrollKeepAlive, scrollSize){ srb =>
+      srb.setQuery(query)
+         .setTypes(`type`)
+    }.mapConcat { h => Option.apply(h.getSourceAsString).to[Seq] }
   }
+
+  def hits(sr: SearchResponse): Seq[SearchHit] = sr.getHits.getHits.to[Seq]
+
   /**
    * Get the result of a search query as a stream.
    * Internally, the scan/scroll ES API is used to improve performance when fetching large chunks of data.
    * @param query search query
    * @param index ES index
-   * @param `type` ES type
    * @param scrollKeepAlive ES scroll keep alive
    * @param scrollSize ES scroll size
-   * @param included
-   * @param excluded
-   * @param addField
-   * @param es
-   * @param ec
+   * @param build : Add additionnal Search parameter
    * @return
    */
-  def queryAsStream(query: QueryBuilder,
-                    index: String,
-                    `type`: String,
-                    scrollKeepAlive: FiniteDuration,
-                    scrollSize: Int,
-                    included: Array[String],
-                    excluded: Array[String],
-                    addField: List[String])
-                   (implicit es: EsClient, ec: ExecutionContextForBlockingOps): Source[String, NotUsed] = {
-    implicit val ecValue = ec.value
-
-    def req(query: QueryBuilder) = {
-      val srb = es
-        .prepareSearch(index)
-        .setTypes(`type`)
-        .setQuery(query)                 // Query
+  protected def searchStream(
+    index           : String,
+    scrollKeepAlive : FiniteDuration,
+    scrollSize      : Int
+  )(
+    build           : SearchRequestBuilder => SearchRequestBuilder
+  )(implicit es: EsClient, ec: ExecutionContextForBlockingOps): Source[SearchHit, NotUsed] = {
+    val builder = build(
+      es.prepareSearch(index)
         .setScroll(new TimeValue(scrollKeepAlive.toMillis))
         .setSize(scrollSize)
+    )
 
-      addField.foreach { x => srb.addField(x) }
-      if (!included.isEmpty || !excluded.isEmpty) srb.setFetchSource(included, excluded)
+    Source.unfoldAsync[Either[SearchRequestBuilder, SearchResponse], Seq[SearchHit]](Left(builder)){
+      case Left(srb) =>
+        srb.execute().asScala.map { sr =>
+          Some(Right(sr) -> hits(sr))
+        }(ec.value)
 
-      val res = srb
-        .execute()
-        .actionGet()
+      case Right(psr) if psr.getHits.getHits.nonEmpty =>
+        val next = es
+          .prepareSearchScroll(psr.getScrollId())
+          .setScroll(new TimeValue(scrollKeepAlive.toMillis))
 
-      val docs = res.getHits.getHits.toVector.map(_.getSourceAsString)
+        next.execute().asScala.map { sr =>
+          Some(Right(sr) -> hits(sr))
+        }(ec.value)
 
-      docs #:: next(res)
-    }
- 
-    def next(res: SearchResponse): Stream[Vector[String]] = {
-      val newRes = es
-        .prepareSearchScroll(res.getScrollId())
-        .setScroll(new TimeValue(scrollKeepAlive.toMillis))
-        .execute()
-        .actionGet
-
-      val docs = newRes.getHits.getHits.toVector.map(_.getSourceAsString)
-
-      if (docs.isEmpty) Stream.Empty
-      else docs #:: next(newRes)
-    }
-
-    Source(req(query)).mapConcat { identity }
+      case Right(_) => Future.successful(None)
+    }.mapConcat { identity }
   }
 
 }

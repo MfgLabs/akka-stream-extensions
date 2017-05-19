@@ -4,7 +4,6 @@ package extensions.elasticsearch
 import akka.actor.ActorSystem
 import akka.stream._
 import org.elasticsearch.index.query.QueryBuilders
-import org.elasticsearch.node.NodeBuilder
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Minutes, Span}
 import org.scalatest.{BeforeAndAfterAll, Matchers, FlatSpec}
@@ -14,31 +13,29 @@ import scala.concurrent.duration._
 import scala.util.Try
 
 import org.elasticsearch.common.settings.Settings
-import org.elasticsearch.node.NodeBuilder.nodeBuilder
+import org.elasticsearch.node.Node
 
 class ElasticExtensionsSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll {
+  implicit override val patienceConfig = PatienceConfig(timeout = Span(1, Minutes), interval = Span(100, Millis))
+
   implicit val as = ActorSystem()
   implicit val fm = ActorMaterializer()
-  implicit override val patienceConfig =
-    PatienceConfig(timeout = Span(1, Minutes), interval = Span(100, Millis))
   implicit val blockingEc = ExecutionContextForBlockingOps(scala.concurrent.ExecutionContext.Implicits.global)
 
-  private val DEFAULT_DATA_DIRECTORY = "target/elasticsearch-data"
+  val settings = Settings.builder()
+    .put("path.data", "target/elasticsearch-data")
+    .put("path.home", "/")
+    .put("transport.type", "local")
+    .put("http.enabled", false)
+    .build();
+
+  lazy val node = new Node(settings).start();
+  implicit lazy val client = node.client()
+
+  val index = "test"
+  val `type` = "type"
 
   "EsStream" should "execute a query a get the result as a stream" in {
-    val node = nodeBuilder()
-      .settings(Settings.settingsBuilder()
-          .put("http.enabled", false)
-          .put("path.data", DEFAULT_DATA_DIRECTORY)
-          .put("path.home", "/")
-       )
-      .local(true)
-      .node()
-    implicit val client = node.client()
-
-    val index = "test"
-    val `type` = "type"
-
     Try(client.admin.indices().prepareDelete(index).get())
 
     val toIndex = for (i <- 1 to 5002) yield (i, s"""{i: $i}""")
@@ -53,7 +50,9 @@ class ElasticExtensionsSpec extends FlatSpec with Matchers with ScalaFutures wit
       .futureValue
 
     res.sorted shouldEqual toIndex.map(_._2).sorted
+  }
 
+  override def afterAll(): Unit = {
     client.close()
     node.close()
   }

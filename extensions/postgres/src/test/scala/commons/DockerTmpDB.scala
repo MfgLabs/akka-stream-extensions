@@ -59,7 +59,7 @@ trait DockerTmpDB extends BeforeAndAfter { self: Suite =>
   before {
     val port = newPGDB()
     println(s"New postgres ${version.value} instance at port $port")
-    Thread.sleep(2000)
+    Thread.sleep(5000)
     conn = waitsForConnection(port)
   }
 

@@ -16,7 +16,7 @@ import scala.util.{Failure, Try, Success}
 
 abstract class PostgresVersion(val value:String)
 object PostgresVersion {
-  case object Nine extends PostgresVersion("9.3")
+  case object Nine extends PostgresVersion("9.6")
   case object Eight extends PostgresVersion("8.4")
 
   private val seq = Seq(Nine, Eight)
