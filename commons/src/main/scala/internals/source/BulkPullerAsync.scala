@@ -79,7 +79,7 @@ class BulkPullerAsyncWithErrorMgt[A](offset: Long)(f: (Long, Int) => Future[(Seq
     }
     else {
       if (totalDemand > 0) self ! Pull
-      context.become(waitingForDownstreamReq(s, Seq.empty, stopAfterBuf = false))
+      context.become(waitingForDownstreamReq(s.toLong, Seq.empty, stopAfterBuf = false))
     }
   }
 }
@@ -105,16 +105,16 @@ class BulkPullerAsyncWithErrorExpBackoff[A](offset: Long, maxRetryDuration: Fini
     if (total > maxRetryDuration) {
       log.debug(s"Reached max duration $total > $maxRetryDuration")
       onError(err)
-    }
-    else {
+    } else {
       log.debug(s"Scheduling retry in $expBackoff")
       s = (retryIdx + 1, total)
       context.become(waitingForDownstreamReq(currentPosition, Seq.empty, stopAfterBuf = false))
       context.system.scheduler.scheduleOnce(expBackoff, self, Pull)
+      ()
     }
   }
 
-  def nextExpBackoff(i: Int): FiniteDuration = (Math.pow(2, i) * retryMinInterval).asInstanceOf[FiniteDuration]
+  def nextExpBackoff(i: Int): FiniteDuration = retryMinInterval.mul(math.pow(2, i.toDouble).toLong)
 }
 
 object BulkPullerAsyncWithErrorExpBackoff {

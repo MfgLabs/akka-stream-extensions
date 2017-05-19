@@ -6,7 +6,6 @@ import akka.stream.scaladsl._
 import akka.stream.stage._
 import akka.util.ByteString
 
-import scala.collection.{GenTraversableLike, TraversableLike, IterableLike}
 import scala.concurrent._
 import scala.concurrent.duration._
 import akka.stream.scaladsl._
@@ -310,7 +309,7 @@ trait FlowExt {
    * @tparam B
    * @return
    */
-  def zipWithConstantLazyAsync[A, B](futB: => Future[B])(implicit ec: ExecutionContext): Flow[A, (A, B), NotUsed] = {
+  def zipWithConstantLazyAsync[A, B](futB: => Future[B]): Flow[A, (A, B), NotUsed] = {
     Flow.fromGraph( GraphDSL.create() { implicit builder =>
       import GraphDSL.Implicits._
 

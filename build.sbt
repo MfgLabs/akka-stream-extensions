@@ -27,7 +27,27 @@ publishMavenStyle in ThisBuild := true
 
 bintrayReleaseOnPublish in ThisBuild := false
 
-scalacOptions in ThisBuild ++= Seq("-feature", "-unchecked", "-language:postfixOps")
+scalacOptions in ThisBuild ++= Seq(
+  "-encoding", "UTF-8",
+  "-target:jvm-1.8",
+  "-Ydelambdafy:method",
+  "-Yno-adapted-args",
+  "-deprecation",
+  "-feature",
+  "-language:postfixOps",
+  "-unchecked",
+  "-Xfuture",
+  "-Xlint",
+  "-Xlint:-missing-interpolator",
+  "-Xlint:private-shadow",
+  "-Xlint:type-parameter-shadow",
+  "-Ywarn-dead-code",
+  "-Ywarn-unused",
+  "-Ywarn-unused-import",
+  "-Ywarn-numeric-widen",
+  "-Ywarn-value-discard",
+  "-Xcheckinit"
+)
 
 resolvers in ThisBuild ++= Seq(
   "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
