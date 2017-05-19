@@ -3,12 +3,13 @@ package extensions.elasticsearch
 
 import akka.actor.ActorSystem
 import akka.stream._
+import akka.stream.scaladsl.Sink
+
 import org.elasticsearch.index.query.QueryBuilders
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Minutes, Span}
 import org.scalatest.{BeforeAndAfterAll, Matchers, FlatSpec}
 
-import scala.concurrent._
 import scala.concurrent.duration._
 import scala.util.Try
 
@@ -46,7 +47,7 @@ class ElasticExtensionsSpec extends FlatSpec with Matchers with ScalaFutures wit
     client.admin.indices.prepareRefresh(index).get() // to be sure that the data is indexed
 
     val res = EsStream.queryAsStream(QueryBuilders.matchAllQuery(), index, `type`, 1 minutes, 50)
-      .runWith(SinkExt.collect)
+      .runWith(Sink.seq)
       .futureValue
 
     res.sorted shouldEqual toIndex.map(_._2).sorted

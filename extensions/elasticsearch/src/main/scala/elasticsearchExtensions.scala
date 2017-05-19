@@ -1,7 +1,6 @@
 package com.mfglabs.stream
 package extensions.elasticsearch
 
-import scala.Stream
 import scala.collection.immutable.Seq
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.Future
@@ -35,7 +34,6 @@ trait EsStream {
     `type`          : String,
     scrollKeepAlive : FiniteDuration,
     scrollSize      : Int,
-    build           : SearchRequestBuilder => SearchRequestBuilder = identity
   )(implicit es: EsClient, ec: ExecutionContextForBlockingOps): Source[String, NotUsed] = {
     searchStream(index, scrollKeepAlive, scrollSize){ srb =>
       srb.setQuery(query)

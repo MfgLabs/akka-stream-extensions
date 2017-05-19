@@ -49,7 +49,7 @@ trait DockerTmpDB extends BeforeAndAfter { self: Suite =>
     try {
       DriverManager.getConnection(s"jdbc:postgresql://$dockerIp:$port/postgres", "postgres", "pwd")
     } catch {
-      case err: PSQLException =>
+      case _: PSQLException =>
         println("Retrying DB connection...")
         Thread.sleep(1000)
         waitsForConnection(port)

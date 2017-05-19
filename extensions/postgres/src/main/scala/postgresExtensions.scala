@@ -42,7 +42,7 @@ trait PgStream {
     options: Map[String, String],
     pgVersion : PostgresVersion = PostgresVersion.Nine,
     outputStreamTransformer : OutputStream => OutputStream = identity
-  )(implicit conn: PGConnection, ec: ExecutionContextForBlockingOps): Source[ByteString, akka.actor.ActorRef] = {
+  )(implicit conn: PGConnection, ec: ExecutionContextForBlockingOps): Source[ByteString, Future[IOResult]] = {
     val copyManager = conn.getCopyAPI()
     val os = new PipedOutputStream()
     val is = new PipedInputStream(os)
@@ -63,7 +63,7 @@ trait PgStream {
           os.close()
       }
     }(ec.value)
-    SourceExt.fromStream(is).concat(errorStream)
+    StreamConverters.fromInputStream(() => is).concat(errorStream)
   }
 
   /**
@@ -107,7 +107,7 @@ trait PgStream {
       case Eight =>
         def optToStr(st: Map[String, String]) = st.map { case (k, v) => s"$k $v" }.mkString(" ")
         val csvOptionKeys = Set("header", "quote", "escape", "force quote")
-        val (csvOptions, commonOptions) = options.partition { case (k, v) => csvOptionKeys.contains(k.toLowerCase()) }
+        val (csvOptions, commonOptions) = options.partition { case (k, _) => csvOptionKeys.contains(k.toLowerCase()) }
         val csvOptsStr = if (csvOptions.isEmpty) "" else " CSV " + optToStr(csvOptions)
         s"${optToStr(commonOptions)} $csvOptsStr"
     }

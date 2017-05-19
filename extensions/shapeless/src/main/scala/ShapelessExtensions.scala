@@ -10,10 +10,6 @@ import shapeless.ops.coproduct.Inject
 import akka.stream._
 import akka.stream.scaladsl._
 import akka.stream.stage._
-import akka.event.Logging
-
-import com.mfglabs.stream.FlowExt
-
 
 object ShapelessStream extends ShapelessStream
 
@@ -34,12 +30,12 @@ trait ShapelessStream {
    *                                             |                               |
    *                                             |                               |
    *                                             +-------- Flow[An, Bn] ---------+
-   * 
+   *
    *
    * The flows is built with a custom FlexiRoute with `DemandFromAll` condition & FlexiMerge using `ReadAny` condition.
    *
    * Be careful, the order is NOT guaranteed due to the nature of used FlexiRoute & FlexiMerge and potentially to the flow you provide in your HList.
-   * 
+   *
    * @param a Hlist of flows Flow[A1, B1] :: FLow[A2, B2] :: ... :: Flow[An, Bn] :: HNil
    * @return the flow of the Coproduct of inputs and the Coproduct of outputs Flow[A1 :+: A2 :+: ... :+: An :+: CNil, B1 :+: B2 :+: ... +: Bn :+: CNil, Unit]
    */
@@ -56,9 +52,6 @@ trait ShapelessStream {
       flowBuilder: FlowBuilderC.Aux[CIn, COut, CInOutlets, HL, COutInlets]
   ): Graph[FlowShape[CIn, COut], NotUsed] =
     GraphDSL.create() { implicit builder =>
-    
-      import GraphDSL.Implicits._
-
       val router = builder.add(new CoproductFlexiRoute[CIn, CInOutlets]())
       val merger = builder.add(new CoproductFlexiMerge[COut, COutInlets]())
 
@@ -103,9 +96,6 @@ trait ShapelessStream {
       flowBuilder: FlowBuilder.Aux[CIn, COut, CInOutlets, HL, N]
   ): Graph[FlowShape[CIn, Any], NotUsed] =
     GraphDSL.create() { implicit builder =>
-
-      import GraphDSL.Implicits._
-
       val router = builder.add(new CoproductFlexiRoute[CIn, CInOutlets]())
       val merge = builder.add(Merge[Any](toIntN()))
 
@@ -251,13 +241,13 @@ trait InletBuilder[C <: Coproduct] {
 
 object InletBuilder {
   type Aux[C <: Coproduct, Sub0 <: Coproduct, HL <: HList] = InletBuilder[C] { type Sub = Sub0; type Out = HL }
-  
+
   implicit def last[Sub0 <: Coproduct]: Aux[CNil, Sub0, HNil] = new InletBuilder[CNil] {
     type Sub = Sub0
     type Out = HNil
     def apply(f: InletFunction): HNil = HNil
   }
-  
+
   implicit def head[H, T <: Coproduct, Sub0 <: Coproduct, HT <: HList](
     implicit tl: InletBuilder.Aux[T, Sub0, HT]
   ): InletBuilder.Aux[H :+: T, Sub0, Inlet[Sub0] :: HT] = new InletBuilder[H :+: T] {
@@ -357,8 +347,7 @@ object FlowBuilder{
   implicit def last[HI, HO, HLO0 <: HList, HLF0 <: HList](
     implicit
       selO: Selector[HLO0, Outlet[HI]],
-      selF: Selector[HLF0, Flow[HI, HO, NotUsed]],
-      toInt: ToInt[Nat._1]
+      selF: Selector[HLF0, Flow[HI, HO, NotUsed]]
   ): FlowBuilder.Aux[HI :+: CNil, HO :+: CNil, HLO0, HLF0, Nat._1] =
     new FlowBuilder[HI :+: CNil, HO :+: CNil] {
       type HLO = HLO0
@@ -387,7 +376,7 @@ object FlowBuilder{
 
       def build(outlets: HLO0, flows: HLF0, merge: UniformFanInShape[Any, Any])(implicit builder: GraphDSL.Builder[NotUsed]): Unit = {
         import GraphDSL.Implicits._
-        
+
         val outlet = outlets.select[Outlet[HI]]
         val flow = flows.select[Flow[HI, HO, NotUsed]]
         outlet ~> flow ~> merge.in(merge.inlets.size - toInt())
@@ -444,7 +433,7 @@ object FlowBuilderC{
 
       def build(outlets: Outlet[HI] :: HLO0, flows: Flow[HI, HO, NotUsed] :: HLF0, inlets: Inlet[C] :: HLI0)(implicit builder: GraphDSL.Builder[NotUsed]): Unit = {
         import GraphDSL.Implicits._
-        
+
         val outlet = outlets.head
         val flow = flows.head
         val inlet = inlets.head

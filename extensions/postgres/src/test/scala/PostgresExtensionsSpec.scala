@@ -63,13 +63,13 @@ class PostgresExtensionsSpec extends FlatSpec with Matchers with ScalaFutures wi
       .via(FlowExt.rechunkByteStringBySize(5 * 1024 * 1024))
       .via(FlowExt.rechunkByteStringBySeparator(ByteString("\n"), maximumChunkBytes = 1 * 1024 * 1024))
       .map(_.utf8String)
-      .runWith(SinkExt.collect)
+      .runWith(Sink.seq)
 
     val futExpectedLines = SourceExt
       .fromFile(new File(getClass.getResource("/report.csv0000_part_00").getPath), maxChunkSize = 5 * 1024 * 1024)
       .via(FlowExt.rechunkByteStringBySeparator(ByteString("\n"), maximumChunkBytes = 1 * 1024 * 1024))
       .map(_.utf8String)
-      .runWith(SinkExt.collect)
+      .runWith(Sink.seq)
 
     whenReady(futLines zip futExpectedLines) { case (lines, expectedLines) =>
       lines.length shouldEqual expectedLines.length
