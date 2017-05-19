@@ -124,7 +124,7 @@ implicit val blockingEc = ExecutionContextForBlockingOps(someEc)
 implicit val esClient: Client = // ...
 
 EsStream
-  .queryAsAsStream(
+  .queryAsStream(
     QueryBuilders.matchAllQuery(),
     index = "index",
     `type` = "type",
