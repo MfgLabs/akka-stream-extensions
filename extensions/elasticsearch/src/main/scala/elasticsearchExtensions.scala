@@ -33,7 +33,7 @@ trait EsStream {
     index           : String,
     `type`          : String,
     scrollKeepAlive : FiniteDuration,
-    scrollSize      : Int,
+    scrollSize      : Int
   )(implicit es: EsClient, ec: ExecutionContextForBlockingOps): Source[String, NotUsed] = {
     searchStream(index, scrollKeepAlive, scrollSize){ srb =>
       srb.setQuery(query)
