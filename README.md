@@ -14,7 +14,7 @@ We have been developing this library in the context of [MFG Labs](http://mfglabs
 
 ## How-To
 
-Scaladoc is available [there](http://mfglabs.github.io/akka-stream-extensions/api/#package).
+Scaladoc is available [there](http://mfglabs.github.io/akka-stream-extensions/api/current).
 
 
 ### Add resolvers to your `build.sbt`
@@ -62,7 +62,7 @@ someBinaryStream
     )
   )
 ```
-Many more helpers, check the [Scaladoc](http://mfglabs.github.io/akka-stream-extensions/api/#package)!
+Many more helpers, check the [Scaladoc](http://mfglabs.github.io/akka-stream-extensions/api/current)!
 
 ## Postgres extension
 
