@@ -88,7 +88,7 @@ lazy val docSettings = Seq(
     file("README.md") -> "_includes/README.md"
   ),
   scalacOptions in (ScalaUnidoc, unidoc) ++= Seq(
-    "-doc-source-url", scmInfo.value.get.browseUrl + "/tree/master€{FILE_PATH}.scala",
+    "-doc-source-url", scmInfo.value.get.browseUrl + s"/tree/${version.value}€{FILE_PATH}.scala",
     "-sourcepath", baseDirectory.in(LocalRootProject).value.getAbsolutePath
   ),
   git.remoteRepo := "git@github.com:MfgLabs/akka-stream-extensions.git",
