@@ -28,7 +28,7 @@ resolvers += Resolver.bintrayRepo("mfglabs", "maven")
 Currently depends on `akka-stream-2.4.18`
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.11.1"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.11.2"
 ```
 
 Changelog [here](CHANGES.md)
@@ -71,7 +71,7 @@ This extension provides tools to stream data from/to Postgres.
 ### Dependencies
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.11.0"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-postgres" % "0.11.2"
 ```
 
 ### Prerequisites
@@ -111,7 +111,7 @@ someLineStream
 ### Dependencies
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-elasticsearch" % "0.11.0"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-elasticsearch" % "0.11.2"
 ```
 
 ### Sample
@@ -144,7 +144,7 @@ For more details on the history of this extension, read [this article](http://ma
 ### Dependencies
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-shapeless" % "0.11.0"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions-shapeless" % "0.11.2"
 ```
 
 ### Sample

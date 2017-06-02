@@ -1,5 +1,9 @@
 # MFG Akka-Stream-Extensions #
 
+### Version 0.11.2 ###
+* Add a `Debounce` graph which wrap elements in `Ok` or `Ko` depending on whether they are the first occurence in the given time window.
+* Add `Flow.debounce` which keep only the fist occurence of an element in the given time window.
+
 ### Version 0.11.1 ###
 * Fix `tut-plugin` bug which added `tut-core` to the POM [#28](https://github.com/MfgLabs/akka-stream-extensions/pull/28).
 

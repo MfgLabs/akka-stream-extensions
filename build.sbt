@@ -58,7 +58,11 @@ resolvers in ThisBuild ++= Seq(
 lazy val commonSettings = Seq(
   scmInfo := Some(ScmInfo(url("https://github.com/MfgLabs/akka-stream-extensions"),
     "git@github.com:MfgLabs/akka-stream-extensions.git")),
-  libraryDependencies += "org.scalatest" %% "scalatest" % ScalaTest % Test
+  libraryDependencies ++= Seq(
+    "com.typesafe.akka" %% "akka-stream" % Akka,
+    "com.typesafe.akka" %% "akka-stream-testkit" % Akka % Test,
+    "org.scalatest" %% "scalatest" % ScalaTest % Test
+  )
 )
 
 lazy val publishSettings = Seq(
@@ -119,9 +123,6 @@ site.jekyllSupport()
 lazy val commons = project.in(file("commons"))
   .settings(
     name := "akka-stream-extensions",
-    libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-stream" % Akka
-    ),
     commonSettings,
     publishSettings
   )
@@ -132,7 +133,6 @@ lazy val postgres = project.in(file("extensions/postgres"))
     name := "akka-stream-extensions-postgres",
     resolvers += Resolver.bintrayRepo("softprops", "maven"),
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-stream"  % Akka,
       "org.postgresql"    % "postgresql"    % Postgresql % Provided
     ),
     commonSettings,
@@ -146,9 +146,8 @@ lazy val elasticsearch = project.in(file("extensions/elasticsearch"))
   .settings(
     name := "akka-stream-extensions-elasticsearch",
     libraryDependencies ++= Seq(
-      "com.typesafe.akka"   %% "akka-stream"         % Akka,
-      "org.elasticsearch"   % "elasticsearch"        % Elasticsearch   % Provided,
-      "net.java.dev.jna"    % "jna"                  % Jna             % Test
+      "org.elasticsearch"   % "elasticsearch"   % Elasticsearch   % Provided,
+      "net.java.dev.jna"    % "jna"             % Jna             % Test
     ),
     commonSettings,
     publishSettings
@@ -159,7 +158,6 @@ lazy val shapeless = project.in(file("extensions/shapeless"))
  .settings(
    name := "akka-stream-extensions-shapeless",
    libraryDependencies ++= Seq(
-     "com.typesafe.akka" %% "akka-stream" % Akka,
      "com.chuusai"       %% "shapeless"   % Shapeless
    ),
    commonSettings,

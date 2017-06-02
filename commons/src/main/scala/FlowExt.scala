@@ -13,6 +13,15 @@ import akka.stream.scaladsl._
 trait FlowExt {
 
   /**
+   * Create a Flow  which debounce messages with similar hashes
+   */
+  def debounce[A](per: FiniteDuration, toHash: A => String): Flow[A, A, NotUsed] = {
+    Flow[A]
+      .via(Debounce(per, toHash))
+      .collect { case Debounced.Ok(elem) => elem }
+  }
+
+  /**
    * Create a Flow whose creation depends on the first element of the upstream.
    * @param includeHeadInUpStream true if we want the first element of the upstream to be included in the dowstream.
    * @param f takes the first element of upstream in input and returns the resulting flow
