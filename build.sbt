@@ -7,13 +7,13 @@ import sbtrelease.ReleaseStateTransformations._
 import sbtrelease.Utilities._
 import sbtunidoc.Plugin.UnidocKeys._
 
-val Akka            = "2.4.18"
+val Akka            = "2.5.12"
 val Elasticsearch   = "2.4.5"
 val Jna             = "4.4.0"
 val Postgresql      = "42.1.1"
-val Shapeless       = "2.3.2"
-val Scala           = "2.12.2"
-val ScalaTest       = "3.0.3"
+val Shapeless       = "2.3.3"
+val Scala           = "2.12.6"
+val ScalaTest       = "3.0.5"
 
 organization in ThisBuild := "com.mfglabs"
 
@@ -21,7 +21,7 @@ name in ThisBuild := "akka-stream-extensions"
 
 scalaVersion in ThisBuild := Scala
 
-crossScalaVersions in ThisBuild := Seq("2.11.11", Scala)
+crossScalaVersions in ThisBuild := Seq("2.11.12", Scala)
 
 publishMavenStyle in ThisBuild := true
 

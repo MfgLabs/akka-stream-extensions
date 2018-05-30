@@ -3,11 +3,11 @@ package com.mfglabs.stream
 import java.io.{FileInputStream, InputStream, File}
 import java.util.zip.GZIPInputStream
 
-import akka.NotUsed
+import akka.{Done, NotUsed}
 import akka.stream.scaladsl._
 import akka.util.ByteString
 import akka.actor.ActorRef
-import com.mfglabs.stream.internals.source.{UnfoldPullerAsync, BulkPullerAsync, BulkPullerAsyncWithErrorMgt, BulkPullerAsyncWithErrorExpBackoff}
+import com.mfglabs.stream.internals.source.{BulkPullerAsync, BulkPullerAsyncWithErrorMgt, BulkPullerAsyncWithErrorExpBackoff}
 
 import scala.concurrent._
 import scala.concurrent.duration.FiniteDuration
@@ -45,7 +45,7 @@ trait SourceExt {
    * @return
    */
   def fromGZIPFile(f: File, maxChunkSize: Int = defaultChunkSize): Source[ByteString, Future[akka.stream.IOResult]] =
-    StreamConverters.fromInputStream(() => new FileInputStream(f), maxChunkSize)
+    StreamConverters.fromInputStream(() => new GZIPInputStream(new FileInputStream(f)), maxChunkSize)
 
   /**
    * Create a source that calls the f function each time that downstream requests more elements.
@@ -108,17 +108,6 @@ trait SourceExt {
     Source.actorPublisher(BulkPullerAsyncWithErrorExpBackoff.props(offset, maxRetryDuration, retryMinInterval)(f))
 
   /**
-   * Create a source that calls the f function each time that downstream requests more elements.
-   * @param zero
-   * @param f pulling unfold function that takes a state B and produce optionally an element to push to downstream. It produces
-   *          a new state b if we want the stream to continue or no new state if we want the stream to end.
-   * @return
-   */
-  @deprecated("Since 0.11.0","Source now support unfoldAsync")
-  def unfoldPullerAsync[A, B](zero: => B)(f: B => Future[(Option[A], Option[B])]): Source[A, ActorRef] =
-    Source.actorPublisher(UnfoldPullerAsync.props[A, B](zero)(f))
-
-  /**
    * Create a source from the result of a Future redeemed when the stream is materialized.
    *
    * @param futB the future seed
@@ -155,7 +144,12 @@ trait SourceExt {
    * @tparam A
    * @return
    */
-  def constantLazyAsync[A](fut: => Future[A]): Source[A, ActorRef] = constantLazy(fut).mapAsync(1)(identity)
+  def constantLazyAsync[A](fut: => Future[A]): Source[A, NotUsed] =
+    Source.unfoldResourceAsync[A, A](
+      { () => fut },
+      { a => Future.successful(Some(a)) },
+      { _ => Future.successful(Done) }
+    )
 
   /**
    * Create an infinite source of the same Lazy value evaluated only when the stream is materialized.
@@ -164,8 +158,12 @@ trait SourceExt {
    * @tparam A
    * @return
    */
-  def constantLazy[A](a: => A): Source[A, ActorRef] =
-    unfoldPullerAsync(a) { evaluatedA => Future.successful(Some(evaluatedA) -> Some(evaluatedA)) }
+  def constantLazy[A](a: => A): Source[A, NotUsed] =
+    Source.unfoldResourceAsync[A, A](
+      { () => Future.successful(a) },
+      { a => Future.successful(Some(a)) },
+      { _ => Future.successful(Done) }
+    )
 }
 
 object SourceExt extends SourceExt

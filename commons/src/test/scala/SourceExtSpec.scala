@@ -79,31 +79,6 @@ class SourceExtSpec extends FlatSpec with Matchers with ScalaFutures {
     ) { res => assert(res == elements)}
   }
 
-  "unfoldPullerAsync" should "perform a async unfold" in {
-    val futR = SourceExt.unfoldPullerAsync[Int, Int](0) {
-      case i if i < 100 => Future.successful(Option(i * 10) -> Option(i + 1))
-      case i if i == 100 => Future.successful(Option(i * 10) -> None)
-    }
-    .runWith(Sink.seq)
-
-    whenReady(futR) { result =>
-      result shouldEqual (for (i <- 0 to 100) yield i * 10).toSeq
-    }
-  }
-
-  it should "not end the stream when we push no element" in {
-    val futR = SourceExt.unfoldPullerAsync[Int, Int](0) {
-      case i if i < 100 && i % 2 == 0 => Future.successful(None -> Option(i + 1))
-      case i if i < 100 => Future.successful(Option(i * 10) -> Option(i + 1))
-      case i if i == 100 => Future.successful(None -> None)
-    }
-    .runWith(Sink.seq)
-
-    whenReady(futR) { result =>
-      result shouldEqual (for (i <- (0 to 100).filterNot(_ % 2 == 0)) yield i * 10).toSeq
-    }
-  }
-
   "bulkAsyncPullerWithMaxRetries" should "manage max retry failure" in {
     @volatile var i = 0
 

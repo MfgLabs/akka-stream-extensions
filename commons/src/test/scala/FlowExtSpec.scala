@@ -232,15 +232,4 @@ class FlowExtSpec extends FlatSpec with Matchers with ScalaFutures {
       seq should equal ((1 to 10).flatMap(i => List(i, i, i)))
     }
   }
-
-  "takeWhile" should "end a stream when a condition is met" in {
-    val range = 1 to 100
-
-    val source = Source(range).via(FlowExt.takeWhile(_ == 42))
-
-    whenReady(source.runWith(Sink.seq)) { seq =>
-      seq shouldEqual range.toSeq.takeWhile(_ == 42)
-    }
-  }
-
 }
