@@ -1,5 +1,10 @@
 # MFG Akka-Stream-Extensions #
 
+### Version 0.12.0 ###
+* Upgrade to akka `2.5.12` (still depends on deprecated stuff).
+* Deprecate `FlowExt.rechunkByteStringBySeparator` and `FlowExt.takeWhile`
+* Remove deprecated `SourceExt.unfoldPullerAsync`
+
 ### Version 0.11.2 ###
 * Add a `Debounce` graph which wrap elements in `Ok` or `Ko` depending on whether they are the first occurence in the given time window.
 * Add `Flow.debounce` which keep only the fist occurence of an element in the given time window.

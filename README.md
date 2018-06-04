@@ -25,10 +25,10 @@ resolvers += Resolver.bintrayRepo("mfglabs", "maven")
 
 ### Add dependencies to your `build.sbt`
 
-Currently depends on `akka-stream-2.4.18`
+Currently depends on `akka-stream-2.5.12`
 
 ```scala
-libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.11.2"
+libraryDependencies += "com.mfglabs" %% "akka-stream-extensions" % "0.12.0"
 ```
 
 Changelog [here](CHANGES.md)

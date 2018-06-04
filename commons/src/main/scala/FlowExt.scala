@@ -3,7 +3,6 @@ package com.mfglabs.stream
 import akka.NotUsed
 import akka.stream._
 import akka.stream.scaladsl._
-import akka.stream.stage._
 import akka.util.ByteString
 
 import scala.concurrent._
@@ -52,75 +51,14 @@ trait FlowExt {
     }
   }
 
-  /**
-   * Rechunk of stream of bytes according to a separator
-   * @param separator the separator to split the stream. For example ByteString("\n") to split a stream by lines.
-   * @param maximumChunkBytes the maximum possible size of a split to send downstream (in bytes). If no separator is found
-   *                          before reaching this limit, the stream fails.
-   * @return
-   */
-  def rechunkByteStringBySeparator(separator: ByteString, maximumChunkBytes: Int): Flow[ByteString, ByteString, NotUsed] = {
-    def stage = new PushPullStage[ByteString, ByteString] {
-      private val separatorBytes = separator
-      private val firstSeparatorByte = separatorBytes.head
-      private var buffer = ByteString.empty
-      private var nextPossibleMatch = 0
-
-      override def onPush(chunk: ByteString, ctx: Context[ByteString]): SyncDirective = {
-        buffer ++= chunk
-        emitChunkOrPull(ctx)
-      }
-
-      override def onPull(ctx: Context[ByteString]): SyncDirective = emitChunkOrPull(ctx)
-
-      private def emitChunkOrPull(ctx: Context[ByteString]): SyncDirective = {
-        val possibleMatchPos = buffer.indexOf(firstSeparatorByte, from = nextPossibleMatch)
-        if (possibleMatchPos == -1) {
-          // No matching character, we need to accumulate more bytes into the buffer
-          nextPossibleMatch = buffer.size
-          pushIfLastChunkOrElsePull(ctx)
-        } else if (possibleMatchPos + separatorBytes.size > buffer.size) {
-          // We have found a possible match (we found the first character of the terminator
-          // sequence) but we don't have yet enough bytes. We remember the position to
-          // retry from next time.
-          nextPossibleMatch = possibleMatchPos
-          pushIfLastChunkOrElsePull(ctx)
-        } else {
-          if (buffer.slice(possibleMatchPos, possibleMatchPos + separatorBytes.size) == separatorBytes) {
-            // Found a match
-            val nextChunk = buffer.slice(0, possibleMatchPos)
-            buffer = buffer.drop(possibleMatchPos + separatorBytes.size)
-            nextPossibleMatch -= possibleMatchPos + separatorBytes.size
-            ctx.push(nextChunk)
-          } else {
-            nextPossibleMatch += 1
-            pushIfLastChunkOrElsePull(ctx)
-          }
-        }
-      }
-
-      private def pushIfLastChunkOrElsePull(ctx: Context[ByteString]) = {
-        if (ctx.isFinishing) {
-          if (buffer.isEmpty) {
-            ctx.finish()
-          } else {
-            ctx.pushAndFinish(buffer) // last uncompleted line
-          }
-        }
-        else {
-          if (buffer.size > maximumChunkBytes)
-            ctx.fail(new IllegalStateException(s"Read ${buffer.size} bytes " +
-              s"which is more than $maximumChunkBytes without seeing a line terminator"))
-          else
-            ctx.pull()
-        }
-      }
-
-      override def onUpstreamFinish(ctx: Context[ByteString]): TerminationDirective = ctx.absorbTermination()
-    }
-
-    Flow[ByteString].transform(() => stage)
+  @deprecated("Since 0.12.0", "Use Framing.delimiter")
+  def rechunkByteStringBySeparator(
+    separator         : ByteString,
+    maximumChunkBytes : Int
+  ): Flow[ByteString, ByteString, NotUsed] = {
+    Flow[ByteString].via(Framing.delimiter(separator, maximumChunkBytes, allowTruncation = true))
   }
+
 
   /**
    * Limit downstream rate to one element every 'interval' by applying back-pressure on upstream.
@@ -152,44 +90,8 @@ trait FlowExt {
    * @param chunkSize the new chunk size
    * @return
    */
-  def rechunkByteStringBySize(chunkSize: Int): Flow[ByteString, ByteString, NotUsed] = {
-    def stage = new PushPullStage[ByteString, ByteString] {
-      private var buffer = ByteString.empty
-
-      override def onPush(elem: ByteString, ctx: Context[ByteString]): SyncDirective = {
-        buffer ++= elem
-        emitChunkOrPull(ctx)
-      }
-
-      override def onPull(ctx: Context[ByteString]): SyncDirective = emitChunkOrPull(ctx)
-
-      private def emitChunkOrPull(ctx: Context[ByteString]): SyncDirective = {
-        if (ctx.isFinishing) {
-          if (buffer.isEmpty) {
-            ctx.finish()
-          } else if (buffer.length < chunkSize) {
-            ctx.pushAndFinish(buffer)
-          } else {
-            val (emit, nextBuffer) = buffer.splitAt(chunkSize)
-            buffer = nextBuffer
-            ctx.push(emit)
-          }
-        } else {
-          if (buffer.length < chunkSize) {
-            ctx.pull()
-          } else {
-            val (emit, nextBuffer) = buffer.splitAt(chunkSize)
-            buffer = nextBuffer
-            ctx.push(emit)
-          }
-        }
-      }
-
-      override def onUpstreamFinish(ctx: Context[ByteString]): TerminationDirective = ctx.absorbTermination()
-    }
-
-    Flow[ByteString].transform(() => stage)
-  }
+  def rechunkByteStringBySize(chunkSize: Int): Flow[ByteString, ByteString, NotUsed] =
+    Flow[ByteString].via(new Chunker(chunkSize))
 
   /**
    * Fold and/or unfold the stream with an user-defined function.
@@ -201,70 +103,10 @@ trait FlowExt {
    *                               are pushed downstream as the last elements of the stream.
    * @return
    */
-  def customStatefulProcessor[A, B, C](zero: => B)
-                             (f: (B, A) => (Option[B], IndexedSeq[C]),
-                              lastPushIfUpstreamEnds: B => IndexedSeq[C] = {_: B => IndexedSeq.empty}): Flow[A, C, NotUsed] = {
-    def stage = new PushPullStage[A, C] {
-      private var state: B = _
-      private var buffer = Vector.empty[C]
-      private var finishing = false
-
-      override def onPush(elem: A, ctx: Context[C]): SyncDirective = {
-        if (state == null) state = zero // to keep the laziness of zero
-        f(state, elem) match {
-          case (Some(b), cs) =>
-            state = b
-            buffer ++= cs
-            emitChunkOrPull(ctx)
-          case (None, cs) =>
-            buffer ++= cs
-            finishing = true
-            emitChunkOrPull(ctx)
-        }
-      }
-
-      override def onPull(ctx: Context[C]): SyncDirective = {
-        if (state == null) state = zero // to keep the laziness of zero
-        emitChunkOrPull(ctx)
-      }
-
-      private def emitChunkOrPull(ctx: Context[C]): SyncDirective = {
-        if (finishing) { // customProcessor is ending
-          buffer match {
-            case Seq() => ctx.finish()
-            case elem +: nextBuffer =>
-              buffer = nextBuffer
-              ctx.push(elem)
-          }
-        } else if (ctx.isFinishing) { // upstream ended
-          buffer match {
-            case Seq() =>
-              lastPushIfUpstreamEnds(state) match {
-                case Seq() => ctx.finish()
-                case elem +: nextBuffer =>
-                  finishing = true
-                  buffer = nextBuffer.toVector
-                  ctx.push(elem)
-              }
-            case elem +: nextBuffer =>
-              buffer = nextBuffer
-              ctx.push(elem)
-          }
-        } else {
-          buffer match {
-            case Seq() => ctx.pull()
-            case elem +: nextBuffer =>
-              buffer = nextBuffer
-              ctx.push(elem)
-          }
-        }
-      }
-
-      override def onUpstreamFinish(ctx: Context[C]): TerminationDirective = ctx.absorbTermination()
-    }
-
-    Flow[A].transform(() => stage)
-  }
+  def customStatefulProcessor[A, B, C](zero: => B)(
+    f: (B, A) => (Option[B], IndexedSeq[C]),
+    lastPushIfUpstreamEnds: B => IndexedSeq[C] = { _: B => IndexedSeq.empty }
+  ): Flow[A, C, NotUsed] = Flow[A].via(new StatefulProcessor(zero, f, lastPushIfUpstreamEnds))
 
   /**
    * Unfold a stream with an user-defined function.
@@ -304,12 +146,8 @@ trait FlowExt {
    * @tparam A
    * @return
    */
-  def takeWhile[A](f: A => Boolean): Flow[A, A, NotUsed] = {
-    customStatelessProcessor { a =>
-      if (!f(a)) (Vector.empty, true)
-      else (Vector(a), false)
-    }
-  }
+  @deprecated("Since 0.12.0","Flow now support takeWhile")
+  def takeWhile[A](f: A => Boolean): Flow[A, A, NotUsed] = Flow[A].takeWhile(f)
 
   /**
    * Zip a stream with a lazy future that will be evaluated only when the stream is materialized.
